@@ -20,6 +20,10 @@ public class CalendarServlet extends HttpServlet {
     eventList = new ArrayList<CalendarEvent>();
   }
 
+  /**
+   * Retrieves the new calendar event's information from the POST request. Creates a new instance of
+   * the CalendarEvent class and adds it to a list of calendar events.
+   */
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Gson gson = new Gson();
