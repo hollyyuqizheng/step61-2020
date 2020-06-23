@@ -21,11 +21,6 @@ public class CalendarServlet extends HttpServlet {
   }
 
   @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    // TODO
-  }
-
-  @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Gson gson = new Gson();
     CalendarEvent event = gson.fromJson(request.getReader(), CalendarEvent.class);
