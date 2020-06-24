@@ -1,6 +1,6 @@
 package com.google.sps.data;
 
-/** Models a task that the user creates. */
+/** Models a task. It can be used for both creation and import flow. */
 public final class Task {
 
   private final String name;
@@ -8,7 +8,7 @@ public final class Task {
   private final Integer durationMinute;
   private final Integer priority;
 
-  // TODO: does a task need an ID?
+  // TODO(raulcruise): Add an ID field if necessary.
 
   public Task(String name, String description, Integer durationMinute, Integer priority) {
     if (durationMinute == null) {

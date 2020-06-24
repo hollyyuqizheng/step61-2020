@@ -18,11 +18,11 @@
 
 <body>
   <div id="new-task-wrapper">
-    <h2>What are your work hours for today?</h2>
+    <h2>What are your working hours for today?</h2>
     <span>
-    <input type="time" id="work-hour-start" name="work-hour-start" value="09:00">
-      to
-    <input type="time" id="work-hour-end" name="work-hour-end" value="17:00">
+      <input type="time" id="working-hour-start" name="working-hour-start" value="09:00">
+        to
+      <input type="time" id="working-hour-end" name="working-hour-end" value="17:00">
     </span>
 
     <h2>Add new tasks</h2> 
@@ -34,20 +34,18 @@
       <label for="new-task-estimated-length">Estimated length:</label>
       <input type="text" id="new-task-estimated-length" name="new-task-estimated-length">
       <select id="new-task-estimated-length-unit" name="new-task-estimated-length-unit">
-          <option value="minute">minutes(s)</option>
-          <option value="hour">hour(s)</option>
-          <option value="day">day(s)</option>
+        <option value="minute">minutes(s)</option>
+        <option value="hour">hour(s)</option>
+        <option value="day">day(s)</option>
       </select> 
       <br>
-      <label for="new-task-due-date">Due date:</label>
-      <input type="date" id="new-task-due-date" name="new-task-due-date"><br>
       <label for="new-task-priority">Task's priority:</label>
       <select id="new-task-priority" name="new-task-priority">
-          <option value="5">5 (High)</option>
-          <option value="4">4</option>
-          <option value="3">3</option>
-          <option value="2">2</option>
-          <option value="1">1 (Low)</option>
+        <option value="5">5 (High)</option>
+        <option value="4">4</option>
+        <option value="3">3</option>
+        <option value="2">2</option>
+        <option value="1">1 (Low)</option>
       </select><br>
       <button type="button" class="btn btn-primary">Add this task</button>
     </div>
@@ -63,13 +61,13 @@
       <label for="new-event-name">Event name:</label>
       <input type="text" id="new-event-name" name="new-event-name"><br>
       <span>
-      <label for="new-event-start-time">Start time:</label>
-      <input type="time" id="new-event-start-time" name="new-event-end-time" value="09:00">
+        <label for="new-event-start-time">Start time:</label>
+        <input type="time" id="new-event-start-time" name="new-event-end-time" value="09:00">
       </span>    
       <br> 
       <span> 
-      <label for="new-event-end-time">End time:</label>
-      <input type="time" id="new-event-end-time" name="new-event-end-time" value="20:00">
+        <label for="new-event-end-time">End time:</label>
+        <input type="time" id="new-event-end-time" name="new-event-end-time" value="20:00">
       </span>
       <br> 
       <button type="button" class="btn btn-primary" onclick="createNewCalendarEvent()">Add this task</button>
@@ -82,7 +80,7 @@
     <ol id="new-event-list"></ol> 
   </div>
   
-  <button type="button" class="btn btn-primary">Start scheduling!</button>
+  <button type="button" class="btn btn-primary" onclick="sendEventToServer()">Start scheduling!</button>
     
   <div id="schedule-result-wrapper">
     <h2>Your tasks are scheduled!</h2>

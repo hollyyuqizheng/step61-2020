@@ -14,10 +14,10 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/calendarServlet")
 public class CalendarServlet extends HttpServlet {
 
-  public List<CalendarEvent> eventList;
+  public List<CalendarEvent> events;
 
   public CalendarServlet() {
-    eventList = new ArrayList<CalendarEvent>();
+    events = new ArrayList<CalendarEvent>();
   }
 
   /**
@@ -27,7 +27,11 @@ public class CalendarServlet extends HttpServlet {
   @Override
   public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
     Gson gson = new Gson();
-    CalendarEvent event = gson.fromJson(request.getReader(), CalendarEvent.class);
-    eventList.add(event);
+    List<String> allEvents = gson.fromJson(request.getReader(), List.class);
+    allEvents.forEach(
+        (eventString) -> {
+          CalendarEvent event = gson.fromJson(eventString, CalendarEvent.class);
+          events.add(event);
+        });
   }
 }

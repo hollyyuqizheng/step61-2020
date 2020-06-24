@@ -1,34 +1,36 @@
 package com.google.sps.data;
 
-/** Models a calendar event that the user creates. */
+import java.time.Instant;
+
+/** Models a calendar event. It can be used for both creation and import flow. */
 public class CalendarEvent {
   private final String name;
-  private final String startTime;
-  private final String endTime;
+  private final String startTimeString;
+  private final String endTimeString;
 
-  // TODO: does an event need an ID?
+  // TODO(hollyyuqizheng): Add an ID field if necessary.
 
-  public CalendarEvent(String name, String startTime, String endTime) {
-    if (startTime == null) {
+  public CalendarEvent(String name, String startTimeString, String endTimeString) {
+    if (startTimeString == null) {
       throw new IllegalArgumentException("Event needs a start time");
     }
-    if (endTime == null) {
+    if (endTimeString == null) {
       throw new IllegalArgumentException("Event needs an end time");
     }
     this.name = name;
-    this.startTime = startTime;
-    this.endTime = endTime;
+    this.startTimeString = startTimeString;
+    this.endTimeString = endTimeString;
   }
 
   public String getName() {
     return name;
   }
 
-  public String getStartTime() {
-    return startTime;
+  public Instant getStartTimeInstant() {
+    return Instant.parse(startTimeString);
   }
 
-  public String getEndTime() {
-    return endTime;
+  public Instant getEndTimeInstant() {
+    return Instant.parse(endTimeString);
   }
 }
