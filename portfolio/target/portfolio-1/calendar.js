@@ -75,6 +75,7 @@ function updateCalendarEventList(newCalendarEvent) {
   eventList.appendChild(newEventElement); 
 }
 
+/** Performs the POST request to send the event list to calendar servlet. */
 function sendEventToServer() {
   fetch('/calendarServlet', {method: 'POST', body: JSON.stringify(allEventJson)});
 }

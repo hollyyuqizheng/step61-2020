@@ -9,6 +9,11 @@ import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public final class CalendarEventTest {
+
+  /**
+   * Testing calendar event initialization and conversion between String and Instant for the start
+   * and end times.
+   */
   @Test
   public void TestTimeStringConversion() {
     CalendarEvent event =
