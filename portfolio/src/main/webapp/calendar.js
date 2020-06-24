@@ -4,6 +4,7 @@
  * to the calendar servlet through a POST request. 
  * This class contains all the event information that can be easily
  * converted into a JSON string. 
+ * All fields are required. 
  */
 class CalendarEvent {
   constructor(name, startTime, endTime) {
