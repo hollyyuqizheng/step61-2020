@@ -4,6 +4,7 @@
  * to the task servlet through a POST request. 
  * This class contains all the task information that can be easily
  * converted into a JSON string. 
+ * All fields are required. 
  */
 class Task {
   constructor(name, description, durationMinutes, priority) {
