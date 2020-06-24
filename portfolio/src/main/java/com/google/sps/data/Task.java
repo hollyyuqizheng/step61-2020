@@ -8,19 +8,29 @@ public final class Task {
   private final String name;
   private final String description;
   private final Duration durationMinute;
-  private final Integer priority;
+  private final TaskPriority priority;
 
   // TODO(raulcruise): Add an ID field if necessary.
 
+  // The constructor will make sure that all necessary parameters are passed in,
+  // and populate each class variable appropriately.
   public Task(String name, String description, Duration durationMinute, Integer priority) {
+    if (name == null) {
+      throw new IllegalArgumentException("Name cannot be null");
+    }
+
     if (durationMinute == null) {
-      throw new IllegalArgumentException("Task needs a duration");
+      throw new IllegalArgumentException("Duration cannot be null");
+    }
+
+    if (priority == null) {
+      throw new IllegalArgumentException("Priority cannot be null");
     }
 
     this.name = name;
     this.description = description;
     this.durationMinute = durationMinute;
-    this.priority = priority;
+    this.priority = new TaskPriority(priority);
   }
 
   public String getName() {
@@ -36,6 +46,6 @@ public final class Task {
   }
 
   public Integer getPriority() {
-    return priority;
+    return priority.getPriority();
   }
 }
