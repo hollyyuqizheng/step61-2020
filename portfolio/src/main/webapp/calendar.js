@@ -57,8 +57,8 @@ function getTimeObject(timeString) {
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth();
   const currentDate = today.getDate();
-  const timeHour = timeString.split(":")[0]; 
-  const timeMinute = timeString.split(":")[1]; 
+  const timeHour = timeString.split(":")[0];
+  const timeMinute = timeString.split(":")[1];
   return new Date(
       currentYear, currentMonth, currentDate, timeHour, timeMinute); 
 }
