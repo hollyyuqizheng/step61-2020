@@ -1,9 +1,8 @@
-#event-end-time-warning {
-  visibility: hidden; 
+#event-end-time-warning,
+#event-duplicate-warning {
+  visibility: hidden;
 }
 
-.new-event-card {
-  border-style: solid; 
-  height: 300px;
-  width: 400px; 
+#new-event-list-wrapper {
+  width: 30%;
 }

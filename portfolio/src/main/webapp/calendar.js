@@ -21,8 +21,6 @@ class CalendarEvent {
   }
 }
 
-let allEvents = new Set();
-
 /**
  * Onclick function for "Add this event" button.
  * Retrieves the new event's name, start and end times, and creates a new
@@ -52,10 +50,20 @@ function createNewCalendarEventUserInput() {
         'hidden';
     const newCalendarEvent = new CalendarEvent(eventName, startTime, endTime);
 
-    // Use the allEvents set to ensure that duplicate events
-    // do not get displayed on the UI.
+    // Get all the events currently displayed on the UI.
+    // Look through this set of events to ensure that duplicate events
+    // do not get added again.
     const newEventJson = JSON.stringify(newCalendarEvent);
-    if (!allEvents.has(newEventJson)) {
+    const allEvents = collectAllEvents();
+
+    let doesEventExist = false;
+    allEvents.forEach((existingEvent) => {
+      if (existingEvent === newEventJson) {
+        doesEventExist = true;
+      }
+    });
+
+    if (! doesEventExist) {
       document.getElementById('event-duplicate-warning').style.visibility =
           'hidden';
       updateCalendarEventList(newCalendarEvent);
@@ -83,9 +91,9 @@ function getTimeObject(timeString) {
   return new Date(currentYear, currentMonth, currentDate, timeHour, timeMinute);
 }
 
-/** Creates a single element for a new calendar event. */
+/** Creates a card element for a new calendar event. */
 function updateCalendarEventList(newCalendarEvent) {
-  const newEventCard = document.createElement('div');
+  const newEventCard = document.createElement('div'); 
   newEventCard.classList.add('card');
 
   const cardBody = document.createElement('div');
@@ -117,16 +125,13 @@ function updateCalendarEventList(newCalendarEvent) {
   eventList.innterHTML = '';
   eventList.appendChild(newEventCard);
 
-  deleteButton.onclick = function(
-      newEventCard, cardTitle, startTimeText, endTimeText) {
-    newEventCard.target.closest('div.card').remove();
-    console.log(cardTitle);
-    const event = new CalendarEvent(cardTitle, startTimeText, endTimeText);
-    allEvents.delete(JSON.stringify(event));
+  // The delete button removes the event's card from the UI. 
+  deleteButton.onclick = function(newEventCard) {
+    newEventCard.target.closest('div.card').remove(); 
   }
 }
 
-/** Collects all the events currently displayed on the UI. */
+/** Collects and returns all the events currently displayed on the UI. */
 function collectAllEvents() {
   // A set for all calendar events displayed on the UI.
   // Each element in this set is a Json string.
@@ -139,10 +144,12 @@ function collectAllEvents() {
   // Add all event information to a set of all Json strings.
   eventList.childNodes.forEach((eventCard) => {
     const eventName = eventCard.childNodes[0].childNodes[0].innerText;
-    const startTime = eventCard.childNodes[0].childNodes[1].innerText;
-    const endTime = eventCard.childNodes[0].childNodes[2].innerText;
+    const startTime = new Date(eventCard.childNodes[0].childNodes[1].innerText);
+    const endTime = new Date(eventCard.childNodes[0].childNodes[2].innerText);
     const event = new CalendarEvent(eventName, startTime, endTime);
     const eventJson = JSON.stringify(event);
     allEventJson.add(eventJson);
   });
+
+  return allEventJson; 
 }

@@ -29,7 +29,6 @@
     <script src="calendar.js"></script>
 
     <!-- Files for Jasmine, Unit testing tool for Javascript -->
-    <link rel="stylesheet" type="text/css" href="jasmine/lib/jasmine-3.5.0/jasmine.css" />
     <script src="jasmine/lib/jasmine-3.5.0/jasmine.js"></script>
     <script src="jasmine/lib/jasmine-3.5.0/jasmine-html.js"></script>
     <script src="jasmine/lib/jasmine-3.5.0/boot.js"></script>
@@ -89,13 +88,18 @@
           <input type="time" id="new-event-end-time" name="new-event-end-time" value="20:00" />
         </span>
         <br />
-        <button type="button" class="btn btn-primary" onclick="createNewCalendarEvent()">Add this task</button>
+        <button type="button" class="btn btn-primary" onclick="createNewCalendarEventUserInput()">Add this task</button>
       </div>
     </div>
 
     <div id="new-event-list-wrapper">
       <h2>Events added:</h2>
-      <h3 id="event-end-time-warning">End time must be later than start time.</h3>
+      <div class="alert alert-secondary" role="alert" id="event-end-time-warning">
+        End time must be later than start time.
+      </div>
+      <div class="alert alert-secondary" role="alert" id="event-duplicate-warning">
+        This event has already been already added.
+      </div>
       <div id="new-event-list"></div>
     </div>
 
