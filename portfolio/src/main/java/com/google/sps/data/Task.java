@@ -23,7 +23,7 @@ public final class Task {
    * as it is optional. If the description is passed in as null then it will be stored as an empty
    * Optional object.
    */
-  public Task(String name, String description, Duration duration, Integer priority) {
+  public Task(String name, String description, Duration duration, TaskPriority priority) {
     if (name == null) {
       throw new IllegalArgumentException("Name cannot be null");
     }
