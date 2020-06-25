@@ -4,14 +4,15 @@ package com.google.sps.data;
 public final class TaskPriority {
   private final int priority;
 
-  TaskPriority(int priority) {
-    if (priority >= 1 || priority <= 5) {
+  public TaskPriority(int priority) {
+    if (priority < 1 || priority > 5) {
       throw new IllegalArgumentException("Priority must be a value from 1 to 5.");
     }
+
     this.priority = priority;
   }
 
-  int getPriority() {
+  public int getPriority() {
     return priority;
   }
 }
