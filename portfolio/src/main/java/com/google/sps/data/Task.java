@@ -9,7 +9,6 @@ import java.util.Optional;
  * description will be stored as an empty Optional object.
  */
 public final class Task {
-
   private final String name;
   private final Optional<String> description;
   private final Duration duration;
