@@ -17,8 +17,12 @@ public final class Task {
 
   // TODO(raulcruise): Add an ID field if necessary.
 
-  // The constructor will make sure that all necessary parameters are passed in,
-  // and populate each class variable appropriately.
+  /**
+   * The constructor will make sure that all necessary parameters are passed in, and populate each
+   * class variable appropriately. None of the fields can be null with exception to the description
+   * as it is optional. If the description is passed in as null then it will be stored as an empty
+   * Optional object.
+   */
   public Task(String name, String description, Duration duration, Integer priority) {
     if (name == null) {
       throw new IllegalArgumentException("Name cannot be null");
