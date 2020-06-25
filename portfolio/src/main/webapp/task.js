@@ -11,15 +11,15 @@ class Task {
   /**
    * All fields are required except description, which will be null
    * when not set.
-   * @param name: name of task
-   * @param description: description of task, can be null
-   * @param durationMinutes: duration of task in minutes
+   * @param name: name of task as String
+   * @param description: description of task as String, can be null
+   * @param duration: duration of task as Duration class
    * @param priority: priority level of task, range 1-5 inclusive. 
    */
-  constructor(name, description, durationMinutes, priority) {
+  constructor(name, description, duration, priority) {
     this.name = name;
     this.description = description;
-    this.durationMinutes = durationMinutes;
+    this.duration = duration;
     this.priority = priority;
   }
 }
