@@ -44,7 +44,7 @@ public class ScheduleRequest {
     this.endTime = Instant.parse(endTimeString);
   }
 
-  /* Because all three fields are required, the following getters won't return null. */
+  /* Because all four fields are required, the following getters won't return null. */
   public Collection<CalendarEvent> getEvents() {
     return events;
   }
