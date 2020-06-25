@@ -4,6 +4,10 @@
  * to the calendar servlet through a POST request. 
  * This class contains all the event information that can be easily
  * converted into a JSON string. 
+ * All fields are required. 
+ * @param name: of type String, name of event
+ *        startTime: of type Date in format "Day Month Date Year HH:MM:SS GMT-Time Zone" 
+ *        endTime: of type Date in format "Day Month Date Year HH:MM:SS GMT-Time Zone"
  */
 class CalendarEvent {
   constructor(name, startTime, endTime) {
@@ -12,8 +16,6 @@ class CalendarEvent {
     this.endTime = endTime;
   }
 }
-
-let allEventJson = []; 
 
 /** 
  * Onclick function for "Add this event" button.
@@ -39,12 +41,8 @@ function createNewCalendarEvent() {
   } else {
     document.getElementById('event-end-time-warning').style.visibility = 'hidden';
     const newCalendarEvent = new CalendarEvent(eventName, startTime, endTime);
-
     updateCalendarEventList(newCalendarEvent); 
-    document.getElementById('new-event-name').value = ''; 
-
-    const newEventJson = JSON.stringify(newCalendarEvent);
-    allEventJson.push(newEventJson);  
+    document.getElementById('new-event-name').value = 'New Event';  
   }
 }
 
@@ -57,7 +55,7 @@ function getTimeObject(timeString) {
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth();
   const currentDate = today.getDate();
-  const timeHour = timeString.split(":")[0]; 
+  const timeHour = timeString.split(":")[0];
   const timeMinute = timeString.split(":")[1];
   return new Date(
       currentYear, currentMonth, currentDate, timeHour, timeMinute); 
@@ -75,7 +73,21 @@ function updateCalendarEventList(newCalendarEvent) {
   eventList.appendChild(newEventElement); 
 }
 
-/** Performs the POST request to send the event list to calendar servlet. */
-function sendEventToServer() {
-  fetch('/calendarServlet', {method: 'POST', body: JSON.stringify(allEventJson)});
+/** Collects all the events currently displayed on the UI. */
+function collectAllEvents() {
+  // A set for all calendar events displayed on the UI.
+  // Each element in this set is a Json string. 
+  allEventJson = new Set(); 
+
+  const eventList = document.getElementById('new-event-list');
+  
+  eventList.childNodes.forEach((eventCard) => {
+    const eventName = eventCard.childNodes[0].childNodes[0].innerText; 
+    const startTime = eventCard.childNodes[0].childNodes[1].innerText; 
+    const endTime = eventCard.childNodes[0].childNodes[2].innerText; 
+    const event = new CalendarEvent(eventName, startTime, endTime);
+    const eventJson = JSON.stringify(event); 
+    allEventJson.add(eventJson); 
+  }); 
+  console.log(allEventJson); 
 }
