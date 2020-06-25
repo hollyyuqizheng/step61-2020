@@ -1,0 +1,9 @@
+#event-end-time-warning {
+  visibility: hidden; 
+}
+
+.new-event-card {
+  border-style: solid; 
+  height: 300px;
+  width: 400px; 
+}
