@@ -1,12 +1,17 @@
 package com.google.sps.data;
 
 import java.time.Duration;
+import java.util.Optional;
 
-/** Models a task. It can be used for both creation and import flow. */
+/**
+ * Models a task. It can be used for both creation and import flow. The description variable is
+ * optional while all other fields are required. If a null is passed in for the description, then
+ * description will be stored as an empty Optional object.
+ */
 public final class Task {
 
   private final String name;
-  private final String description;
+  private final Optional<String> description;
   private final Duration durationMinute;
   private final TaskPriority priority;
 
@@ -28,7 +33,7 @@ public final class Task {
     }
 
     this.name = name;
-    this.description = description;
+    this.description = Optional.ofNullable(description);
     this.durationMinute = durationMinute;
     this.priority = new TaskPriority(priority);
   }
@@ -37,7 +42,7 @@ public final class Task {
     return name;
   }
 
-  public String getDescription() {
+  public Optional<String> getDescription() {
     return description;
   }
 
