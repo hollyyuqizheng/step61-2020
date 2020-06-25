@@ -39,7 +39,7 @@ public final class Task {
     this.name = name;
     this.description = Optional.ofNullable(description);
     this.duration = duration;
-    this.priority = new TaskPriority(priority);
+    this.priority = priority;
   }
 
   public String getName() {
