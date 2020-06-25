@@ -17,10 +17,10 @@ public class ScheduleRequest {
    *
    * @param events: events happening the day of the scheduling,
    * @param tasks: the tasks a user would like to schedule on that day
-   * @param startTimeString: a string representation of the event's start time.
-   *     The string is in format Day Month Date Year HH:MM:SS GMT-Time-zone
-   * @param endTimeString: a string representation of the event's end time. The
-   *    string's format is the same as startTimeString's.
+   * @param startTimeString: a string representation of the work hours start 
+   *     time. The string is in format Day Month Date Year HH:MM:SS GMT-Time-zone
+   * @param endTimeString: a string representation of the work hours end time. 
+   *     The string's format is the same as startTimeString's.
    * All of these fields are required for a request (can be empty not null).
    */
   public ScheduleRequest(Collection<CalendarEvent> events, Collection<Task> tasks,
@@ -44,7 +44,7 @@ public class ScheduleRequest {
     this.workHoursEndTime = Instant.parse(workHoursEndTimeString);
   }
 
-  /* Because all three fields are required, the following getters won't return null. */
+  /* Because all four fields are required, the following getters won't return null. */
   public Collection<CalendarEvent> getEvents() {
     return events;
   }
@@ -52,18 +52,18 @@ public class ScheduleRequest {
   public Collection<Task> getTasks() {
     return tasks;
   }
-  public Instant getWorkStartTimeInstant() {
+  public Instant getWorkHoursStartTimeInstant() {
     return workHoursStartTime;
   }
-  public Instant getWorkEndTimeInstant() {
+  public Instant getWorkHoursEndTimeInstant() {
     return workHoursEndTime;
   }
 
-  public long getWorkStartTimeLong() {
+  public long getWorkHoursStartTimeLong() {
     return workHoursStartTime.getEpochSecond();
   }
 
-  public long getWorkEndTimeLong() {
+  public long getWorkHoursEndTimeLong() {
     return workHoursEndTime.getEpochSecond();
   }
 }
