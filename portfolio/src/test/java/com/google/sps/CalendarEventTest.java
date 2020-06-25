@@ -15,7 +15,7 @@ public final class CalendarEventTest {
    * and end times.
    */
   @Test
-  public void TestTimeStringConversion() {
+  public void testTimeStringConversion() {
     CalendarEvent event =
         new CalendarEvent(
             /* name= */ "test",

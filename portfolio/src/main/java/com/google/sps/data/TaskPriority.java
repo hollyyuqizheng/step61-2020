@@ -4,8 +4,12 @@ package com.google.sps.data;
 public final class TaskPriority {
   private final int priority;
 
+  // Constants for minimum and maximum priority levels.
+  public static int MIN_PRIORITY = 1;
+  public static int MAX_PRIORITY = 5;
+
   public TaskPriority(int priority) {
-    if (priority < 1 || priority > 5) {
+    if (priority < MIN_PRIORITY || priority > MAX_PRIORITY) {
       throw new IllegalArgumentException("Priority must be a value from 1 to 5.");
     }
 

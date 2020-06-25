@@ -8,8 +8,6 @@ import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
 public final class TaskPriorityTest {
-  private static final int MAX_ACCEPTABLE_VALUE = 5;
-  private static final int MIN_ACCEPTABLE_VALUE = 1;
 
   /**
    * Expect the TaskPriority constructor to throw an IllegalArgumentException if it is passed a
@@ -48,10 +46,10 @@ public final class TaskPriorityTest {
 
   @Test
   public void maxAcceptableValue() {
-    int priority = MAX_ACCEPTABLE_VALUE;
+    int priority = TaskPriority.MAX_PRIORITY;
     TaskPriority taskPriority = new TaskPriority(priority);
 
-    int expected = MAX_ACCEPTABLE_VALUE;
+    int expected = TaskPriority.MAX_PRIORITY;
     int actual = taskPriority.getPriority();
 
     Assert.assertEquals(expected, actual);
@@ -59,10 +57,10 @@ public final class TaskPriorityTest {
 
   @Test
   public void minAcceptableValue() {
-    int priority = MIN_ACCEPTABLE_VALUE;
+    int priority = TaskPriority.MIN_PRIORITY;
     TaskPriority taskPriority = new TaskPriority(priority);
 
-    int expected = MIN_ACCEPTABLE_VALUE;
+    int expected = TaskPriority.MIN_PRIORITY;
     int actual = taskPriority.getPriority();
 
     Assert.assertEquals(expected, actual);
