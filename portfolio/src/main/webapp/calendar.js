@@ -5,6 +5,9 @@
  * This class contains all the event information that can be easily
  * converted into a JSON string. 
  * All fields are required. 
+ * @param name: of type String, name of event
+ *        startTime: of type Date in format "Day Month Date Year HH:MM:SS GMT-Time Zone" 
+ *        endTime: of type Date in format "Day Month Date Year HH:MM:SS GMT-Time Zone"
  */
 class CalendarEvent {
   constructor(name, startTime, endTime) {
@@ -13,8 +16,6 @@ class CalendarEvent {
     this.endTime = endTime;
   }
 }
-
-let allEventJson = []; 
 
 /** 
  * Onclick function for "Add this event" button.
@@ -40,12 +41,8 @@ function createNewCalendarEvent() {
   } else {
     document.getElementById('event-end-time-warning').style.visibility = 'hidden';
     const newCalendarEvent = new CalendarEvent(eventName, startTime, endTime);
-
     updateCalendarEventList(newCalendarEvent); 
-    document.getElementById('new-event-name').value = ''; 
-
-    const newEventJson = JSON.stringify(newCalendarEvent);
-    allEventJson.push(newEventJson);  
+    document.getElementById('new-event-name').value = 'New Event';  
   }
 }
 
@@ -74,9 +71,4 @@ function updateCalendarEventList(newCalendarEvent) {
   const eventList = document.getElementById('new-event-list');
   eventList.innterHTML = ''; 
   eventList.appendChild(newEventElement); 
-}
-
-/** Performs the POST request to send the event list to calendar servlet. */
-function sendEventToServer() {
-  fetch('/calendarServlet', {method: 'POST', body: JSON.stringify(allEventJson)});
 }
