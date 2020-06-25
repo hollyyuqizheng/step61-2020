@@ -69,74 +69,14 @@ function getTimeObject(timeString) {
   return new Date(currentYear, currentMonth, currentDate, timeHour, timeMinute);
 }
 
-// /** Creates a single element for a new calendar event. */
-// function updateCalendarEventList(newCalendarEvent) {
-//   const newEventElement = document.createElement('li');
-//   newEventElement.innerHTML = 'New Event: ' + newCalendarEvent.name +
-//       '<br>starts at ' + newCalendarEvent.startTime + '<br>ends at ' +
-//       newCalendarEvent.endTime;
-
-//   const eventList = document.getElementById('new-event-list');
-//   eventList.innterHTML = '';
-//   eventList.appendChild(newEventElement);
-// }
-
 /** Creates a single element for a new calendar event. */
 function updateCalendarEventList(newCalendarEvent) {
-  const newEventCard = document.createElement('div');
-  newEventCard.classList.add('card'); 
- 
-  const cardBody = document.createElement('div');
-  cardBody.classList.add('card-body');
-  newEventCard.appendChild(cardBody);
- 
-  const cardTitle = document.createElement('h4');
-  cardTitle.classList.add('card-title');
-  cardTitle.innerText = newCalendarEvent.name;
-  cardBody.appendChild(cardTitle);
- 
-  const startTimeText = document.createElement('p');
-  startTimeText.classList.add('card-text');
-  startTimeText.innerText = newCalendarEvent.startTime; 
-  cardBody.appendChild(startTimeText); 
- 
-  const endTimeText = document.createElement('p');
-  endTimeText.classList.add('card-text');
-  endTimeText.innerText = newCalendarEvent.endTime; 
-  cardBody.appendChild(endTimeText); 
- 
-  const deleteButton = document.createElement('button');
-  deleteButton.classList.add('btn');
-  deleteButton.classList.add('btn-danger');
-  deleteButton.innerText = 'Delete this event'; 
-  cardBody.appendChild(deleteButton); 
- 
-  //TODO(hollyyuqizheng): Duplicate events shouldn't be displayed on UI.
- 
-  const eventList = document.getElementById('new-event-list');
-  eventList.innterHTML = ''; 
-  eventList.appendChild(newEventCard); 
- 
-  deleteButton.onclick = function(newEventCard) {
-    newEventCard.target.closest('div.card').remove(); 
-  }
-}
+  const newEventElement = document.createElement('li');
+  newEventElement.innerHTML = 'New Event: ' + newCalendarEvent.name +
+      '<br>starts at ' + newCalendarEvent.startTime + '<br>ends at ' +
+      newCalendarEvent.endTime;
 
-/** Collects all the events currently displayed on the UI. */
-function collectAllEvents() {
-  // A set for all calendar events displayed on the UI.
-  // Each element in this set is a Json string. 
-  allEventJson = new Set(); 
- 
   const eventList = document.getElementById('new-event-list');
-  
-  eventList.childNodes.forEach((eventCard) => {
-    const eventName = eventCard.childNodes[0].childNodes[0].innerText; 
-    const startTime = eventCard.childNodes[0].childNodes[1].innerText; 
-    const endTime = eventCard.childNodes[0].childNodes[2].innerText; 
-    const event = new CalendarEvent(eventName, startTime, endTime);
-    const eventJson = JSON.stringify(event); 
-    allEventJson.add(eventJson); 
-  }); 
-  console.log(allEventJson); 
+  eventList.innterHTML = '';
+  eventList.appendChild(newEventElement);
 }
