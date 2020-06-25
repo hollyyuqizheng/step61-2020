@@ -1,6 +1,6 @@
 package com.google.sps.data;
 
-/** The TraskPriority class handles range checking, and allows retrieval of the priority value. */
+/** Handles range checking, and allows retrieval of the priority value. */
 public final class TaskPriority {
   private final int priority;
 
