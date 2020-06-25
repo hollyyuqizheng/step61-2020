@@ -34,6 +34,7 @@ public class CalendarEvent {
     this.endTimeString = Instant.parse(endTimeString);
   }
 
+  /* Because all three fields are required, the following getters won't return null. */
   public String getName() {
     return name;
   }
