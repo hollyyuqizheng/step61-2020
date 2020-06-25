@@ -9,8 +9,8 @@ import java.util.Collection;
 public class ScheduleRequest {
   private Collection<CalendarEvent> events;
   private Collection<Task> tasks;
-  private final Instant startTime;
-  private final Instant endTime;
+  private final Instant workHoursStartTime;
+  private final Instant workHoursEndTime;
 
   /**
    * Constructs a request to be scheduled.
@@ -24,7 +24,7 @@ public class ScheduleRequest {
    * All of these fields are required for a request (can be empty not null).
    */
   public ScheduleRequest(Collection<CalendarEvent> events, Collection<Task> tasks,
-      String startTimeString, String endTimeString) {
+      String workHoursStartTimeString, String workHoursEndTimeString) {
     if (events == null) {
       throw new IllegalArgumentException("Events cannot be null");
     }
@@ -40,11 +40,11 @@ public class ScheduleRequest {
     this.events = events;
     this.tasks = tasks;
     // Converts time from string representation into an instance of Instant class.
-    this.startTime = Instant.parse(startTimeString);
-    this.endTime = Instant.parse(endTimeString);
+    this.workHoursStartTime = Instant.parse(workHoursStartTimeString);
+    this.workHoursEndTime = Instant.parse(workHoursEndTimeString);
   }
 
-  /* Because all four fields are required, the following getters won't return null. */
+  /* Because all three fields are required, the following getters won't return null. */
   public Collection<CalendarEvent> getEvents() {
     return events;
   }
@@ -52,18 +52,18 @@ public class ScheduleRequest {
   public Collection<Task> getTasks() {
     return tasks;
   }
-  public Instant getStartTimeInstant() {
-    return startTime;
+  public Instant getWorkStartTimeInstant() {
+    return workHoursStartTime;
   }
-  public Instant getEndTimeInstant() {
-    return endtime;
-  }
-
-  public long getStartTimeLong() {
-    return startTime.getEpochSecond();
+  public Instant getWorkEndTimeInstant() {
+    return workHoursEndTime;
   }
 
-  public long getEndTimeLong() {
-    return endTime.getEpochSecond();
+  public long getWorkStartTimeLong() {
+    return workHoursStartTime.getEpochSecond();
+  }
+
+  public long getWorkEndTimeLong() {
+    return workHoursEndTime.getEpochSecond();
   }
 }
