@@ -152,7 +152,7 @@ function updateCalendarEventList(newCalendarEvent) {
 function collectAllEvents() {
   // A set for all calendar events displayed on the UI.
   // Each element in this set is a Json string.
-  allEvents = new Set();
+  var allEvents = [];
 
   const eventList = document.getElementById('new-event-list');
 
@@ -166,7 +166,7 @@ function collectAllEvents() {
     const endTime = new Date(eventCardBody.childNodes[2].innerText);
     const event = new CalendarEvent(eventName, startTime, endTime);
     const eventJson = JSON.stringify(event);
-    allEvents.add(eventJson);
+    allEvents.push(eventJson);
   });
   return allEvents;
 }
