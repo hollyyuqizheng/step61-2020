@@ -1,0 +1,22 @@
+{
+  "name": "step-intern-2020-v2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --recursive portfolio/src/main/webapp"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/googleinterns/step61-2020.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/googleinterns/step61-2020/issues"
+  },
+  "homepage": "https://github.com/googleinterns/step61-2020#readme",
+  "dependencies": {
+    "mocha": "^8.0.1"
+  }
+}
