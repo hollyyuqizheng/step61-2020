@@ -89,6 +89,10 @@ public final class Task {
     return duration.getSeconds();
   }
 
+  public Instant getScheduledTime() {
+    return scheduledTime;
+  }
+
   // These methods provide a way to tell if two objects are both Task objects
   // and have all the same fields
 
@@ -99,7 +103,7 @@ public final class Task {
 
   private static boolean equals(Task a, Task b) {
     return a.name.equals(b.name) && a.description.equals(b.description)
-        && a.getDurationSeconds()==b.getDurationSeconds() && a.priority.equals(b.priority)
-        && a.scheduledTime.getEpochSecond()==b.scheduledTime.getEpochSecond();
+        && a.getDurationSeconds() == b.getDurationSeconds() && a.priority.equals(b.priority)
+        && a.scheduledTime.getEpochSecond() == b.scheduledTime.getEpochSecond();
   }
 }
