@@ -38,10 +38,10 @@ function createNewCalendarEventUserInput() {
   const endTime =
       getTimeObject(document.getElementById('new-event-end-time').value);
 
-  // If user enters an empty event name, sets the name to a default string. 
+  // If user enters an empty event name, sets the name to a default string.
   let eventName = document.getElementById('new-event-name').value;
   if (!eventName) {
-    eventName = 'New Event'; 
+    eventName = 'New Event';
   }
 
   // Checks that end time is later than start time.
@@ -104,6 +104,11 @@ function getTimeObject(timeString) {
 }
 
 /** Creates a card element for a new calendar event. */
+/** 
+ * TODO(hollyyuqizheng) Look into refactoring the card creation code 
+ * into a JavaScript class. This card element will be used in different 
+ * sections on the UI, so this refactoring will make things simpler. 
+ */
 function updateCalendarEventList(newCalendarEvent) {
   const newEventCard = document.createElement('div');
   newEventCard.classList.add('card');
