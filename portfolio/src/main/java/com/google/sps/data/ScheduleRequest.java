@@ -17,9 +17,9 @@ public class ScheduleRequest {
    *
    * @param events: events happening the day of the scheduling,
    * @param tasks: the tasks a user would like to schedule on that day
-   * @param startTimeString: a string representation of the work hours start 
+   * @param workHoursStartTimeString: a string representation of the work hours start
    *     time. The string is in format Day Month Date Year HH:MM:SS GMT-Time-zone
-   * @param endTimeString: a string representation of the work hours end time. 
+   * @param workHoursEndTimeString: a string representation of the work hours end time.
    *     The string's format is the same as startTimeString's.
    * All of these fields are required for a request (can be empty not null).
    */
@@ -31,10 +31,10 @@ public class ScheduleRequest {
     if (tasks == null) {
       throw new IllegalArgumentException("Tasks cannot be null");
     }
-    if (startTimeString == null) {
+    if (workHoursStartTimeString == null) {
       throw new IllegalArgumentException("Request needs a start time");
     }
-    if (endTimeString == null) {
+    if (workHoursEndTimeString == null) {
       throw new IllegalArgumentException("Request needs an end time");
     }
     this.events = events;
@@ -58,6 +58,9 @@ public class ScheduleRequest {
   public Instant getWorkHoursEndTimeInstant() {
     return workHoursEndTime;
   }
+
+  // These methods return the instant as a number of seconds from 00:00:00 UTC
+  // on 1 January 1970
 
   public long getWorkHoursStartTimeLong() {
     return workHoursStartTime.getEpochSecond();
