@@ -32,6 +32,7 @@ public final class FindScheduleTest {
   private static long TIME_1500 = BEGINNING_OF_DAY + 15 * TIME_60_MINUTES;
   private static long TIME_1600 = BEGINNING_OF_DAY + 16 * TIME_60_MINUTES;
   private static long TIME_1700 = BEGINNING_OF_DAY + 17 * TIME_60_MINUTES;
+  private static long TIME_1800 = BEGINNING_OF_DAY + 18 * TIME_60_MINUTES;
 
   private static String STRING_0900AM = "2020-06-25T09:00:00Z";
   private static String STRING_1000AM = "2020-06-25T10:00:00Z";
@@ -58,7 +59,7 @@ public final class FindScheduleTest {
         Arrays.asList(new CalendarEvent("Event 1", "2020-06-25T00:00:00Z", "2020-06-26T00:00:00Z"));
     Collection<Task> tasks = Arrays.asList();
 
-    Collection<Task> actual = schedule.greedy(events, tasks, 540, 1020);
+    Collection<Task> actual = schedule.greedy(events, tasks, TIME_0900, TIME_1700);
     Collection<Task> expected = Arrays.asList();
 
     Assert.assertEquals(expected, actual);
@@ -94,7 +95,42 @@ public final class FindScheduleTest {
     Assert.assertEquals(expected, actual);
   }
 
+  @Test
+  public void manyEventsAndTasksGreedy() {
+    Collection<CalendarEvent> events =
+        Arrays.asList(new CalendarEvent("Event 1", "2020-06-25T09:00:00Z", "2020-06-25T09:30:00Z"),
+            new CalendarEvent("Event 2", "2020-06-25T10:00:00Z", "2020-06-25T10:45:00Z"),
+            new CalendarEvent("Event 3", "2020-06-25T12:00:00Z", "2020-06-25T13:00:00Z"),
+            new CalendarEvent("Event 4", "2020-06-25T13:30:00Z", "2020-06-25T14:00:00Z"),
+            new CalendarEvent("Event 5", "2020-06-25T15:00:00Z", "2020-06-25T15:30:00Z"),
+            new CalendarEvent("Event 6", "2020-06-25T17:30:00Z", "2020-06-25T18:00:00Z"));
+    Collection<Task> tasks = Arrays.asList(new Task("Task 1", "First task", 15, LOW_PRIORITY),
+        new Task("Task 2", "Second task", 30, LOW_PRIORITY),
+        new Task("Task 3", "Third task", 45, LOW_PRIORITY),
+        new Task("Task 4", "Fourth task", 15, LOW_PRIORITY),
+        new Task("Task 5", "Fifth task", 15, LOW_PRIORITY),
+        new Task("Task 6", "Sixth task", 45, LOW_PRIORITY),
+        new Task("Task 7", "Seventh task", 30, LOW_PRIORITY),
+        new Task("Task 8", "Eigth task", 15, LOW_PRIORITY),
+        new Task("Task 9", "Ninth task", 30, LOW_PRIORITY));
+    Collection<Task> actual = schedule.greedy(events, tasks, TIME_0900, TIME_1800);
 
-  // TODO(tomasalvarez): implement more robust tests
-  // (need to work out larger cases by hand before that)
+    List<Task> expected =
+        Arrays.asList(new Task("Task 1", "First task", 15, LOW_PRIORITY, "2020-06-25T09:30:00Z"),
+            new Task("Task 4", "Fourth task", 15, LOW_PRIORITY, "2020-06-25T09:45:00Z"),
+            new Task("Task 5", "Fifth task", 15, LOW_PRIORITY, "2020-06-25T10:45:00Z"),
+            new Task("Task 8", "Eigth task", 15, LOW_PRIORITY, "2020-06-25T11:00:00Z"),
+            new Task("Task 2", "Second task", 30, LOW_PRIORITY, "2020-06-25T11:15:00Z"),
+            new Task("Task 7", "Seventh task", 30, LOW_PRIORITY, "2020-06-25T13:00:00Z"),
+            new Task("Task 9", "Ninth task", 30, LOW_PRIORITY, "2020-06-25T14:00:00Z"),
+            new Task("Task 3", "Third task", 45, LOW_PRIORITY, "2020-06-25T15:30:00Z"),
+            new Task("Task 6", "Sixth task", 45, LOW_PRIORITY, "2020-06-25T16:15:00Z"));
+
+    Assert.assertEquals(expected, actual);
+  }
+
+  // TODO(tomasalvarez): Test edge cases
+  // 1: Events out of the scheduling bounds
+  // 2: Scheduling time is more than 24 hours
+  // 3: ???
 }
