@@ -28,8 +28,8 @@ class CalendarEvent {
  * event list.
  */
 function createNewCalendarEventUserInput() {
-  setWarningsToHidden(); 
-  
+  setWarningsToHidden();
+
   // Constructs time objects for start and end times.
   // The objects are in format:
   // Day Month Date Year HH:MM:SS GMT-Time Zone
@@ -38,7 +38,11 @@ function createNewCalendarEventUserInput() {
   const endTime =
       getTimeObject(document.getElementById('new-event-end-time').value);
 
-  const eventName = document.getElementById('new-event-name').value;
+  // If user enters an empty event name, sets the name to a default string. 
+  let eventName = document.getElementById('new-event-name').value;
+  if (!eventName) {
+    eventName = 'New Event'; 
+  }
 
   // Checks that end time is later than start time.
   // If the time order is wrong, show a warning message on the UI.
@@ -56,20 +60,19 @@ function createNewCalendarEventUserInput() {
     // Look through this set of events to ensure that duplicate events
     // do not get added again.
     const newEventJson = JSON.stringify(newCalendarEvent);
-    const allEvents = collectAllEvents();
+    const allEventJson = collectAllEvents();
 
     let doesEventExist = false;
-    allEvents.forEach((existingEvent) => {
-      if (existingEvent === newEventJson) {
+    allEventJson.forEach((existingEvenJson) => {
+      if (newEventJson === existingEvenJson) {
         doesEventExist = true;
       }
     });
 
-    if (! doesEventExist) {
+    if (!doesEventExist) {
       document.getElementById('event-duplicate-warning').style.visibility =
           'hidden';
       updateCalendarEventList(newCalendarEvent);
-      allEvents.add(newEventJson);
     } else {
       document.getElementById('event-duplicate-warning').style.visibility =
           'visible';
@@ -80,10 +83,9 @@ function createNewCalendarEventUserInput() {
 
 /** Sets any warning messages to default hidden. */
 function setWarningsToHidden() {
-  document.getElementById('event-end-time-warning').style.visibility =
-        'hidden';
+  document.getElementById('event-end-time-warning').style.visibility = 'hidden';
   document.getElementById('event-duplicate-warning').style.visibility =
-          'hidden';
+      'hidden';
 }
 
 /**
@@ -103,7 +105,7 @@ function getTimeObject(timeString) {
 
 /** Creates a card element for a new calendar event. */
 function updateCalendarEventList(newCalendarEvent) {
-  const newEventCard = document.createElement('div'); 
+  const newEventCard = document.createElement('div');
   newEventCard.classList.add('card');
 
   const cardBody = document.createElement('div');
@@ -135,9 +137,9 @@ function updateCalendarEventList(newCalendarEvent) {
   eventList.innterHTML = '';
   eventList.appendChild(newEventCard);
 
-  // The delete button removes the event's card from the UI. 
+  // The delete button removes the event's card from the UI.
   deleteButton.onclick = function(newEventCard) {
-    newEventCard.target.closest('div.card').remove(); 
+    newEventCard.target.closest('div.card').remove();
   }
 }
 
@@ -145,7 +147,7 @@ function updateCalendarEventList(newCalendarEvent) {
 function collectAllEvents() {
   // A set for all calendar events displayed on the UI.
   // Each element in this set is a Json string.
-  allEventJson = new Set();
+  allEvents = new Set();
 
   const eventList = document.getElementById('new-event-list');
 
@@ -153,14 +155,13 @@ function collectAllEvents() {
   // start and end times from the HTML elements.
   // Add all event information to a set of all Json strings.
   eventList.childNodes.forEach((eventCard) => {
-    const eventCardBody = eventCard.childNodes[0]; 
+    const eventCardBody = eventCard.childNodes[0];
     const eventName = eventCardBody.childNodes[0].innerText;
     const startTime = new Date(eventCardBody.childNodes[1].innerText);
     const endTime = new Date(eventCardBody.childNodes[2].innerText);
     const event = new CalendarEvent(eventName, startTime, endTime);
     const eventJson = JSON.stringify(event);
-    allEventJson.add(eventJson);
+    allEvents.add(eventJson);
   });
-
-  return allEventJson; 
+  return allEvents;
 }
