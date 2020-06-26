@@ -28,6 +28,8 @@ class CalendarEvent {
  * event list.
  */
 function createNewCalendarEventUserInput() {
+  setWarningsToHidden(); 
+  
   // Constructs time objects for start and end times.
   // The objects are in format:
   // Day Month Date Year HH:MM:SS GMT-Time Zone
@@ -74,6 +76,14 @@ function createNewCalendarEventUserInput() {
     }
     document.getElementById('new-event-name').value = 'New Event';
   }
+}
+
+/** Sets any warning messages to default hidden. */
+function setWarningsToHidden() {
+  document.getElementById('event-end-time-warning').style.visibility =
+        'hidden';
+  document.getElementById('event-duplicate-warning').style.visibility =
+          'hidden';
 }
 
 /**
@@ -143,9 +153,10 @@ function collectAllEvents() {
   // start and end times from the HTML elements.
   // Add all event information to a set of all Json strings.
   eventList.childNodes.forEach((eventCard) => {
-    const eventName = eventCard.childNodes[0].childNodes[0].innerText;
-    const startTime = new Date(eventCard.childNodes[0].childNodes[1].innerText);
-    const endTime = new Date(eventCard.childNodes[0].childNodes[2].innerText);
+    const eventCardBody = eventCard.childNodes[0]; 
+    const eventName = eventCardBody.childNodes[0].innerText;
+    const startTime = new Date(eventCardBody.childNodes[1].innerText);
+    const endTime = new Date(eventCardBody.childNodes[2].innerText);
     const event = new CalendarEvent(eventName, startTime, endTime);
     const eventJson = JSON.stringify(event);
     allEventJson.add(eventJson);
