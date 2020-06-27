@@ -43,16 +43,14 @@ function createNewTask() {
     return false;
   }
 
-  const taskDataArrayJson = JSON.stringify(dataArray);
-  console.log(taskDataArrayJson);
-
-  const newTask =
-      new Task(name, description, parseInt(length), parseInt(priority));
-  updateTaskList(newTask, lengthUnit);
+  const newTask = new Task(
+      name, description, getDuration(length, lengthUnit), parseInt(priority));
+  updateTaskList(newTask);
 }
 
+/** Display Task information from user input. */
 function updateTaskList(newTask, lengthUnit) {
-  const newEventCard = document.createElement('div'); 
+  const newEventCard = document.createElement('div');
   newEventCard.classList.add('card');
 
   const cardBody = document.createElement('div');
@@ -75,8 +73,8 @@ function updateTaskList(newTask, lengthUnit) {
   cardBody.appendChild(duration);
 
   const priority = document.createElement('p');
-  duration.classList.add('card-text');
-  duration.innerText = newTask.taskPriority;
+  priority.classList.add('card-text');
+  priority.innerText = newTask.taskPriority;
   cardBody.appendChild(priority);
 
   const deleteButton = document.createElement('button');
@@ -89,12 +87,13 @@ function updateTaskList(newTask, lengthUnit) {
   eventList.innterHTML = '';
   eventList.appendChild(newEventCard);
 
-  // The delete button removes the event's card from the UI. 
+  // The delete button removes the event's card from the UI.
   deleteButton.onclick = function(newEventCard) {
-    newEventCard.target.closest('div.card').remove(); 
+    newEventCard.target.closest('div.card').remove();
   }
 }
 
+/** Return number of minutes from the user's input and unit selection. */
 function getDuration(duration, unit) {
   if (unit == 'minutes') {
     return String(duration);
@@ -103,16 +102,28 @@ function getDuration(duration, unit) {
   }
 }
 
+/**
+ * Returns JSON data from an array of Javascript Task classes
+ * by gathering the information from the previously created
+ * cards used to display input Task information.
+ */
 function collectAllTasks() {
-  const allEventJson = new Array();
+  const allTaskJson = new Array();
 
   // Get task list element to run through cards collecting data.
   const taskList = document.getElementById('new-task-list');
 
   taskList.childNodes.forEach((taskCard) => {
-    const taskName = taskCard.childNode[0].childNode[0].innerText;
-    const taskDescription = taskCard.childNode[0].childNode[1].innerText;
-  })
+    const taskName = taskCard.childNodes[0].childNodes[0].innerText;
+    const taskDescription = taskCard.childNodes[0].childNodes[1].innerText;
+    const taskLength = taskCard.childNodes[0].childNodes[2].innerText;
+    const taskPriority = taskCard.childNodes[0].childNodes[3].innerText;
 
+    const task = new Task(taskName, taskDescription, taskLength, taskPriority);
+    const taskJson = JSON.stringify(task);
+    allTaskJson.push(taskJson);
+  });
 
+  console.log(allTaskJson);
+  return allTaskJson;
 }
