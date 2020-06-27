@@ -21,6 +21,8 @@ class CalendarEvent {
   }
 }
 
+const EVENT_DEFAULT_NAME = 'New Event';
+
 /**
  * Onclick function for "Add this event" button.
  * Retrieves the new event's name, start and end times, and creates a new
@@ -28,7 +30,8 @@ class CalendarEvent {
  * event list.
  */
 function createNewCalendarEventUserInput() {
-  setWarningsToHidden();
+  // First hide the warning message.
+  $('#event-warning').hide();
 
   // Constructs time objects for start and end times.
   // The objects are in format:
@@ -39,53 +42,45 @@ function createNewCalendarEventUserInput() {
       getTimeObject(document.getElementById('new-event-end-time').value);
 
   // If user enters an empty event name, sets the name to a default string.
-  let eventName = document.getElementById('new-event-name').value;
-  if (!eventName) {
-    eventName = 'New Event';
-  }
+  const eventName =
+      document.getElementById('new-event-name').value || EVENT_DEFAULT_NAME;
 
   // Checks that end time is later than start time.
   // If the time order is wrong, show a warning message on the UI.
   // Otherwise, proceed to create a new event list element and
   // send the new event to the Calendar servlet.
   if (endTime.getTime() <= startTime.getTime()) {
-    document.getElementById('event-end-time-warning').style.visibility =
-        'visible';
+    $('#event-warning').removeClass('d-none');
+    $('#event-warning').show();
+    $('#event-warning').text('End time must be later than start time.');
   } else {
-    document.getElementById('event-end-time-warning').style.visibility =
-        'hidden';
+    $('#event-warning').hide();
+    $('#event-warning')
+
     const newCalendarEvent = new CalendarEvent(eventName, startTime, endTime);
 
     // Get all the events currently displayed on the UI.
     // Look through this set of events to ensure that duplicate events
     // do not get added again.
-    const newEventJson = JSON.stringify(newCalendarEvent);
     const allEventJson = collectAllEvents();
 
     let doesEventExist = false;
-    allEventJson.forEach((existingEvenJson) => {
-      if (newEventJson === existingEvenJson) {
+    allEventJson.forEach((existingEvent) => {
+      if (eventsEqual(newCalendarEvent, existingEvent)) {
         doesEventExist = true;
       }
     });
 
     if (!doesEventExist) {
-      document.getElementById('event-duplicate-warning').style.visibility =
-          'hidden';
+      $('#event-warning').hide();
       updateCalendarEventList(newCalendarEvent);
     } else {
-      document.getElementById('event-duplicate-warning').style.visibility =
-          'visible';
+      $('#event-warning').removeClass('d-none');
+      $('#event-warning').show();
+      $('#event-warning').text('This event has already been already added.');
     }
-    document.getElementById('new-event-name').value = 'New Event';
+    document.getElementById('new-event-name').value = EVENT_DEFAULT_NAME;
   }
-}
-
-/** Sets any warning messages to default hidden. */
-function setWarningsToHidden() {
-  document.getElementById('event-end-time-warning').style.visibility = 'hidden';
-  document.getElementById('event-duplicate-warning').style.visibility =
-      'hidden';
 }
 
 /**
@@ -104,11 +99,6 @@ function getTimeObject(timeString) {
 }
 
 /** Creates a card element for a new calendar event. */
-/** 
- * TODO(hollyyuqizheng) Look into refactoring the card creation code 
- * into a JavaScript class. This card element will be used in different 
- * sections on the UI, so this refactoring will make things simpler. 
- */
 function updateCalendarEventList(newCalendarEvent) {
   const newEventCard = document.createElement('div');
   newEventCard.classList.add('card');
@@ -145,14 +135,17 @@ function updateCalendarEventList(newCalendarEvent) {
   // The delete button removes the event's card from the UI.
   deleteButton.onclick = function(newEventCard) {
     newEventCard.target.closest('div.card').remove();
-  }
+  };
 }
 
-/** Collects and returns all the events currently displayed on the UI. */
+/**
+ * Collects and returns all the events currently displayed on the UI.
+ * @return an array of calendar events
+ */
 function collectAllEvents() {
   // A set for all calendar events displayed on the UI.
   // Each element in this set is a Json string.
-  var allEvents = [];
+  const allEvents = [];
 
   const eventList = document.getElementById('new-event-list');
 
@@ -165,8 +158,14 @@ function collectAllEvents() {
     const startTime = new Date(eventCardBody.childNodes[1].innerText);
     const endTime = new Date(eventCardBody.childNodes[2].innerText);
     const event = new CalendarEvent(eventName, startTime, endTime);
-    const eventJson = JSON.stringify(event);
-    allEvents.push(eventJson);
+    allEvents.push(event);
   });
   return allEvents;
+}
+
+/** Checks if two calendar events are identical. */
+function eventsEqual(eventA, eventB) {
+  return (eventA.name === eventB.name) &&
+      (eventA.startTime.getTime() === eventB.startTime.getTime()) &&
+      (eventA.endTime.getTime() === eventB.endTime.getTime());
 }
