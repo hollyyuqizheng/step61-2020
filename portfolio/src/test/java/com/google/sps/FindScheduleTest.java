@@ -12,7 +12,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-/** */
 @RunWith(JUnit4.class)
 public final class FindScheduleTest {
   private static long BEGINNING_OF_DAY = Instant.parse("2020-06-25T00:00:00Z").getEpochSecond();
