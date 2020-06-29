@@ -62,14 +62,11 @@ function createNewCalendarEventUserInput() {
     // Get all the events currently displayed on the UI.
     // Look through this set of events to ensure that duplicate events
     // do not get added again.
-    const allEventJson = collectAllEvents();
+    const allEvents = collectAllEvents();
 
-    let doesEventExist = false;
-    allEventJson.forEach((existingEvent) => {
-      if (eventsEqual(newCalendarEvent, existingEvent)) {
-        doesEventExist = true;
-      }
-    });
+    const doesEventExist = allEvents.reduce(
+        (newEventExists, existingEvent) => newEventExists || eventsEqual(newCalendarEvent, existingEvent),
+        /* initialValue= */ false);
 
     if (!doesEventExist) {
       $('#event-warning').hide();
@@ -143,24 +140,21 @@ function updateCalendarEventList(newCalendarEvent) {
  * @return an array of calendar events
  */
 function collectAllEvents() {
-  // A set for all calendar events displayed on the UI.
-  // Each element in this set is a Json string.
-  const allEvents = [];
-
   const eventList = document.getElementById('new-event-list');
 
   // Looks at each event card and scrapes the event's name and
   // start and end times from the HTML elements.
   // Add all event information to a set of all Json strings.
-  eventList.childNodes.forEach((eventCard) => {
+  const allEventsOnPage = Array.from(eventList.childNodes).map((eventCard) => {
     const eventCardBody = eventCard.childNodes[0];
     const eventName = eventCardBody.childNodes[0].innerText;
     const startTime = new Date(eventCardBody.childNodes[1].innerText);
     const endTime = new Date(eventCardBody.childNodes[2].innerText);
     const event = new CalendarEvent(eventName, startTime, endTime);
-    allEvents.push(event);
+    return event; 
   });
-  return allEvents;
+
+  return allEventsOnPage;
 }
 
 /** Checks if two calendar events are identical. */
