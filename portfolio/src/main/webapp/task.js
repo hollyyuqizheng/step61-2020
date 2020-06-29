@@ -124,6 +124,5 @@ function collectAllTasks() {
     allTaskJson.push(taskJson);
   });
 
-  console.log(allTaskJson);
   return allTaskJson;
 }
