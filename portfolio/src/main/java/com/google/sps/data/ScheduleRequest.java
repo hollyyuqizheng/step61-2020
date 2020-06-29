@@ -18,10 +18,13 @@ public class ScheduleRequest {
    * @param events: events happening the day of the scheduling,
    * @param tasks: the tasks a user would like to schedule on that day
    * @param workHoursStartTimeString: a string representation of the work hours start
-   *     time. The string is in format Day Month Date Year HH:MM:SS GMT-Time-zone
+   *     time. The string is in format YYYY-MM-DDTHH:MM:SSZ
    * @param workHoursEndTimeString: a string representation of the work hours end time.
    *     The string's format is the same as startTimeString's.
-   * All of these fields are required for a request (can be empty not null).
+   * All of these fields are required for a request however, events and tasks can be.
+   * empty in the case where there are no events or no tasks. For example an empty
+   * schedule for that day or the user hits start scheduling before they add any tasks
+   * (maybe by accident).
    */
   public ScheduleRequest(Collection<CalendarEvent> events, Collection<Task> tasks,
       String workHoursStartTimeString, String workHoursEndTimeString) {
