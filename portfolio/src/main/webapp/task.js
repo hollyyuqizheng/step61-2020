@@ -114,10 +114,12 @@ function collectAllTasks() {
   const taskList = document.getElementById('new-task-list');
 
   taskList.childNodes.forEach((taskCard) => {
-    const taskName = taskCard.childNodes[0].childNodes[0].innerText;
-    const taskDescription = taskCard.childNodes[0].childNodes[1].innerText;
-    const taskLength = taskCard.childNodes[0].childNodes[2].innerText;
-    const taskPriority = taskCard.childNodes[0].childNodes[3].innerText;
+    const taskBody = taskCard.childNodes[0];
+
+    const taskName = taskBody.childNodes[0].innerText;
+    const taskDescription = taskBody.childNodes[1].innerText;
+    const taskLength = taskBody.childNodes[2].innerText;
+    const taskPriority = taskBody.childNodes[3].innerText;
 
     const task = new Task(taskName, taskDescription, taskLength, taskPriority);
     const taskJson = JSON.stringify(task);
