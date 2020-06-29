@@ -5,6 +5,15 @@
  * information that can be easily converted into a JSON string.
  */
 class ScheduleRequest {
+    /**
+   * All fields are required for this object.
+   * @param events: events happening the day of the scheduling,
+   * @param tasks: the tasks a user would like to schedule on that day
+   * @param startTime: a string representation of the work hours start
+   *     time. The string is in format YYYY-MM-DDTHH:MM:SSZ
+   * @param endTime: a string representation of the work hours end time.
+   *     The string's format is the same as startTimeString's.
+   */
   constructor(events, tasks, startTime, endTime) {
     this.events = events;
     this.tasks = tasks;
