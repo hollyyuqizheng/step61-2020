@@ -31,156 +31,171 @@
     <script src="calendar.js"></script>
     <script src="request.js"></script>
   </head>
-      <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Task Scheduler</a>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Scheduling Preferences
-              </a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a>Working Hours:</a>
-                <form class="px-4 py-3">
-                  <input type="time" id="working-hour-start" name="working-hour-start" class="form-control" value="09:00" />
-                  <a>to</a>
-                  <input type="time" id="working-hour-end" name="working-hour-end" class="form-control" value="17:00" />
-                </form>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </nav>
-      <div class="row">
-        <div id="new-task-wrapper" class="col-md-12 col-lg-6 col-xl-3">
-          <h2>Add the tasks you would like to schedule for today</h2>
-          <form id="new-task-form">
-            <div class="form-group">
-              <label for="new-task-name">Task name:</label>
-              <input type="text" id="new-task-name" class="form-control" name="new-task-name" placeholder="New Task"/>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <a class="navbar-brand" href="#">Task Scheduler</a>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              href="#"
+              id="navbarDropdown"
+              role="button"
+              data-toggle="dropdown"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Scheduling Preferences
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+              <a>Working Hours:</a>
+              <form class="px-4 py-3">
+                <input
+                  type="time"
+                  id="working-hour-start"
+                  name="working-hour-start"
+                  class="form-control"
+                  value="09:00"
+                />
+                <a>to</a>
+                <input type="time" id="working-hour-end" name="working-hour-end" class="form-control" value="17:00" />
+              </form>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </nav>
+    <div class="row">
+      <div id="new-task-wrapper" class="col-md-12 col-lg-6 col-xl-3">
+        <h2>Add the tasks you would like to schedule for today</h2>
+        <form id="new-task-form">
+          <div class="form-group">
+            <label for="new-task-name">Task name:</label>
+            <input type="text" id="new-task-name" class="form-control" name="new-task-name" placeholder="New Task" />
+          </div>
+
+          <label for="new-task-description">Task description:</label><br />
+          <textarea
+            id="new-task-description"
+            class="form-control"
+            name="new-task-description"
+            placeholder="Description"
+          ></textarea
+          ><br />
+
+          <div class="form-row">
+            <div class="col">
+              <label for="new-task-estimated-length">Duration:</label>
+              <input type="text" id="new-task-estimated-length" class="form-control" name="new-task-estimated-length" />
             </div>
 
-            <label for="new-task-description">Task description:</label><br />
-            <textarea id="new-task-description" class="form-control" name="new-task-description" placeholder="Description"></textarea><br />
+            <div class="col">
+              <label for="new-task-estimated-length-unit">Unit:</label>
+              <select id="new-task-estimated-length-unit" class="form-control" name="new-task-estimated-length-unit">
+                <option value="minutes">minute(s)</option>
+                <option value="hours">hour(s)</option>
+              </select>
+            </div>
 
-            <div class="form-row">
-              <div class="col">
-                <label for="new-task-estimated-length">Duration:</label>
+            <div class="col">
+              <label for="new-task-priority">Priority:</label>
+              <select id="new-task-priority" class="form-control" name="new-task-priority">
+                <option value="5">5 (High)</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+                <option value="1">1 (Low)</option>
+              </select>
+            </div>
+          </div>
+          <br />
+          <button type="button" class="btn btn-primary" onclick="createNewTask()">Add this task</button>
+        </form>
+
+        <br />
+        <h2>Tasks added:</h2>
+        <div class="scrollable" id="new-task-list-wrapper">
+          <div id="new-task-list"></div>
+        </div>
+      </div>
+
+      <div id="new-event-wrapper" class="col-md-12 col-lg-6 col-xl-3">
+        <h2>Add any pre-scheduled events here</h2>
+        <h4>We will not schedule any tasks during these time slots.</h4>
+        <form id="new-event-form">
+          <div class="form-group">
+            <label for="new-event-name">Event name:</label>
+            <input
+              type="text"
+              class="form-control"
+              aria-describedby="new-event-name"
+              id="new-event-name"
+              name="new-event-name"
+              value="New Event"
+            />
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <div class="form-group">
+                <label for="new-event-start-time">Start time:</label>
                 <input
-                  type="text"
-                  id="new-task-estimated-length"
+                  type="time"
                   class="form-control"
-                  name="new-task-estimated-length"
+                  aria-describedby="new-event-start-time"
+                  id="new-event-start-time"
+                  name="new-event-end-time"
+                  value="09:00"
+                />
+                <small id="new-event-time-help-text" class="form-text text-muted"
+                  >The times you enter will be in your current timezone.</small
+                >
+              </div>
+            </div>
+            <div class="col">
+              <div class="form-group">
+                <label for="new-event-end-time">End time:</label>
+                <input
+                  type="time"
+                  class="form-control"
+                  aria-describedby="new-event-end-time"
+                  id="new-event-end-time"
+                  name="new-event-end-time"
+                  value="17:00"
                 />
               </div>
-
-              <div class="col">
-                <label for="new-task-estimated-length-unit">Unit:</label>
-                <select id="new-task-estimated-length-unit" class="form-control" name="new-task-estimated-length-unit">
-                  <option value="minutes">minute(s)</option>
-                  <option value="hours">hour(s)</option>
-                </select>
-              </div>
-
-              <div class="col">
-                <label for="new-task-priority">Priority:</label>
-                <select id="new-task-priority" class="form-control" name="new-task-priority">
-                  <option value="5">5 (High)</option>
-                  <option value="4">4</option>
-                  <option value="3">3</option>
-                  <option value="2">2</option>
-                  <option value="1">1 (Low)</option>
-                </select>
-              </div>
             </div>
-            <br>
-            <button type="button" class="btn btn-primary" onclick="createNewTask()">Add this task</button>
-          </form>
-
-          <br>
-          <h2>Tasks added:</h2>
-          <div class="scrollable" id="new-task-list-wrapper">
-            <div id="new-task-list"></div>
           </div>
-        </div>
 
-        <div id="new-event-wrapper" class="col-md-12 col-lg-6 col-xl-3">
-          <h2>Add any pre-scheduled events here</h2>
-          <h4>We will not schedule any tasks during these time slots.</h4>
-          <form id="new-event-form">
-            <div class="form-group">
-              <label for="new-event-name">Event name:</label>
-              <input
-                type="text"
-                class="form-control"
-                aria-describedby="new-event-name"
-                id="new-event-name"
-                name="new-event-name"
-                value="New Event"
-              />
-            </div>
-
-            <div class="row">
-              <div class="col">
-                <div class="form-group">
-                  <label for="new-event-start-time">Start time:</label>
-                  <input
-                    type="time"
-                    class="form-control"
-                    aria-describedby="new-event-start-time"
-                    id="new-event-start-time"
-                    name="new-event-end-time"
-                    value="09:00"
-                  />
-                  <small id="new-event-time-help-text" class="form-text text-muted"
-                    >The times you enter will be in your current timezone.</small
-                  >
-                </div>
-              </div>
-              <div class="col">
-                <div class="form-group">
-                  <label for="new-event-end-time">End time:</label>
-                  <input
-                    type="time"
-                    class="form-control"
-                    aria-describedby="new-event-end-time"
-                    id="new-event-end-time"
-                    name="new-event-end-time"
-                    value="17:00"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <button type="button" class="btn btn-primary" onclick="createNewCalendarEventUserInput()">
-              Add this event
-            </button>
-
-            <div class="alert alert-secondary" role="alert" id="event-end-time-warning">
-              End time must be later than start time.
-            </div>
-            <div class="alert alert-secondary" role="alert" id="event-duplicate-warning">
-              This event has already been already added.
-            </div>
-          </form>
-
-          <div id="new-event-list-wrapper">
-            <h2>Events added:</h2>
-            <div id="new-event-list"></div>
-          </div>
-        </div>
-
-        <div id="calendar-view-wrapper" class="col-md-12 col-lg-6 col-xl-3">
-          <h4>Calendar view will be embedded here</h4>
-        </div>
-
-        <div id="schedule-result-wrapper" class="col-md-12 col-lg-6 col-xl-3">
-          <button type="button" class="btn btn-primary" onclick="startScheduling()">
-            Start scheduling!
+          <button type="button" class="btn btn-primary" onclick="createNewCalendarEventUserInput()">
+            Add this event
           </button>
-          <h2>Your tasks are scheduled here!</h2>
-          <div id="schedule-result-list"></div>
+
+          <div class="alert alert-secondary" role="alert" id="event-end-time-warning">
+            End time must be later than start time.
+          </div>
+          <div class="alert alert-secondary" role="alert" id="event-duplicate-warning">
+            This event has already been already added.
+          </div>
+        </form>
+
+        <div id="new-event-list-wrapper">
+          <h2>Events added:</h2>
+          <div id="new-event-list"></div>
         </div>
+      </div>
+
+      <div id="calendar-view-wrapper" class="col-md-12 col-lg-6 col-xl-3">
+        <h4>Calendar view will be embedded here</h4>
+      </div>
+
+      <div id="schedule-result-wrapper" class="col-md-12 col-lg-6 col-xl-3">
+        <button type="button" class="btn btn-primary" onclick="startScheduling()">
+          Start scheduling!
+        </button>
+        <h2>Your tasks are scheduled here!</h2>
+        <div id="schedule-result-list"></div>
       </div>
     </div>
   </body>
