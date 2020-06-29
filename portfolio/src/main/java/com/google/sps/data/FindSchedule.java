@@ -47,9 +47,9 @@ public final class FindSchedule {
     int i = 0;
     // Index of Task we are trying to schedule
     int j = 0;
-    // Integer indicating the time (in minutes) we are currently trying to
+    // Integer indicating the start time (in minutes) we are currently trying to
     // schedule events in
-    long time = 0;
+    long scheduleTimeSeconds = 0;
 
     // This will iterate through the time ranges and tasks and if one can be
     // scheduled then it will be (and we move onto the next task) otherwise
@@ -62,21 +62,21 @@ public final class FindSchedule {
       Task task = tasksArray[j];
       // Either time is already past the start of the time range or we should
       // update it (maybe this is our first iteration in the range).
-      time = Math.max(time, timeRange.start());
+      scheduleTimeSeconds = Math.max(scheduleTimeSeconds, timeRange.start());
       // The task can be scheduled in the current time range.
-      if (time + task.getDurationSeconds() <= timeRange.end()) {
+      if (scheduleTimeSeconds + task.getDurationSeconds() <= timeRange.end()) {
         Task scheduledTask;
         if (task.getDescription().isPresent()) {
           scheduledTask =
               new Task(task.getName(), task.getDescription().get(), task.getDuration().toMinutes(),
-                  task.getPriority(), Instant.ofEpochSecond(time).toString());
+                  task.getPriority(), Instant.ofEpochSecond(scheduleTimeSeconds).toString());
         } else {
           scheduledTask = new Task(task.getName(), null, task.getDuration().toMinutes(),
-              task.getPriority(), Instant.ofEpochSecond(time).toString());
+              task.getPriority(), Instant.ofEpochSecond(scheduleTimeSeconds).toString());
         }
 
         scheduledTasks.add(scheduledTask);
-        time = time + task.getDurationSeconds();
+        scheduleTimeSeconds += task.getDurationSeconds();
         j++;
       } else {
         i++;
