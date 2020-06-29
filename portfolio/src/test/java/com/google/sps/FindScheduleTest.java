@@ -131,5 +131,5 @@ public final class FindScheduleTest {
   // TODO(tomasalvarez): Test edge cases
   // 1: Events out of the scheduling bounds
   // 2: Scheduling time is more than 24 hours
-  // 3: ???
+  // 3: More events than we can possible schedule
 }
