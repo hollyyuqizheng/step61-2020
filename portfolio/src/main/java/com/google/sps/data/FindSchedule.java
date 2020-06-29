@@ -97,7 +97,7 @@ public final class FindSchedule {
     // meeting. As events are processed, this changes to their end times.
     long earliestPossibleSoFar = workHoursStartTimeSeconds;
     for (CalendarEvent event : events) {
-      // Make sure that there is some time between the events and is it not
+      // Make sure that there is some time between the events and it is not
       // later than the person's working hours ending time.
       if (event.getStartTimeLong() - earliestPossibleSoFar > (long) 0
           && event.getStartTimeLong() <= workHoursEndTimeSeconds) {
