@@ -34,12 +34,13 @@ public final class FindSchedule {
    * determines should be scheduled for the person.
    */
   public Collection<Task> greedy(Collection<CalendarEvent> events, Collection<Task> tasks,
-      long startTimeMinutes, long endTimeMinutes) {
+      long workHoursStartTimeSeconds, long workHoursEndTimeSeconds) {
     List<CalendarEvent> eventsList = new ArrayList<CalendarEvent>(events);
     Task[] tasksArray = tasks.toArray(new Task[tasks.size()]);
     Collections.sort(eventsList, sortAscending);
     Arrays.sort(tasksArray, 0, tasks.size(), sortByDuration);
-    TimeRange[] availableTimes = emptyTimeRanges(eventsList, startTimeMinutes, endTimeMinutes);
+    TimeRange[] availableTimes =
+        emptyTimeRanges(eventsList, workHoursStartTimeSeconds, workHoursEndTimeSeconds);
 
     List<Task> scheduledTasks = new ArrayList<Task>();
     // Index of TimeRange we are in
@@ -90,25 +91,25 @@ public final class FindSchedule {
    * working hours.
    */
   public static TimeRange[] emptyTimeRanges(
-      List<CalendarEvent> events, long startTimeMinutes, long endTimeMinutes) {
+      List<CalendarEvent> events, long workHoursStartTimeSeconds, long workHoursEndTimeSeconds) {
     List<TimeRange> possibleTimes = new ArrayList<TimeRange>();
     // This represents the earliest time that we can schedule a window for the
     // meeting. As events are processed, this changes to their end times.
-    long earliestPossibleSoFar = startTimeMinutes;
+    long earliestPossibleSoFar = workHoursStartTimeSeconds;
     for (CalendarEvent event : events) {
       // Make sure that there is some time between the events and is it not
       // later than the person's working hours ending time.
       if (event.getStartTimeLong() - earliestPossibleSoFar > (long) 0
-          && event.getStartTimeLong() <= endTimeMinutes) {
+          && event.getStartTimeLong() <= workHoursEndTimeSeconds) {
         possibleTimes.add(TimeRange.fromStartEnd(
             earliestPossibleSoFar, event.getStartTimeLong(), /* inclusive= */ true));
       }
       earliestPossibleSoFar = Math.max(earliestPossibleSoFar, event.getEndTimeLong());
     }
-    // The end of the day is potentially never included so we check.
-    if (endTimeMinutes - earliestPossibleSoFar > 0) {
-      possibleTimes.add(
-          TimeRange.fromStartEnd(earliestPossibleSoFar, endTimeMinutes, /* inclusive= */ true));
+    // The end of the work hours is potentially never included so we check.
+    if (workHoursEndTimeSeconds - earliestPossibleSoFar > 0) {
+      possibleTimes.add(TimeRange.fromStartEnd(
+          earliestPossibleSoFar, workHoursEndTimeSeconds, /* inclusive= */ true));
     }
     return possibleTimes.toArray(new TimeRange[possibleTimes.size()]);
   }
