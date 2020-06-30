@@ -63,7 +63,7 @@ public class ScheduleRequest {
   }
 
   // These methods return the instant as a number of seconds from 00:00:00 UTC
-  // on 1 January 1970
+  // on 1 January 1970.
 
   public long getWorkHoursStartTimeLong() {
     return workHoursStartTime.getEpochSecond();
