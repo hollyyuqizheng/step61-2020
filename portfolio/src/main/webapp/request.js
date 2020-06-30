@@ -5,7 +5,7 @@
  * information that can be easily converted into a JSON string.
  */
 class ScheduleRequest {
-    /**
+  /**
    * All fields are required for this object.
    * @param events: events happening the day of the scheduling,
    * @param tasks: the tasks a user would like to schedule on that day
