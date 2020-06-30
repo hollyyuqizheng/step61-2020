@@ -47,7 +47,7 @@ public final class FindSchedule {
     int i = 0;
     // Index of Task we are trying to schedule
     int j = 0;
-    // Integer indicating the start time (in minutes) we are currently trying to
+    // Integer indicating the start time (in seconds) we are currently trying to
     // schedule events in
     long scheduleTimeSeconds = 0;
 
