@@ -25,7 +25,7 @@ public class CalendarEvent {
     if (startTimeInstant == null) {
       throw new IllegalArgumentException("Event needs a start time");
     }
-    if (startTimeInstant == null) {
+    if (endTimeInstant == null) {
       throw new IllegalArgumentException("Event needs an end time");
     }
     this.name = name;
