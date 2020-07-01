@@ -1,5 +1,4 @@
 // require('dotenv').config();
-// console.log(process.env);
 
 var GoogleAuth;
 
@@ -51,7 +50,23 @@ function handleAuth() {
     GoogleAuth.signOut();
   } else {
     // User is not signed in. Start Google auth flow.
-    GoogleAuth.signIn();
+    GoogleAuth.signIn()
+      .catch(function(error) {
+        handleAuthError(error); 
+      }); 
+  }
+}
+
+/** Updates import message box based on the error during authentication process. */
+function handleAuthError(e) {
+  if (e.error === 'popup_closed_by_user') {
+    $('#import-calendar-message').text(
+        'It seems like you didn\'t complete the authorization process. ' +  
+        'Please click the Login button again.'); 
+  } else if (e.error === 'access_denied') {
+    $('#import-calendar-message').text(
+        'You didn\'t give permission to access your Google Calendar, ' +  
+        'so your calendar events cannot be viewed or updated');
   }
 }
 
