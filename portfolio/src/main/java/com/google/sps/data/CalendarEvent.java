@@ -29,7 +29,6 @@ public class CalendarEvent {
       throw new IllegalArgumentException("Event needs an end time");
     }
     this.name = name;
-    // Converts time from string representation into an instance of Instant class.
     this.startTimeInstant = startTimeInstant;
     this.endTimeInstant = endTimeInstant;
   }
