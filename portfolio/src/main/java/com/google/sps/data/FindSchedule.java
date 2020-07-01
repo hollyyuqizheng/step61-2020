@@ -16,40 +16,45 @@ package com.google.sps.data;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-public final class FindSchedule {
-  private static final Comparator<CalendarEvent> sortAscending =
-      Comparator.comparingLong(CalendarEvent::getStartTimeLong);
+// TODO(tomasalvarez): Refactor this class into an abstract class where each of
+// the scheduling algorithms can be their own class that extends this one.
 
-  private static final Comparator<Task> sortByDuration =
-      Comparator.comparing(Task::getDurationSeconds).thenComparing(Task::getName);
+public class FindSchedule {
+  private static final Comparator<CalendarEvent> sortByEventStartTimeAscending =
+      Comparator.comparing(CalendarEvent::getStartTimeInstant);
+
+  private static final Comparator<Task> sortByTaskDurationThenName =
+      Comparator.comparing(Task::getDuration).thenComparing(Task::getName);
 
   /**
-   * This method returns a Task Collection which the greedy algorithm
-   * determines should be scheduled for the person.
+   * This method schedules tasks from shortest to longest and returns a ScheduledTask Collection
+   * based on the tasks that were able to be scheduled.
    */
-  public Collection<Task> greedy(Collection<CalendarEvent> events, Collection<Task> tasks,
-      long workHoursStartTimeSeconds, long workHoursEndTimeSeconds) {
+  public static Collection<ScheduledTask> shortestTaskFirst(
+      Collection<CalendarEvent> events,
+      Collection<Task> tasks,
+      Instant workHoursStartTime,
+      Instant workHoursEndTime) {
     List<CalendarEvent> eventsList = new ArrayList<CalendarEvent>(events);
-    Task[] tasksArray = tasks.toArray(new Task[tasks.size()]);
-    Collections.sort(eventsList, sortAscending);
-    Arrays.sort(tasksArray, 0, tasks.size(), sortByDuration);
-    TimeRange[] availableTimes =
-        emptyTimeRanges(eventsList, workHoursStartTimeSeconds, workHoursEndTimeSeconds);
+    List<Task> tasksList = new ArrayList<Task>(tasks);
+    Collections.sort(eventsList, sortByEventStartTimeAscending);
+    Collections.sort(tasksList, sortByTaskDurationThenName);
+    List<TimeRange> availableTimes =
+        getEmptyTimeRanges(eventsList, workHoursStartTime, workHoursEndTime);
 
-    List<Task> scheduledTasks = new ArrayList<Task>();
-    // Index of TimeRange we are in
+    List<ScheduledTask> scheduledTasks = new ArrayList<ScheduledTask>();
+    // Index of TimeRange we are in.
     int i = 0;
-    // Index of Task we are trying to schedule
+    // Index of Task we are trying to schedule.
     int j = 0;
-    // Integer indicating the start time (in seconds) we are currently trying to
-    // schedule events in
-    long scheduleTimeSeconds = 0;
+    // Integer indicating the start time (in minutes) we are currently trying to
+    // schedule events in.
+    Instant currentScheduleTime = workHoursStartTime;
 
     // This will iterate through the time ranges and tasks and if one can be
     // scheduled then it will be (and we move onto the next task) otherwise
@@ -57,26 +62,21 @@ public final class FindSchedule {
     // duration so if one task did not fit in the given range then we know no
     // later ones will fit either). We create new Task objects for the result
     // so data structures passed in are never changed.
-    while (i < availableTimes.length && j < tasksArray.length) {
-      TimeRange timeRange = availableTimes[i];
-      Task task = tasksArray[j];
+    while (i < availableTimes.size() && j < tasksList.size()) {
+      TimeRange availableTimeRange = availableTimes.get(i);
+      Task task = tasksList.get(j);
       // Either time is already past the start of the time range or we should
       // update it (maybe this is our first iteration in the range).
-      scheduleTimeSeconds = Math.max(scheduleTimeSeconds, timeRange.start());
+      if (availableTimeRange.start().isAfter(currentScheduleTime)) {
+        currentScheduleTime = availableTimeRange.start();
+      }
       // The task can be scheduled in the current time range.
-      if (scheduleTimeSeconds + task.getDurationSeconds() <= timeRange.end()) {
-        Task scheduledTask;
-        if (task.getDescription().isPresent()) {
-          scheduledTask =
-              new Task(task.getName(), task.getDescription().get(), task.getDuration().toMinutes(),
-                  task.getPriority(), Instant.ofEpochSecond(scheduleTimeSeconds).toString());
-        } else {
-          scheduledTask = new Task(task.getName(), null, task.getDuration().toMinutes(),
-              task.getPriority(), Instant.ofEpochSecond(scheduleTimeSeconds).toString());
-        }
-
+      if (!currentScheduleTime
+          .plusSeconds(task.getDuration().getSeconds())
+          .isAfter(availableTimeRange.end())) {
+        ScheduledTask scheduledTask = new ScheduledTask(task, currentScheduleTime);
         scheduledTasks.add(scheduledTask);
-        scheduleTimeSeconds += task.getDurationSeconds();
+        currentScheduleTime = currentScheduleTime.plusSeconds(task.getDuration().getSeconds());
         j++;
       } else {
         i++;
@@ -86,31 +86,33 @@ public final class FindSchedule {
   }
 
   /**
-   * This method returns an TimeRange array which represent the periods of
-   * time that are empty of events and lie completely inside the person's
-   * working hours.
+   * This method returns an TimeRange array which represent the periods of time that are empty of
+   * events and lie completely inside the person's working hours.
    */
-  public static TimeRange[] emptyTimeRanges(
-      List<CalendarEvent> events, long workHoursStartTimeSeconds, long workHoursEndTimeSeconds) {
+  public static List<TimeRange> getEmptyTimeRanges(
+      List<CalendarEvent> events, Instant startTime, Instant endTime) {
     List<TimeRange> possibleTimes = new ArrayList<TimeRange>();
     // This represents the earliest time that we can schedule a window for the
     // meeting. As events are processed, this changes to their end times.
-    long earliestPossibleSoFar = workHoursStartTimeSeconds;
+    Instant earliestNonScheduledInstant = startTime;
     for (CalendarEvent event : events) {
       // Make sure that there is some time between the events and it is not
       // later than the person's working hours ending time.
-      if (event.getStartTimeLong() - earliestPossibleSoFar > (long) 0
-          && event.getStartTimeLong() <= workHoursEndTimeSeconds) {
-        possibleTimes.add(TimeRange.fromStartEnd(
-            earliestPossibleSoFar, event.getStartTimeLong(), /* inclusive= */ true));
+      if (event.getStartTimeInstant().isAfter(earliestNonScheduledInstant)
+          && (!event.getStartTimeInstant().isAfter(endTime))) {
+        possibleTimes.add(
+            TimeRange.fromStartEnd(
+                earliestNonScheduledInstant, event.getStartTimeInstant(), /* inclusive= */ true));
       }
-      earliestPossibleSoFar = Math.max(earliestPossibleSoFar, event.getEndTimeLong());
+      if (earliestNonScheduledInstant.isBefore(event.getEndTimeInstant())) {
+        earliestNonScheduledInstant = event.getEndTimeInstant();
+      }
     }
     // The end of the work hours is potentially never included so we check.
-    if (workHoursEndTimeSeconds - earliestPossibleSoFar > 0) {
-      possibleTimes.add(TimeRange.fromStartEnd(
-          earliestPossibleSoFar, workHoursEndTimeSeconds, /* inclusive= */ true));
+    if (endTime.isAfter(earliestNonScheduledInstant)) {
+      possibleTimes.add(
+          TimeRange.fromStartEnd(earliestNonScheduledInstant, endTime, /* inclusive= */ true));
     }
-    return possibleTimes.toArray(new TimeRange[possibleTimes.size()]);
+    return possibleTimes;
   }
 }
