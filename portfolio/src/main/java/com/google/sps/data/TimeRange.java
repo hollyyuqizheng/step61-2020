@@ -14,32 +14,35 @@
 
 package com.google.sps.data;
 
+import java.time.Duration;
+import java.time.Instant;
+
 /**
  * Class representing a span of time, enforcing properties (e.g. start comes before end) and
  * providing methods to make ranges easier to work with (e.g. {@code overlaps}).
  */
 public final class TimeRange {
-  private final long start;
-  private final long duration;
+  private final Instant start;
+  private final Duration duration;
 
-  private TimeRange(long start, long duration) {
+  private TimeRange(Instant start, Duration duration) {
     this.start = start;
     this.duration = duration;
   }
 
   /** Returns the start of the range in minutes. */
-  public long start() {
+  public Instant start() {
     return start;
   }
 
   /** Returns the number of minutes between the start and end. */
-  public long duration() {
+  public Duration duration() {
     return duration;
   }
 
   /** Returns the end of the range. This ending value is the closing exclusive bound. */
-  public long end() {
-    return start + duration;
+  public Instant end() {
+    return Instant.ofEpochSecond(start.getEpochSecond() + duration.getSeconds());
   }
 
   @Override
@@ -48,17 +51,12 @@ public final class TimeRange {
   }
 
   @Override
-  public int hashCode() {
-    return Long.hashCode(start) ^ Long.hashCode(duration);
-  }
-
-  @Override
   public String toString() {
-    return String.format("Range: [%d, %d)", start, start + duration);
+    return String.format("Range: [%d, %d)", start, this.end());
   }
 
   private static boolean equals(TimeRange a, TimeRange b) {
-    return a.start == b.start && a.duration == b.duration;
+    return a.start.equals(b.start) && a.duration.equals(b.duration);
   }
 
   /**
@@ -66,14 +64,10 @@ public final class TimeRange {
    * included in the range will depend on {@code inclusive}. If {@code inclusive} is {@code true},
    * then @{code end} will be in the range.
    */
-  public static TimeRange fromStartEnd(long start, long end, boolean inclusive) {
-    return inclusive ? new TimeRange(start, end - start + 1) : new TimeRange(start, end - start);
-  }
-
-  /**
-   * Create a {@code TimeRange} starting at {@code start} with a duration equal to {@code duration}.
-   */
-  public static TimeRange fromStartDuration(long start, long duration) {
-    return new TimeRange(start, duration);
+  public static TimeRange fromStartEnd(Instant start, Instant end, boolean inclusive) {
+    return inclusive
+        ? new TimeRange(
+            start, Duration.ofSeconds(end.getEpochSecond() - start.getEpochSecond() + 1))
+        : new TimeRange(start, Duration.ofSeconds(end.getEpochSecond() - start.getEpochSecond()));
   }
 }
