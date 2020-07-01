@@ -9,8 +9,7 @@ var SCOPE_READ_WRITE = 'https://www.googleapis.com/auth/calendar';
 
 var CLIENT_ID =
     '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
-var API_KEY = 'AIzaSyAcS8-F743Xy2ZTSYxxZIB0nY5kDQQ8i7E';
-//var API_KEY = process.env.API_KEY_CALENDAR; 
+ 
 
 /**
  * Loads the API's client and auth2 modules.
