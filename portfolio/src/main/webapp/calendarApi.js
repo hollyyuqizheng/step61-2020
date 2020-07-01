@@ -13,6 +13,10 @@ const DISCOVERY_URL =
 const CLIENT_ID =
     '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
 
+// Constants for error codes during OAuth process. 
+const ERROR_CODE_POPUP_CLOSED = 'popup_closed_by_user';
+const ERROR_CODE_ACCESS_DENIED = 'access_denied';
+
 /**
  * Loads the API's client and auth2 modules.
  * Calls the initClient function after the modules load.
@@ -23,6 +27,10 @@ function initiateCalendarAuth() {
 
 /** Starts authentication flow based on current user's login status. */
 function initClient() {
+  // Hide the error messages by default. 
+  // These messages will appear if authentication errors are caught. 
+  hideErrorMessages();
+
   // Initializes the gapi.client object, which app uses to make API requests.
   // Initially, the scope is read-only to view user's Google Calendar.
   gapi.client
@@ -52,22 +60,24 @@ function handleAuth() {
     // User is not signed in. Start Google auth flow.
     GoogleAuth.signIn()
       .catch(function(error) {
-        handleAuthError(error); 
+        handleImportAuthError(error); 
       }); 
   }
 }
 
-/** Updates import message box based on the error during authentication process. */
-function handleAuthError(e) {
-  if (e.error === 'popup_closed_by_user') {
+/** Updates import message box based on the error during authentication process for importing */
+function handleImportAuthError(e) {
+  $('#import-calendar-message').removeClass('d-none');
+  if (e.error === ERROR_CODE_POPUP_CLOSED) {
     $('#import-calendar-message').text(
         'It seems like you didn\'t complete the authorization process. ' +  
         'Please click the Login button again.'); 
-  } else if (e.error === 'access_denied') {
+  } else if (e.error === ERROR_CODE_ACCESS_DENIED) {
     $('#import-calendar-message').text(
-        'You didn\'t give permission to access your Google Calendar, ' +  
-        'so your calendar events cannot be viewed or updated');
+        'You didn\'t give permission to view your Google Calendar, ' +  
+        'so your calendar events cannot be viewed or imported.');
   }
+  $('#import-calendar-message').show(); 
 }
 
 /** Disconnects current user authentication. */
@@ -185,10 +195,15 @@ function showCalendarView(user) {
  * Asks the user for Write access to the API scope.
  */
 function addWriteScope() {
+  hideErrorMessages();
   var GoogleUser = GoogleAuth.currentUser.get();
-  GoogleUser.grant({'scope': SCOPE_READ_WRITE}).then((response) => {
-    addNewEventsToGoogleCalendar();
-  });
+  GoogleUser.grant({'scope': SCOPE_READ_WRITE})
+      .then((response) => {
+        addNewEventsToGoogleCalendar();
+      })
+      .catch(function(error) {
+        handleExportAuthError(error); 
+      })
 }
 
 /**
@@ -219,4 +234,25 @@ function addOneEventToGoogleCalendar(event) {
     // Refreshes the calendar view so that the new event shows up on it.
     showCalendarView(GoogleAuth.currentUser.get());
   });
+}
+
+/** Updates import message box based on the error during authentication process for exporting */
+function handleExportAuthError(e) {
+  $('#export-calendar-message').removeClass('d-none');
+  if (e.error === ERROR_CODE_POPUP_CLOSED) {
+    $('#export-calendar-message').text(
+        'It seems like you didn\'t complete the authorization process. ' +  
+        'Please click the Export button again.'); 
+  } else if (e.error === ERROR_CODE_ACCESS_DENIED) {
+    $('#export-calendar-message').text(
+        'You didn\'t give permission to update your Google Calendar, ' +  
+        'so your calendar events cannot be exported.');
+  } 
+  $('#export-calendar-message').show(); 
+}
+
+/** Hides the error messages when authentication completes succesfully. */
+function hideErrorMessages() {
+  $('#import-calendar-message').hide();
+  $('#export-calendar-message').hide(); 
 }
