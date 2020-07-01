@@ -5,8 +5,8 @@ import java.time.Instant;
 /** Models a calendar event. It can be used for both creation and import flow. */
 public class CalendarEvent {
   private String name;
-  private final Instant startTime;
-  private final Instant endTime;
+  private final Instant startTimeInstant;
+  private final Instant endTimeInstant;
 
   // TODO(hollyyuqizheng): Add an ID field if necessary.
 
