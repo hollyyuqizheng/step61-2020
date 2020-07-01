@@ -12,8 +12,10 @@ const DISCOVERY_URL =
 
 const CLIENT_ID =
     '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
+const API_KEY = 'AIzaSyAcS8-F743Xy2ZTSYxxZIB0nY5kDQQ8i7E';
+// const API_KEY = process.env.API_KEY_CALENDAR;
 
-// Constants for error codes during OAuth process. 
+// Constants for error codes during OAuth process.
 const ERROR_CODE_POPUP_CLOSED = 'popup_closed_by_user';
 const ERROR_CODE_ACCESS_DENIED = 'access_denied';
 
@@ -27,8 +29,8 @@ function initiateCalendarAuth() {
 
 /** Starts authentication flow based on current user's login status. */
 function initClient() {
-  // Hide the error messages by default. 
-  // These messages will appear if authentication errors are caught. 
+  // Hide the error messages by default.
+  // These messages will appear if authentication errors are caught.
   hideErrorMessages();
 
   // Initializes the gapi.client object, which app uses to make API requests.
@@ -58,26 +60,30 @@ function handleAuth() {
     GoogleAuth.signOut();
   } else {
     // User is not signed in. Start Google auth flow.
-    GoogleAuth.signIn()
-      .catch(function(error) {
-        handleImportAuthError(error); 
-      }); 
+    GoogleAuth.signIn().catch(function(error) {
+      handleImportAuthError(error);
+    });
   }
 }
 
-/** Updates import message box based on the error during authentication process for importing */
+/**
+ * Updates import message box based on the error during authentication process
+ * for importing
+ */
 function handleImportAuthError(e) {
   $('#import-calendar-message').removeClass('d-none');
   if (e.error === ERROR_CODE_POPUP_CLOSED) {
-    $('#import-calendar-message').text(
-        'It seems like you didn\'t complete the authorization process. ' +  
-        'Please click the Login button again.'); 
+    $('#import-calendar-message')
+        .text(
+            'It seems like you didn\'t complete the authorization process. ' +
+            'Please click the Login button again.');
   } else if (e.error === ERROR_CODE_ACCESS_DENIED) {
-    $('#import-calendar-message').text(
-        'You didn\'t give permission to view your Google Calendar, ' +  
-        'so your calendar events cannot be viewed or imported.');
+    $('#import-calendar-message')
+        .text(
+            'You didn\'t give permission to view your Google Calendar, ' +
+            'so your calendar events cannot be viewed or imported.');
   }
-  $('#import-calendar-message').show(); 
+  $('#import-calendar-message').show();
 }
 
 /** Disconnects current user authentication. */
@@ -202,7 +208,7 @@ function addWriteScope() {
         addNewEventsToGoogleCalendar();
       })
       .catch(function(error) {
-        handleExportAuthError(error); 
+        handleExportAuthError(error);
       })
 }
 
@@ -236,23 +242,28 @@ function addOneEventToGoogleCalendar(event) {
   });
 }
 
-/** Updates import message box based on the error during authentication process for exporting */
+/**
+ * Updates import message box based on the error during authentication process
+ * for exporting
+ */
 function handleExportAuthError(e) {
   $('#export-calendar-message').removeClass('d-none');
   if (e.error === ERROR_CODE_POPUP_CLOSED) {
-    $('#export-calendar-message').text(
-        'It seems like you didn\'t complete the authorization process. ' +  
-        'Please click the Export button again.'); 
+    $('#export-calendar-message')
+        .text(
+            'It seems like you didn\'t complete the authorization process. ' +
+            'Please click the Export button again.');
   } else if (e.error === ERROR_CODE_ACCESS_DENIED) {
-    $('#export-calendar-message').text(
-        'You didn\'t give permission to update your Google Calendar, ' +  
-        'so your calendar events cannot be exported.');
-  } 
-  $('#export-calendar-message').show(); 
+    $('#export-calendar-message')
+        .text(
+            'You didn\'t give permission to update your Google Calendar, ' +
+            'so your calendar events cannot be exported.');
+  }
+  $('#export-calendar-message').show();
 }
 
 /** Hides the error messages when authentication completes succesfully. */
 function hideErrorMessages() {
   $('#import-calendar-message').hide();
-  $('#export-calendar-message').hide(); 
+  $('#export-calendar-message').hide();
 }
