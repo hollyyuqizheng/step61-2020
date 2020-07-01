@@ -47,12 +47,4 @@ public class CalendarEvent {
   public Instant getEndTimeInstant() {
     return endTime;
   }
-
-  public long getStartTimeLong() {
-    return startTime.getEpochSecond();
-  }
-
-  public long getEndTimeLong() {
-    return endTime.getEpochSecond();
-  }
 }
