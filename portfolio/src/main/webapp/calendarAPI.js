@@ -1,4 +1,4 @@
-// require('dotenv').config(); 
+// require('dotenv').config();
 // console.log(process.env);
 
 var GoogleAuth;
@@ -8,7 +8,8 @@ const SCOPE_READ_ONLY = 'https://www.googleapis.com/auth/calendar.readonly';
 const SCOPE_READ_WRITE = 'https://www.googleapis.com/auth/calendar';
 
 // For the discovery document for Google Calendar API.
-const DISCOVERY_URL = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'; 
+const DISCOVERY_URL =
+    'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
 
 const CLIENT_ID =
     '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
@@ -24,7 +25,7 @@ function initiateCalendarAuth() {
 /** Starts authentication flow based on current user's login status. */
 function initClient() {
   // Initializes the gapi.client object, which app uses to make API requests.
-  // Initially, the scope is read-only to view user's Google Calendar. 
+  // Initially, the scope is read-only to view user's Google Calendar.
   gapi.client
       .init({
         'apiKey': API_KEY,
@@ -165,15 +166,14 @@ function showCalendarView(user) {
       });
 }
 
-/** 
- * Asks the user for Write access to the API scope.  
+/**
+ * Asks the user for Write access to the API scope.
  */
 function addWriteScope() {
   var GoogleUser = GoogleAuth.currentUser.get();
-  GoogleUser.grant({'scope': SCOPE_READ_WRITE})
-      .then((response) => {
-        addNewEventsToGoogleCalendar()
-      }); 
+  GoogleUser.grant({'scope': SCOPE_READ_WRITE}).then((response) => {
+    addNewEventsToGoogleCalendar();
+  });
 }
 
 /**
@@ -182,17 +182,17 @@ function addWriteScope() {
  */
 function addNewEventsToGoogleCalendar() {
   const event = {
-      'summary': 'Testing',
-      'description': 'test description',
-      'start': {
-        'dateTime': '2020-07-01T07:00:00Z',
-      },
-      'end': {
-        'dateTime': '2020-07-01T17:00:00Z',
-      },
+    'summary': 'Testing',
+    'description': 'test description',
+    'start': {
+      'dateTime': '2020-07-01T07:00:00Z',
+    },
+    'end': {
+      'dateTime': '2020-07-01T17:00:00Z',
+    },
   };
 
-  addOneEventToGoogleCalendar(event); 
+  addOneEventToGoogleCalendar(event);
 }
 
 /** Adds an individual event to the authorized user's Google Calendar. */
