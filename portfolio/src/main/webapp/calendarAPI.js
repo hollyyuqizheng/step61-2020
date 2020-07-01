@@ -4,12 +4,14 @@
 var GoogleAuth;
 
 // Scopes for API access to Google Calendar
-var SCOPE_READ_ONLY = 'https://www.googleapis.com/auth/calendar.readonly';
-var SCOPE_READ_WRITE = 'https://www.googleapis.com/auth/calendar';
+const SCOPE_READ_ONLY = 'https://www.googleapis.com/auth/calendar.readonly';
+const SCOPE_READ_WRITE = 'https://www.googleapis.com/auth/calendar';
 
-var CLIENT_ID =
+// For the discovery document for Google Calendar API.
+const DISCOVERY_URL = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'; 
+
+const CLIENT_ID =
     '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
- 
 
 /**
  * Loads the API's client and auth2 modules.
@@ -21,17 +23,13 @@ function initiateCalendarAuth() {
 
 /** Starts authentication flow based on current user's login status. */
 function initClient() {
-  // Retrieves the discovery document for Google Calendar API.
-  var discoveryUrl =
-      'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
-
   // Initializes the gapi.client object, which app uses to make API requests.
   // Initially, the scope is read-only to view user's Google Calendar. 
   gapi.client
       .init({
         'apiKey': API_KEY,
         'clientId': CLIENT_ID,
-        'discoveryDocs': [discoveryUrl],
+        'discoveryDocs': [DISCOVERY_URL],
         'scope': SCOPE_READ_ONLY
       })
       .then(function() {
@@ -168,9 +166,7 @@ function showCalendarView(user) {
 }
 
 /** 
- * Adds Write access to the API scope. 
- * TODO(hollyyuqizheng): need to prompt user to give this permission instead
- * of granting it automatically. 
+ * Asks the user for Write access to the API scope.  
  */
 function addWriteScope() {
   var GoogleUser = GoogleAuth.currentUser.get();
