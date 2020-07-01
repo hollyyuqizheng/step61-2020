@@ -22,10 +22,10 @@ public class CalendarEvent {
     if (name == null) {
       throw new IllegalArgumentException("Event needs a name");
     }
-    if (startTimeString == null) {
+    if (startTimeInstant == null) {
       throw new IllegalArgumentException("Event needs a start time");
     }
-    if (endTimeString == null) {
+    if (endTimeInstant == null) {
       throw new IllegalArgumentException("Event needs an end time");
     }
     this.name = name;
