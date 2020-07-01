@@ -14,12 +14,11 @@ public class CalendarEvent {
    * Constructs a calendar event.
    *
    * @param name: Name for the event,
-   * @param startTimeString: a string representation of the event's start time. The string is in
-   *     format Day Month Date Year HH:MM:SS GMT-Time-zone
-   * @param endTimeString: a string representation of the event's end time. The string's format is
-   *     the same as startTimeString's. All of these fields are required for a calendar event.
+   * @param startTimeInstant: event's start time, of type Instant.
+   * @param endTimeInstant: event's end time, of type Instant. All of these fields are required for
+   *     a calendar event.
    */
-  public CalendarEvent(String name, String startTimeString, String endTimeString) {
+  public CalendarEvent(String name, Instant startTimeInstant, Instant endTimeInstant) {
     if (name == null) {
       throw new IllegalArgumentException("Event needs a name");
     }
@@ -31,8 +30,8 @@ public class CalendarEvent {
     }
     this.name = name;
     // Converts time from string representation into an instance of Instant class.
-    this.startTime = Instant.parse(startTimeString);
-    this.endTime = Instant.parse(endTimeString);
+    this.startTimeInstant = startTimeInstant;
+    this.endTimeInstant = endTimeInstant;
   }
 
   /* Because all three fields are required, the following getters won't return null. */
@@ -41,10 +40,10 @@ public class CalendarEvent {
   }
 
   public Instant getStartTimeInstant() {
-    return startTime;
+    return startTimeInstant;
   }
 
   public Instant getEndTimeInstant() {
-    return endTime;
+    return endTimeInstant;
   }
 }
