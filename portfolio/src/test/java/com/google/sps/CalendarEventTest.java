@@ -19,8 +19,8 @@ public final class CalendarEventTest {
     CalendarEvent event =
         new CalendarEvent(
             /* name= */ "test",
-            /* startTimeString= */ "2020-06-24T13:00:00.000Z",
-            /* endTimeString= */ "2020-06-25T00:00:00.000Z");
+            /* startTime= */ Instant.parse("2020-06-24T13:00:00.000Z"),
+            /* endTime= */ Instant.parse("2020-06-25T00:00:00.000Z"));
 
     Instant expectedStartTimeInstant = Instant.parse("2020-06-24T13:00:00.000Z");
     Instant actualStartTimeInstant = event.getStartTimeInstant();
