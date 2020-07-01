@@ -1,4 +1,4 @@
-// require('dotenv').config();
+// require(['dotenv']).config({path: './.env'});
 
 var GoogleAuth;
 
@@ -106,16 +106,38 @@ function updateCalendarView() {
   }
 }
 
+/** Retrives the date that the user has picked for the scheduling. */
+function getUserPickedDate() {
+  const userPickedDate = $('#date-picker').val().split('-');
+  const year = userPickedDate[0];
+  const month = userPickedDate[1];
+  const date = userPickedDate[2];
+
+  const pickedDate = new Date();
+  pickedDate.setFullYear(year);
+  pickedDate.setMonth(month - 1);  // month is zero-indexed.
+  pickedDate.setDate(date);
+
+  return pickedDate;
+}
+
 /**
  * Print the summary and start datetime/date of the next ten events in
  * the authorized user's calendar. If no events are found an
  * appropriate message is printed.
  */
 function listUpcomingEvents() {
-  // Only import events for the next 24 hours.
-  const timeRangeStart = new Date();  // this is a timestamp of now
+  const timeRangeStart = getUserPickedDate();
+
   const timeRangeEnd = new Date();
+  timeRangeEnd.setFullYear(timeRangeStart.getFullYear());
+  timeRangeEnd.setMonth(timeRangeStart.getMonth());
   timeRangeEnd.setDate(timeRangeStart.getDate() + 1);
+
+  // Only import events for the next 24 hours.
+  // const timeRangeStart = new Date();  // this is a timestamp of now
+  // const timeRangeEnd = new Date();
+  // timeRangeEnd.setDate(timeRangeStart.getDate() + 1);
 
   gapi.client.calendar.events
       .list({
@@ -141,12 +163,12 @@ function listUpcomingEvents() {
             // When retrieved from Google Calendar, these time strings
             // are in the time zone of the user's Calendar's time zone.
             // These time strings have format YYYY-MM-DDTHH:MM:SS-TimeZoneOffset
-            const startTimeString = event.start.dateTime;
+            var startTimeString = event.start.dateTime;
             if (!startTimeString) {
               startTimeString = event.start.date;
             }
 
-            const endTimeString = event.end.dateTime;
+            var endTimeString = event.end.dateTime;
             if (!endTimeString) {
               endTimeString = event.end.date;
             }
