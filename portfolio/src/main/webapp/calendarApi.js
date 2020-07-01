@@ -12,8 +12,6 @@ const DISCOVERY_URL =
 
 const CLIENT_ID =
     '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
-const API_KEY = 'AIzaSyAcS8-F743Xy2ZTSYxxZIB0nY5kDQQ8i7E';
-// const API_KEY = process.env.API_KEY_CALENDAR;
 
 // Constants for error codes during OAuth process.
 const ERROR_CODE_POPUP_CLOSED = 'popup_closed_by_user';
