@@ -5,8 +5,8 @@ import java.time.Instant;
 /** Models a calendar event. It can be used for both creation and import flow. */
 public class CalendarEvent {
   private String name;
-  private final Instant startTime;
-  private final Instant endTime;
+  private final Instant startTimeInstant;
+  private final Instant endTimeInstant;
 
   // TODO(hollyyuqizheng): Add an ID field if necessary.
 
@@ -22,10 +22,10 @@ public class CalendarEvent {
     if (name == null) {
       throw new IllegalArgumentException("Event needs a name");
     }
-    if (startTimeString == null) {
+    if (startTimeInstant == null) {
       throw new IllegalArgumentException("Event needs a start time");
     }
-    if (endTimeString == null) {
+    if (startTimeInstant == null) {
       throw new IllegalArgumentException("Event needs an end time");
     }
     this.name = name;
