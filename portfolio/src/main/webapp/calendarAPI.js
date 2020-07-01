@@ -170,7 +170,10 @@ function showCalendarView(user) {
  */
 function addWriteScope() {
   var GoogleUser = GoogleAuth.currentUser.get();
-  GoogleUser.grant({'scope': SCOPE_READ_WRITE});
+  GoogleUser.grant({'scope': SCOPE_READ_WRITE})
+      .then((response) => {
+        addNewEventsToGoogleCalendar()
+      }); 
 }
 
 /**
@@ -178,8 +181,6 @@ function addWriteScope() {
  * TODO(hollyyuqizheng): change the hard-coded part later.
  */
 function addNewEventsToGoogleCalendar() {
-  addWriteScope();
-  
   const event = {
       'summary': 'Testing',
       'description': 'test description',
