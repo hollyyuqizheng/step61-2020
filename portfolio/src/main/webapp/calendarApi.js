@@ -153,8 +153,8 @@ function listUpcomingEvents() {
           $('#empty-calendar-import-message').show();
         } else {
           $('#empty-calendar-import-message').hide(); 
-          for (i = 0; i < events.length; i++) {
-            const event = events[i];
+
+          events.forEach((event) => {
             const eventName = event.summary;
 
             // When retrieved from Google Calendar, these time strings
@@ -186,7 +186,7 @@ function listUpcomingEvents() {
             if (!doesEventExist) {
               updateCalendarEventList(newCalendarEvent);
             }
-          }
+          });
         }
       });
 }
