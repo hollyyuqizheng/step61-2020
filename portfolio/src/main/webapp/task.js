@@ -39,9 +39,6 @@ function createNewTask() {
       document.getElementById('new-task-estimated-length-unit').value;
   const priority = document.getElementById('new-task-priority').value;
 
-  const dataArray =
-      [name, description, getDurationMinutes(length, lengthUnit), priority];
-
   if (name == '') {
     return false;
   }
