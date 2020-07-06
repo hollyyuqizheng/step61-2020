@@ -20,10 +20,10 @@ public final class Task {
    * The constructor will make sure that all necessary parameters are passed in, and populate each
    * class variable appropriately.
    *
-   * @param name: Name for the Task,
+   * @param name: Name for the Task
    * @param description: Optional description for the Task, this can be passed in as null but will
    *     be set the class variable to an empty
-   * @param duration: the amount of time the user estimates this Task will require to be completed,
+   * @param duration: the amount of time the user estimates this Task will require to be completed
    * @param priority: the priority the user wants the algorithm to consider when creating a
    *     schedule. The priority can range from 1 through 5 with 5 being the highest priority.
    *     Priority is handled by the custom class TaskPriority which checks input values.
