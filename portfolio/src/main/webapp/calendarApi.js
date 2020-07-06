@@ -122,23 +122,19 @@ function getUserPickedDate() {
 }
 
 /**
- * Print the summary and start datetime/date of the next ten events in
- * the authorized user's calendar. If no events are found an
- * appropriate message is printed.
+ * Print the summary and start datetime/date of the events for the
+ * day that user has picked in the nav bar.
+ * If no events are found a message is displayed on the UI.
  */
 function listUpcomingEvents() {
   const timeRangeStart = getUserPickedDate();
-
   const timeRangeEnd = new Date();
   timeRangeEnd.setFullYear(timeRangeStart.getFullYear());
   timeRangeEnd.setMonth(timeRangeStart.getMonth());
   timeRangeEnd.setDate(timeRangeStart.getDate() + 1);
 
-  // Only import events for the next 24 hours.
-  // const timeRangeStart = new Date();  // this is a timestamp of now
-  // const timeRangeEnd = new Date();
-  // timeRangeEnd.setDate(timeRangeStart.getDate() + 1);
-
+  // Retrieves events on the user's calendar for the day
+  // that the user has picked in the nav bar. 
   gapi.client.calendar.events
       .list({
         'calendarId': 'primary',
