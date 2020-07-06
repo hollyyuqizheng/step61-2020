@@ -22,7 +22,7 @@ public final class Task {
    *
    * @param name: Name for the Task
    * @param description: Optional description for the Task, this can be passed in as null but will
-   *     be set the class variable to an empty
+   *     be the constructor will set the object description to an empty Optional object
    * @param duration: the amount of time the user estimates this Task will require to be completed
    * @param priority: the priority the user wants the algorithm to consider when creating a
    *     schedule. The priority can range from 1 through 5 with 5 being the highest priority.
