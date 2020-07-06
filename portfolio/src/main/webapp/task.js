@@ -40,11 +40,11 @@ function createNewTask() {
   const priority = document.getElementById('new-task-priority').value;
 
   if (name == '') {
-    return false;
+    return;
   }
 
   if (parseInt(length) <= 0 || length == '') {
-    return false;
+    return;
   }
 
   const newTask = new Task(
