@@ -25,7 +25,7 @@ public final class Task {
    * Optional object. Tasks by default do not have a scheduled time, they are only assigned this
    * field as a result of getting scheduled by the scheduling algorithm.
    */
-  public Task(String name, String description, long durationMinutes, TaskPriority priority) {
+  public Task(String name, String description, Duration duration, TaskPriority priority) {
     if (name == null) {
       throw new IllegalArgumentException("Name cannot be null");
     }
@@ -43,11 +43,18 @@ public final class Task {
   /**
    * The constructor allows for Tasks to have their scheduled time be set. New tasks being made for
    * scheduling purposes use this constructor instead.
+   *
+   * @param name: Name for the Task,
+   * @param description: Optional description for the Task,
+   * @param duration: the amount of time the user estimates this Task will require to be completed,
+   * @param priority: the priority the user wants the algorithm to consider when creating a
+   *     schedule. The priority can range from 1 through 5 with 5 being the highest priority.
+   *     Priority is handled by the custom class TaskPriority which checks input values.
    */
   public Task(
       String name,
       String description,
-      long durationMinutes,
+      Duration duration,
       TaskPriority priority,
       String scheduledTime) {
     if (name == null) {
@@ -89,7 +96,7 @@ public final class Task {
     return priority.getPriority();
   }
 
-  public long getDurationSeconds() {
+  public Duration getDuration() {
     return duration.getSeconds();
   }
 
