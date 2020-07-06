@@ -64,29 +64,33 @@ public class ScheduleServlet extends HttpServlet {
 
   private static Collection<CalendarEvent> collectEventsFromJsonArray(JSONArray eventsArray) {
     Collection<CalendarEvent> events = new ArrayList<CalendarEvent>();
-    for (int i = 0; i < eventsArray.length(); i++) {
-      JSONObject eventJsonObject = eventsArray.getJSONObject(i);
-      String name = eventJsonObject.getString("name");
-      String startTime = eventJsonObject.getString("startTime");
-      String endTime = eventJsonObject.getString("endTime");
-      CalendarEvent newEvent = new CalendarEvent(name, startTime, endTime);
-      events.add(newEvent);
+    for (Object object: eventsArray) {
+      if (object instanceof JSONObject) {
+        JSONObject eventJsonObject = (JSONObject) object;
+        String name = eventJsonObject.getString("name");
+        Instant startTime = Instant.parse(eventJsonObject.getString("startTime"));
+        Instant endTime = Instant.parse(eventJsonObject.getString("endTime"));
+        CalendarEvent newEvent = new CalendarEvent(name, startTime, endTime);
+        events.add(newEvent);
+      }
     }
     return events;
   }
 
   private static Collection<Task> collectTasksFromJsonArray(JSONArray tasksArray) {
     Collection<Task> tasks = new ArrayList<Task>();
-    for (int i = 0; i < tasksArray.length(); i++) {
-      JSONObject taskJsonObject = tasksArray.getJSONObject(i);
-      String name = taskJsonObject.getString("name");
-      String description = taskJsonObject.getString("description");
-      long durationMinutes = taskJsonObject.getLong("duration");
-      Duration duration = Duration.ofMinutes(durationMinutes);
-      int priorityInt = taskJsonObject.getInt("taskPriority");
-      TaskPriority priority = new TaskPriority(priorityInt);
-      Task newTask = new Task(name, description, duration, priority);
-      tasks.add(newTask);
+    for (Object object: tasksArray) {
+      if (object instanceof JSONObject) {
+        JSONObject taskJsonObject = (JSONObject) object;
+        String name = taskJsonObject.getString("name");
+        String description = taskJsonObject.getString("description");
+        long durationMinutes = taskJsonObject.getLong("duration");
+        Duration duration = Duration.ofMinutes(durationMinutes);
+        int priorityInt = taskJsonObject.getInt("taskPriority");
+        TaskPriority priority = new TaskPriority(priorityInt);
+        Task newTask = new Task(name, description, duration, priority);
+        tasks.add(newTask);
+      }
     }
     return tasks;
   }
