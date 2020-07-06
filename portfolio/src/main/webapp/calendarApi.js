@@ -156,6 +156,7 @@ function listUpcomingEvents() {
           $('#empty-calendar-import-message').removeClass('d-none');
           $('#empty-calendar-import-message').show();
         } else {
+          $('#empty-calendar-import-message').hide(); 
           for (i = 0; i < events.length; i++) {
             const event = events[i];
             const eventName = event.summary;
@@ -202,6 +203,7 @@ function listUpcomingEvents() {
 function showCalendarView(user) {
   const userEmail = encodeURIComponent(user.getBasicProfile().getEmail());
 
+  // Fetches the user's Calendar's time zone. 
   gapi.client.calendar.settings.get({'setting': 'timezone'})
       .then((responseTimeZone) => {
         const userCalendarTimeZone =
@@ -234,17 +236,22 @@ function addWriteScope() {
 
 /**
  * Adds the scheduled task items back to the user's Google Calendar.
- * TODO(hollyyuqizheng): change the hard-coded part later.
+ * TODO(hollyyuqizheng): change the hard-coded part later when scheduled 
+ * results are returned.
  */
-function addNewEventsToGoogleCalendar() {
+function addNewEventsToGoogleCalendar() { 
+  const now = new Date();
+  const fiveHoursLater = new Date();
+  fiveHoursLater.setHours(now.getHours() + 5);
+
   const event = {
     'summary': 'Testing',
     'description': 'test description',
     'start': {
-      'dateTime': '2020-07-01T07:00:00Z',
+      'dateTime': now.toISOString(),
     },
     'end': {
-      'dateTime': '2020-07-01T17:00:00Z',
+      'dateTime': fiveHoursLater.toISOString(),
     },
   };
 
