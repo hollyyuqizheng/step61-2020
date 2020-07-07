@@ -60,7 +60,7 @@ function initClient() {
  */
 function handleSignIn() {
   gapi.auth2.getAuthInstance().signIn().catch(function(error) {
-    handlenError(error);
+    handleAuthorizationError(error);
   });
 }
 
@@ -105,6 +105,13 @@ function handleAuthorizationError(error) {
   $('#sheets-message').show();
 }
 
+function handleExportError(reason) {
+  $('#sheets-message').removeClass('d-none');
+  $('#sheets-message').text('Error: ' + reason.result.error.message);
+  $('#sheets-message').show();
+}
+
+
 function handleExportSchedule() {
   var spreadsheetProperties = {
     title: 'Your Scheduled Tasks'
@@ -128,6 +135,6 @@ function handleExportSchedule() {
                 response.result.spreadsheetUrl);
       },
       function(reason) {
-        handleError(reason.result.error.message);
+        handleExportError(reason);
       });
 }
