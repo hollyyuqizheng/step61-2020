@@ -57,7 +57,7 @@ public final class TimeRange {
     return String.format("Range: [%d, %d)", start, this.end());
   }
 
-  private static boolean equals(TimeRange a, TimeRange b) {
+  public static boolean equals(TimeRange a, TimeRange b) {
     return a.start.equals(b.start) && a.duration.equals(b.duration);
   }
 
