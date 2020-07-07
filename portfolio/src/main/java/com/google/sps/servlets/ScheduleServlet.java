@@ -56,7 +56,8 @@ public class ScheduleServlet extends HttpServlet {
     response.setContentType("application/json");
     response.getWriter().println(resultJson);
   }
-
+  
+  // TODO(tomasalvarez): Add tests for this method.
   private static Collection<CalendarEvent> collectEventsFromJsonArray(JSONArray eventsArray) {
     Collection<CalendarEvent> events = new ArrayList<CalendarEvent>();
     for (Object object: eventsArray) {
@@ -71,7 +72,8 @@ public class ScheduleServlet extends HttpServlet {
     }
     return events;
   }
-
+  
+  // TODO(tomasalvarez): Add tests for this method.
   private static Collection<Task> collectTasksFromJsonArray(JSONArray tasksArray) {
     Collection<Task> tasks = new ArrayList<Task>();
     for (Object object: tasksArray) {
