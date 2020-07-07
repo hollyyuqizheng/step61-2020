@@ -149,7 +149,12 @@ function listUpcomingEvents() {
 
         // Show message for no imported event if result list is empty.
         if (events.length == 0) {
+          const pickedDate = $('#date-picker').val();
           $('#empty-calendar-import-message').removeClass('d-none');
+          $('#empty-calendar-import-message').text(
+            'There aren\'t any events scheduled on your Google Calendar for ' + 
+            pickedDate 
+          ); 
           $('#empty-calendar-import-message').show();
         } else {
           $('#empty-calendar-import-message').hide(); 
@@ -216,6 +221,7 @@ function showCalendarView(user) {
 }
 
 /**
+ * Onclick function for 'Looks good to me, export" button. 
  * Asks the user for Write access to the API scope.
  */
 function addWriteScope() {
