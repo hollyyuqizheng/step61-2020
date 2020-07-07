@@ -23,6 +23,7 @@ import java.util.List;
 
 // TODO(tomasalvarez): Refactor this class into an abstract class where each of
 // the scheduling algorithms can be their own class that extends this one.
+// TODO: Add test coverage for scheduling algorithms
 
 public class FindSchedule {
   private static final Comparator<CalendarEvent> sortByEventStartTimeAscending =
@@ -80,8 +81,13 @@ public class FindSchedule {
     }
 
   /**
-   * This method returns an TimeRange array which represent the periods of time that are empty of
-   * events and lie completely inside the person's working hours.
+   * This method returns a List of TimeRange's, in chronological order, that are empty of events and
+   * lie completely inside the period in between startTime and endTime. All fields are required for
+   * this method and object construction in the servlet enforces that none are null.
+   *
+   * @param events: A Collection of CalendarEvent objects,
+   * @param startTime: An Instant representing the start of the time period,
+   * @param endTime: An Instant representing the end of the time period.
    */
   public static List<TimeRange> getEmptyTimeRanges(
       List<CalendarEvent> events, Instant startTime, Instant endTime) {
@@ -93,7 +99,7 @@ public class FindSchedule {
       // Make sure that there is some time between the events and it is not
       // later than the person's working hours ending time.
       if (event.getStartTimeInstant().isAfter(earliestNonScheduledInstant)
-          && (!event.getStartTimeInstant().isAfter(endTime))) {
+          && !event.getStartTimeInstant().isAfter(endTime)) {
         possibleTimes.add(
             TimeRange.fromStartEnd(
                 earliestNonScheduledInstant, event.getStartTimeInstant(), /* inclusive= */ true));
