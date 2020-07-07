@@ -42,18 +42,13 @@ public class ScheduleServlet extends HttpServlet {
     JSONArray tasksArray = jsonFromRequest.getJSONArray("tasks");
     String workHoursStartTimeString = (String) jsonFromRequest.get("startTime");
     String workHoursEndTimeString = (String) jsonFromRequest.get("endTime");
+    Instant workHoursStartTime = Instant.parse(workHoursStartTimeString);
+    Instant workHoursEndTime = Instant.parse(workHoursEndTimeString);
 
     Collection<CalendarEvent> events = collectEventsFromJsonArray(eventsArray);
     Collection<Task> tasks = collectTasksFromJsonArray(tasksArray);
-
-    ScheduleRequest scheduleRequest =
-        new ScheduleRequest(events, tasks, workHoursStartTimeString, workHoursEndTimeString);
     Collection<ScheduledTask> scheduledTasks =
-        FindSchedule.shortestTaskFirst(
-            scheduleRequest.getEvents(),
-            scheduleRequest.getTasks(),
-            scheduleRequest.getWorkHoursStartTimeInstant(),
-            scheduleRequest.getWorkHoursEndTimeInstant());
+        algorithm.schedule(events, tasks, workHoursStartTime, workHoursEndTime);
 
     Gson gson = new Gson();
     String resultJson = gson.toJson(scheduledTasks);
