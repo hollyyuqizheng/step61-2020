@@ -17,6 +17,8 @@ package com.google.sps.data;
 import java.time.Duration;
 import java.time.Instant;
 
+
+// TODO(tomasalvarez): Write tests for this class.
 /**
  * Class representing a span of time, enforcing properties (e.g. start comes before end) and
  * providing methods to make ranges easier to work with (e.g. {@code overlaps}).
@@ -62,7 +64,7 @@ public final class TimeRange {
   /**
    * Creates a {@code TimeRange} from {@code start} to {@code end}. Whether or not {@code end} is
    * included in the range will depend on {@code inclusive}. If {@code inclusive} is {@code true},
-   * then @{code end} will be in the range.
+   * then {@code end} will be in the range.
    */
   public static TimeRange fromStartEnd(Instant start, Instant end, boolean inclusive) {
     return inclusive
