@@ -10,6 +10,9 @@ var DISCOVERY_DOCS =
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
 var SCOPE_READ_WRITE = 'https://www.googleapis.com/auth/spreadsheets';
+// Error codes that the process can throw
+const ERROR_POPUP_CLOSED = 'popup_closed_by_user';
+const ERROR_ACCESS_DENIED = 'access_denied';
 
 /**
  * On load, called to load the auth2 library and API client library.
@@ -89,16 +92,14 @@ function handleButtons() {
  * Called when the sign-in process throws an error and displays an error
  * message on the UI.
  */
-function handleError(error) {
+function handleAuthorizationError(error) {
   $('#sheets-message').removeClass('d-none');
-  if (error.error === 'popup_closed_by_user') {
+  if (error.error === ERROR_POPUP_CLOSED) {
     $('#sheets-message')
         .text('You closed out of the popup, please log in again.');
-  } else if (error.error === 'access_denied') {
+  } else if (error.error === ERROR_ACCESS_DENIED) {
     $('#sheets-message').text('You did not authorize Google Sheets.');
-  } else if (typeof error === 'string') {
-    $('#sheets-message').text('Error: ' + error);
-  } else {
+  }else {
     $('#sheets-message').text('An error occurred try again.');
   }
   $('#sheets-message').show();
