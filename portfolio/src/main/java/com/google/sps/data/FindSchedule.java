@@ -46,25 +46,21 @@ public class FindSchedule {
     Collections.sort(tasksList, sortByTaskDurationThenName);
     List<TimeRange> availableTimes =
         getEmptyTimeRanges(eventsList, workHoursStartTime, workHoursEndTime);
-
     List<ScheduledTask> scheduledTasks = new ArrayList<ScheduledTask>();
-    // Index of TimeRange we are in.
-    int i = 0;
-    // Index of Task we are trying to schedule.
-    int j = 0;
-    // Integer indicating the start time (in minutes) we are currently trying to
-    // schedule events in.
+    int rangeIndex = 0;
+    int taskIndex = 0;
+    // Instant indicating the start time we are currently trying to schedule
+    // events in.
     Instant currentScheduleTime = workHoursStartTime;
-
     // This will iterate through the time ranges and tasks and if one can be
     // scheduled then it will be (and we move onto the next task) otherwise
     // we move on to the next range (this is because the tasks are sorted by
     // duration so if one task did not fit in the given range then we know no
     // later ones will fit either). We create new Task objects for the result
     // so data structures passed in are never changed.
-    while (i < availableTimes.size() && j < tasksList.size()) {
-      TimeRange availableTimeRange = availableTimes.get(i);
-      Task task = tasksList.get(j);
+    while (rangeIndex < availableTimes.size() && taskIndex < tasksList.size()) {
+      TimeRange availableTimeRange = availableTimes.get(rangeIndex);
+      Task task = tasksList.get(taskIndex);
       // Either time is already past the start of the time range or we should
       // update it (maybe this is our first iteration in the range).
       if (availableTimeRange.start().isAfter(currentScheduleTime)) {
@@ -77,13 +73,11 @@ public class FindSchedule {
         ScheduledTask scheduledTask = new ScheduledTask(task, currentScheduleTime);
         scheduledTasks.add(scheduledTask);
         currentScheduleTime = currentScheduleTime.plusSeconds(task.getDuration().getSeconds());
-        j++;
+        taskIndex++;
       } else {
-        i++;
+        rangeIndex++;
       }
     }
-    return scheduledTasks;
-  }
 
   /**
    * This method returns an TimeRange array which represent the periods of time that are empty of
