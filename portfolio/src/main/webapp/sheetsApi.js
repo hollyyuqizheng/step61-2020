@@ -1,4 +1,3 @@
-
 // Client ID and API key from the Developer Console
 var CLIENT_ID =
     '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
@@ -10,7 +9,7 @@ var DISCOVERY_DOCS =
 
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
-var SCOPES = 'https://www.googleapis.com/auth/spreadsheets';
+var SCOPE_READ_WRITE = 'https://www.googleapis.com/auth/spreadsheets';
 
 /**
  * On load, called to load the auth2 library and API client library.
@@ -29,7 +28,7 @@ function initClient() {
         apiKey: API_KEY,
         clientId: CLIENT_ID,
         discoveryDocs: DISCOVERY_DOCS,
-        scope: SCOPES
+        scope: SCOPE_READ_WRITE
       })
       .then(
           function() {
