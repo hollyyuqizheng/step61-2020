@@ -28,6 +28,9 @@ public class CalendarEvent {
     if (endTime == null) {
       throw new IllegalArgumentException("Event needs an end time");
     }
+    if (startTime.isAfter(endTime)) {
+      throw new IllegalArgumentException("Start time cannot be after end time");
+    }
     this.name = name;
     this.startTime = startTime;
     this.endTime = endTime;
