@@ -9,10 +9,8 @@ class ScheduleRequest {
    * All fields are required for this object.
    * @param events: events happening the day of the scheduling,
    * @param tasks: the tasks a user would like to schedule on that day
-   * @param startTime: a string representation of the work hours start
-   *     time. The string is in format YYYY-MM-DDTHH:MM:SSZ
-   * @param endTime: a string representation of the work hours end time.
-   *     The string's format is the same as startTimeString's.
+   * @param startTime: a JavaScript Date object representing the start time.
+   * @param endTime: a JavaScript Date object representing the end time.
    */
   constructor(events, tasks, startTime, endTime) {
     this.events = events;
