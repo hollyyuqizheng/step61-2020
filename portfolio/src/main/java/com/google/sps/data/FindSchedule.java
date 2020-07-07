@@ -89,7 +89,7 @@ public class FindSchedule {
    * @param startTime: An Instant representing the start of the time period,
    * @param endTime: An Instant representing the end of the time period.
    */
-  public static List<TimeRange> getEmptyTimeRanges(
+    public static List<TimeRange> getEmptyTimeRanges(
       List<CalendarEvent> events, Instant startTime, Instant endTime) {
     List<TimeRange> possibleTimes = new ArrayList<TimeRange>();
     // This represents the earliest time that we can schedule a window for the
@@ -98,14 +98,14 @@ public class FindSchedule {
     for (CalendarEvent event : events) {
       // Make sure that there is some time between the events and it is not
       // later than the person's working hours ending time.
-      if (event.getStartTimeInstant().isAfter(earliestNonScheduledInstant)
-          && !event.getStartTimeInstant().isAfter(endTime)) {
+      if (event.getStartTime().isAfter(earliestNonScheduledInstant)
+          && !event.getStartTime().isAfter(endTime)) {
         possibleTimes.add(
             TimeRange.fromStartEnd(
-                earliestNonScheduledInstant, event.getStartTimeInstant(), /* inclusive= */ true));
+                earliestNonScheduledInstant, event.getStartTime(), /* inclusive= */ true));
       }
-      if (earliestNonScheduledInstant.isBefore(event.getEndTimeInstant())) {
-        earliestNonScheduledInstant = event.getEndTimeInstant();
+      if (earliestNonScheduledInstant.isBefore(event.getEndTime())) {
+        earliestNonScheduledInstant = event.getEndTime();
       }
     }
     // The end of the work hours is potentially never included so we check.
