@@ -13,7 +13,7 @@ class Task {
    * when not set.
    * @param name: name of task as String
    * @param description: description of task as String, can be null
-   * @param duration: duration of task
+   * @param duration: duration of task in minutes as an integer
    * @param taskPriority: priority level of task, range 1-5 inclusive.
    */
   constructor(name, description, duration, taskPriority) {
@@ -27,8 +27,8 @@ class Task {
 /**
  * This method grabs the required inputs from the front end of the page that
  * will populate the Task's information. It requires that the front end fields
- * for name, and duration to be passed in. Once it checks for the required 
- * inputs, a JavaScript task class is created and passed into the 
+ * for name, and duration to be passed in. Once it checks for the required
+ * inputs, a JavaScript task class is created and passed into the
  * updateTaskList function.
  */
 function createNewTask() {
@@ -48,7 +48,8 @@ function createNewTask() {
   }
 
   const newTask = new Task(
-      name, description, getDurationMinutes(length, lengthUnit), parseInt(priority));
+      name, description, getDurationMinutes(length, lengthUnit),
+      parseInt(priority));
   updateTaskList(newTask);
 }
 
