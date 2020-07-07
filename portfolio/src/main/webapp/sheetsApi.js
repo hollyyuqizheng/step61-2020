@@ -104,14 +104,20 @@ function handleAuthorizationError(error) {
   }
   $('#sheets-message').show();
 }
-
+/**
+ * Called when the export process throws an error and displays an error
+ * message on the UI.
+ */
 function handleExportError(reason) {
   $('#sheets-message').removeClass('d-none');
   $('#sheets-message').text('Error: ' + reason.result.error.message);
   $('#sheets-message').show();
 }
 
-
+/**
+ * Creates and populates a new spreadsheet with the scheduled task information.
+ * Also displays the link to the spreadsheet as text on the UI.
+ */
 function handleExportSchedule() {
   var spreadsheetProperties = {
     title: 'Your Scheduled Tasks'
@@ -126,8 +132,8 @@ function handleExportSchedule() {
       {properties: spreadsheetProperties});
   request.then(
       function(response) {
-        // TODO: Change code below to process the `response` object:
-        console.log(response.result);
+        // TODO(tomasalvarez): Change code below to process the `response` 
+        // object. Currently just displays the link back to the user.
         $('#sheets-url-container').removeClass('d-none');
         $('#sheets-url-container')
             .text(
