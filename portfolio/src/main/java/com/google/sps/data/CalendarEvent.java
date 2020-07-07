@@ -4,9 +4,9 @@ import java.time.Instant;
 
 /** Models a calendar event. It can be used for both creation and import flow. */
 public class CalendarEvent {
-  private String name;
-  private final Instant startTimeInstant;
-  private final Instant endTimeInstant;
+  private final String name;
+  private final Instant startTime;
+  private final Instant endTime;
 
   // TODO(hollyyuqizheng): Add an ID field if necessary.
 
@@ -14,23 +14,23 @@ public class CalendarEvent {
    * Constructs a calendar event.
    *
    * @param name: Name for the event,
-   * @param startTimeInstant: event's start time, of type Instant.
-   * @param endTimeInstant: event's end time, of type Instant. All of these fields are required for
-   *     a calendar event.
+   * @param startTime: event's start time, of type Instant.
+   * @param endTime: event's end time, of type Instant. All of these fields are required for a
+   *     calendar event.
    */
-  public CalendarEvent(String name, Instant startTimeInstant, Instant endTimeInstant) {
+  public CalendarEvent(String name, Instant startTime, Instant endTime) {
     if (name == null) {
       throw new IllegalArgumentException("Event needs a name");
     }
-    if (startTimeInstant == null) {
+    if (startTime == null) {
       throw new IllegalArgumentException("Event needs a start time");
     }
-    if (endTimeInstant == null) {
+    if (endTime == null) {
       throw new IllegalArgumentException("Event needs an end time");
     }
     this.name = name;
-    this.startTimeInstant = startTimeInstant;
-    this.endTimeInstant = endTimeInstant;
+    this.startTime = startTime;
+    this.endTime = endTime;
   }
 
   /* Because all three fields are required, the following getters won't return null. */
@@ -38,11 +38,11 @@ public class CalendarEvent {
     return name;
   }
 
-  public Instant getStartTimeInstant() {
-    return startTimeInstant;
+  public Instant getStartTime() {
+    return startTime;
   }
 
-  public Instant getEndTimeInstant() {
-    return endTimeInstant;
+  public Instant getEndTime() {
+    return endTime;
   }
 }
