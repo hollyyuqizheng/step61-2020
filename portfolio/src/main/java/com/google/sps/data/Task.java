@@ -20,17 +20,16 @@ public final class Task {
    * The constructor will make sure that all necessary parameters are passed in, and populate each
    * class variable appropriately. None of the fields can be null with exception to the description
    * as it is optional. If the description is passed in as null then it will be stored as an empty
-   * Optional object.
+   * Optional object. Tasks by default do not have a scheduled time, they are only assigned this
+   * field as a result of getting scheduled by the scheduling algorithm.
    */
   public Task(String name, String description, Duration duration, TaskPriority priority) {
     if (name == null) {
       throw new IllegalArgumentException("Name cannot be null");
     }
-
     if (duration == null) {
       throw new IllegalArgumentException("Duration cannot be null");
     }
-
     if (priority == null) {
       throw new IllegalArgumentException("Priority cannot be null");
     }
@@ -53,7 +52,22 @@ public final class Task {
     return duration;
   }
 
-  public Integer getPriority() {
-    return priority.getPriority();
+  public TaskPriority getPriority() {
+    return priority;
+  }
+
+  // These methods provide a way to tell if two objects are both Task objects
+  // and have all the same fields
+
+  @Override
+  public boolean equals(Object other) {
+    return other instanceof Task && equals(this, (Task) other);
+  }
+
+  private static boolean equals(Task a, Task b) {
+    return a.name.equals(b.name)
+        && a.description.equals(b.description)
+        && a.getDuration().equals(b.getDuration())
+        && a.priority.equals(b.priority);
   }
 }

@@ -30,8 +30,8 @@
     <script src="task.js"></script>
     <script src="calendar.js"></script>
     <script src="request.js"></script>
-    <script data-main="calendarApi.js" src="require.js"></script>
-    <!-- <script src="calendarApi.js"></script> -->
+    <script src="calendarApi.js" ></script>
+    <script src="sheetsApi.js" onload="handleClientLoad()"></script>
     <script src="https://apis.google.com/js/api.js"></script>
   </head>
  
@@ -253,6 +253,12 @@
             Looks good to me! Add them to my Google Calendar
           </button>
           <div class="d-none" id="export-calendar-message"></div>
+
+          <div id="sheets-message"></div>
+          <button id="sheets-export-button" class="btn btn-primary" class="d-none">Export to Google Sheets</button>
+          <button id="sheets-sign-out-button" class="btn btn-primary" class="d-none">Sign out of Google Sheets</button>
+          <button id="sheets-sign-in-button" class="btn btn-primary">Sign in to Google Sheets</button>
+          <div id="sheets-url-container" class="d-none"></div>
         </div>
       </div>
     </div>

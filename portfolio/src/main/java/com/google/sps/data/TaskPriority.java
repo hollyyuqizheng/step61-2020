@@ -19,4 +19,13 @@ public final class TaskPriority {
   public int getPriority() {
     return priority;
   }
+
+  @Override
+  public boolean equals(Object other) {
+    return other instanceof TaskPriority && equals(this, (TaskPriority) other);
+  }
+
+  private static boolean equals(TaskPriority a, TaskPriority b) {
+    return a.priority == b.priority;
+  }
 }
