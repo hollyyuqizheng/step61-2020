@@ -1,18 +1,21 @@
 // Client ID and API key from the Developer Console
-var CLIENT_ID =
+const CLIENT_ID =
     '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
-var API_KEY = '';
+const API_KEY = '';
 
 // Array of API discovery doc URLs for APIs used by the quickstart
-var DISCOVERY_DOCS =
+const DISCOVERY_DOCS =
     ['https://sheets.googleapis.com/$discovery/rest?version=v4'];
 
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
-var SCOPE_READ_WRITE = 'https://www.googleapis.com/auth/spreadsheets';
+const SCOPE_READ_WRITE = 'https://www.googleapis.com/auth/spreadsheets';
+
 // Error codes that the process can throw
-const ERROR_POPUP_CLOSED = 'popup_closed_by_user';
-const ERROR_ACCESS_DENIED = 'access_denied';
+const ERROR_CODE = {
+  POPUP_CLOSED: 'popup_closed_by_user',
+  ACCESS_DENIED: 'access_denied'
+};
 
 /**
  * On load, called to load the auth2 library and API client library.
@@ -76,7 +79,7 @@ function handleSignOut() {
  * Called when the sign-in state changes and updates the UI appropriately.
  */
 function handleButtons() {
-  $('#sheets-message').addClass('d-none');
+  $('#sheets-export-button').addClass('d-none');
   if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
     $('#sheets-export-button').removeClass('d-none');
     $('#sheets-sign-out-button').removeClass('d-none');
@@ -89,29 +92,31 @@ function handleButtons() {
 }
 
 /**
- * Called when the sign-in process throws an error and displays an error
+ * Called when the sign-in process throws an error and displays the error
  * message on the UI.
  */
 function handleAuthorizationError(error) {
-  $('#sheets-message').removeClass('d-none');
-  if (error.error === ERROR_POPUP_CLOSED) {
-    $('#sheets-message')
-        .text('You closed out of the popup, please log in again.');
-  } else if (error.error === ERROR_ACCESS_DENIED) {
-    $('#sheets-message').text('You did not authorize Google Sheets.');
-  }else {
-    $('#sheets-message').text('An error occurred try again.');
+  var $sheetsMessage = document.getElementById('sheets-message');
+  $sheetsMessage.removeClass('d-none');
+  if (error.error === ERROR_CODE.POPUP_CLOSED) {
+    $sheetsMessage.text('You closed out of the popup, please log in again.');
+  } else if (error.error === ERROR_CODE.ACCESS_DENIED) {
+    $sheetsMessage.text('You did not authorize Google Sheets.');
+  } else {
+    $sheetsMessage.text('An error occurred try again.');
   }
-  $('#sheets-message').show();
+  $sheetsMessage.show();
 }
+
 /**
- * Called when the export process throws an error and displays an error
+ * Called when the export process throws an error and displays the error
  * message on the UI.
  */
 function handleExportError(reason) {
-  $('#sheets-message').removeClass('d-none');
-  $('#sheets-message').text('Error: ' + reason.result.error.message);
-  $('#sheets-message').show();
+  var $sheetsMessage = document.getElementById('sheets-message');
+  $sheetsMessage.removeClass('d-none')
+      .text('Error: ' + reason.result.error.message)
+      .show();
 }
 
 /**
