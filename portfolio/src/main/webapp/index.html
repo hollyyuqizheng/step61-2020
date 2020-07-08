@@ -31,6 +31,7 @@
     <script src="calendar.js"></script>
     <script src="request.js"></script>
     <script src="calendarAPI.js"></script>
+    <script src="sheetsApi.js" onload="handleClientLoad()"></script>
     <script src="https://apis.google.com/js/api.js"></script>
   </head>
 
@@ -167,6 +168,11 @@
           </button>
           <h2>Your tasks are scheduled here!</h2>
           <div id="schedule-result-list"></div>
+          <div id="sheets-message"></div>
+          <button id="sheets-export-button" class="btn btn-primary" class="d-none">Export to Google Sheets</button>
+          <button id="sheets-sign-out-button" class="btn btn-primary" class="d-none">Sign out of Google Sheets</button>
+          <button id="sheets-sign-in-button" class="btn btn-primary">Sign in to Google Sheets</button>
+          <div id="sheets-url-container" class="d-none"></div>
         </div>
       </div>
     </div>
