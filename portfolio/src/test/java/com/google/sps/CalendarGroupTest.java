@@ -5,6 +5,7 @@ import com.google.sps.data.CalendarGroup;
 import com.google.sps.data.TimeRange;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
@@ -93,10 +94,9 @@ public final class CalendarGroupTest {
     TimeRange freeTwo = TimeRange.fromStartEnd(freeTwoStart, freeTwoEnd);
     TimeRange freeThree = TimeRange.fromStartEnd(freeThreeStart, freeThreeEnd);
 
-    List<TimeRange> allFreeTimeRanges = eventGroup.getFreeTimeRanges();
-    Assert.assertTrue(TimeRange.equals(freeOne, allFreeTimeRanges.get(0)));
-    Assert.assertTrue(TimeRange.equals(freeTwo, allFreeTimeRanges.get(1)));
-    Assert.assertTrue(TimeRange.equals(freeThree, allFreeTimeRanges.get(2)));
+    List<TimeRange> expectedFreeTimeRanges = Arrays.asList(freeOne, freeTwo, freeThree);
+    List<TimeRange> actualFreeTimeRanges = eventGroup.getFreeTimeRanges();
+    Assert.assertEquals(expectedFreeTimeRanges, actualFreeTimeRanges);
   }
 
   /** Tests for getting the correct free times with overlapping events. */
@@ -121,7 +121,6 @@ public final class CalendarGroupTest {
     events.add(eventTwo);
 
     CalendarGroup eventGroup = new CalendarGroup(events, startTime, endTime);
-    List<TimeRange> freeTimeRanges = eventGroup.getFreeTimeRanges();
 
     Instant freeOneStart = startTime;
     Instant freeOneEnd = startTime.plusSeconds(1000);
@@ -130,8 +129,9 @@ public final class CalendarGroupTest {
     TimeRange freeOne = TimeRange.fromStartEnd(freeOneStart, freeOneEnd);
     TimeRange freeTwo = TimeRange.fromStartEnd(freeTwoStart, freeTwoEnd);
 
-    Assert.assertTrue(TimeRange.equals(freeOne, freeTimeRanges.get(0)));
-    Assert.assertTrue(TimeRange.equals(freeTwo, freeTimeRanges.get(1)));
+    List<TimeRange> expectedFreeTimeRanges = Arrays.asList(freeOne, freeTwo);
+    List<TimeRange> actualFreeTimeRanges = eventGroup.getFreeTimeRanges();
+    Assert.assertEquals(expectedFreeTimeRanges, actualFreeTimeRanges);
   }
 
   /** Tests for getting the correct free times with completely overlapping events. */
@@ -156,7 +156,6 @@ public final class CalendarGroupTest {
     events.add(eventTwo);
 
     CalendarGroup eventGroup = new CalendarGroup(events, startTime, endTime);
-    List<TimeRange> freeTimeRanges = eventGroup.getFreeTimeRanges();
 
     Instant freeOneStart = startTime;
     Instant freeOneEnd = startTime.plusSeconds(1000);
@@ -165,8 +164,9 @@ public final class CalendarGroupTest {
     TimeRange freeOne = TimeRange.fromStartEnd(freeOneStart, freeOneEnd);
     TimeRange freeTwo = TimeRange.fromStartEnd(freeTwoStart, freeTwoEnd);
 
-    Assert.assertTrue(TimeRange.equals(freeOne, freeTimeRanges.get(0)));
-    Assert.assertTrue(TimeRange.equals(freeTwo, freeTimeRanges.get(1)));
+    List<TimeRange> expectedFreeTimeRanges = Arrays.asList(freeOne, freeTwo);
+    List<TimeRange> actualFreeTimeRanges = eventGroup.getFreeTimeRanges();
+    Assert.assertEquals(expectedFreeTimeRanges, actualFreeTimeRanges);
   }
 
   /** Tests for scenario when there is no free time. */
@@ -211,9 +211,10 @@ public final class CalendarGroupTest {
     TimeRange targetFreeTime = TimeRange.fromStartEnd(startTime, endTime);
 
     CalendarGroup eventGroup = new CalendarGroup(events, startTime, endTime);
-    List<TimeRange> freeTimeRanges = eventGroup.getFreeTimeRanges();
 
-    Assert.assertTrue(freeTimeRanges.get(0).equals(targetFreeTime));
+    List<TimeRange> expectedFreeTimeRanges = Arrays.asList(targetFreeTime);
+    List<TimeRange> actualFreeTimeRanges = eventGroup.getFreeTimeRanges();
+    Assert.assertEquals(expectedFreeTimeRanges, actualFreeTimeRanges);
   }
 
   /** Tests deleting and modifying a free time range. */
@@ -252,9 +253,9 @@ public final class CalendarGroupTest {
     TimeRange freeTwo = TimeRange.fromStartEnd(freeTwoStart, freeTwoEnd);
     TimeRange freeThree = TimeRange.fromStartEnd(freeThreeStart, freeThreeEnd);
 
-    List<TimeRange> freeTimeRangesAfterDelete = eventGroup.deleteFreeTimeRange(freeTwo);
-    Assert.assertTrue(freeTimeRangesAfterDelete.get(0).equals(freeOne));
-    Assert.assertTrue(freeTimeRangesAfterDelete.get(1).equals(freeThree));
+    List<TimeRange> expectedFreeTimeRangesAfterDelete = Arrays.asList(freeOne, freeThree);
+    List<TimeRange> actualFreeTimeRangesAfterDelete = eventGroup.deleteFreeTimeRange(freeTwo);
+    Assert.assertEquals(expectedFreeTimeRangesAfterDelete, actualFreeTimeRangesAfterDelete);
 
     // Creates a new time range that is 10 seconds shorter than free time One.
     Instant freeOneEndNew = freeOneEnd.minusSeconds(10);
@@ -263,7 +264,7 @@ public final class CalendarGroupTest {
     List<TimeRange> freeTimeRangesAfterModify =
         eventGroup.modifyFreeTimeRange(
             /* originalFreeTimeRange= */ freeOne, /* newFreeTimeRange= */ freeOneNew);
-    Assert.assertTrue(freeTimeRangesAfterModify.get(0).end().equals(freeOneNew.end()));
+    Assert.assertEquals(freeTimeRangesAfterModify.get(0).end(), freeOneNew.end());
   }
 
   /**
