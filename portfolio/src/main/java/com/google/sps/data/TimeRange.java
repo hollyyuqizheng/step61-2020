@@ -59,11 +59,7 @@ public final class TimeRange {
     return a.start.equals(b.start) && a.duration.equals(b.duration);
   }
 
-  /**
-   * Creates a {@code TimeRange} from {@code start} to {@code end}. Whether or not {@code end} is
-   * included in the range will depend on {@code inclusive}. If {@code inclusive} is {@code true},
-   * then @{code end} will be in the range.
-   */
+  /** Creates a {@code TimeRange} from {@code start} to {@code end}. */
   public static TimeRange fromStartEnd(Instant start, Instant end) {
     return new TimeRange(
         start, Duration.ofSeconds(end.getEpochSecond() - start.getEpochSecond() + 1));

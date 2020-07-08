@@ -4,7 +4,7 @@ import java.time.Instant;
 
 /** Models a calendar event. It can be used for both creation and import flow. */
 public class CalendarEvent {
-  private String name;
+  private final String name;
   private final Instant startTime;
   private final Instant endTime;
 
@@ -27,6 +27,9 @@ public class CalendarEvent {
     }
     if (endTime == null) {
       throw new IllegalArgumentException("Event needs an end time");
+    }
+    if (startTime.isAfter(endTime)) {
+      throw new IllegalArgumentException("Start time cannot be after end time");
     }
     this.name = name;
     this.startTime = startTime;
