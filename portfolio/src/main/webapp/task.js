@@ -32,12 +32,11 @@ class Task {
  * updateTaskList function. Return statements are used only to end the function.
  */
 function createNewTask() {
-  const name = document.getElementById('new-task-name').value;
-  const description = document.getElementById('new-task-description').value;
-  const length = document.getElementById('new-task-estimated-length').value;
-  const lengthUnit =
-      document.getElementById('new-task-estimated-length-unit').value;
-  const priority = document.getElementById('new-task-priority').value;
+  const name = $('#new-task-name').val();
+  const description = $('#new-task-description').val();
+  const length = $('#new-task-estimated-length').val();
+  const lengthUnit = $('#new-task-estimated-length-unit').val();
+  const priority = $('#new-task-priority').val();
 
   if (name == '') {
     return;
@@ -50,6 +49,7 @@ function createNewTask() {
   const newTask = new Task(
       name, description, getDurationMinutes(length, lengthUnit),
       parseInt(priority));
+
   updateTaskList(newTask);
 }
 
