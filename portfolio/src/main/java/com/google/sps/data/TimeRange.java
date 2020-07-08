@@ -65,10 +65,8 @@ public final class TimeRange {
    * included in the range will depend on {@code inclusive}. If {@code inclusive} is {@code true},
    * then {@code end} will be in the range.
    */
-  public static TimeRange fromStartEnd(Instant start, Instant end, boolean inclusive) {
-    return inclusive
-        ? new TimeRange(
-            start, Duration.ofSeconds(end.getEpochSecond() - start.getEpochSecond() + 1))
-        : new TimeRange(start, Duration.ofSeconds(end.getEpochSecond() - start.getEpochSecond()));
+  public static TimeRange fromStartEnd(Instant start, Instant end) {
+    return new TimeRange(
+        start, Duration.ofSeconds(end.getEpochSecond() - start.getEpochSecond() + 1));
   }
 }
