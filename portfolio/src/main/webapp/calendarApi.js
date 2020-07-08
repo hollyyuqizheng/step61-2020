@@ -1,5 +1,3 @@
-// require(['dotenv']).config({path: './.env'});
-
 var GoogleAuth;
 
 // Scopes for API access to Google Calendar
@@ -13,9 +11,11 @@ const DISCOVERY_URL =
 const CLIENT_ID =
     '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
 
-// Constants for error codes during OAuth process.
-const ERROR_CODE_POPUP_CLOSED = 'popup_closed_by_user';
-const ERROR_CODE_ACCESS_DENIED = 'access_denied';
+// Object for all error codes
+const ERROR_CODES = {
+  popup_closed_by_user : 'popup_closed_by_user',
+  access_denied : 'access_denied'
+}
 
 /**
  * Loads the API's client and auth2 modules.
@@ -27,18 +27,14 @@ function initiateCalendarAuth() {
 
 /** Starts authentication flow based on current user's login status. */
 function initClient() {
-  // Hide the error messages by default.
-  // These messages will appear if authentication errors are caught.
-  hideErrorMessages();
-
   // Initializes the gapi.client object, which app uses to make API requests.
   // Initially, the scope is read-only to view user's Google Calendar.
   gapi.client
       .init({
-        'apiKey': API_KEY,
-        'clientId': CLIENT_ID,
-        'discoveryDocs': [DISCOVERY_URL],
-        'scope': SCOPE_READ_ONLY
+        apiKey: API_KEY,
+        clientId: CLIENT_ID,
+        discoveryDocs: [DISCOVERY_URL],
+        scope: SCOPE_READ_ONLY
       })
       .then(function() {
         GoogleAuth = gapi.auth2.getAuthInstance();
@@ -57,31 +53,35 @@ function handleAuth() {
   if (GoogleAuth.isSignedIn.get()) {
     GoogleAuth.signOut();
   } else {
-    // User is not signed in. Start Google auth flow.
-    GoogleAuth.signIn().catch(function(error) {
-      handleImportAuthError(error);
-    });
+    // User is not signed in. Start Google auth flow. 
+    GoogleAuth.signIn()
+        .then((response) => {
+          $('#import-calendar-message').addClass('d-none');
+        })
+        .catch(function(error) {
+          handleImportAuthError(error);
+        });
   }
 }
 
 /**
  * Updates import message box based on the error during authentication process
- * for importing
+ * for importing. 
  */
 function handleImportAuthError(e) {
-  $('#import-calendar-message').removeClass('d-none');
-  if (e.error === ERROR_CODE_POPUP_CLOSED) {
-    $('#import-calendar-message')
-        .text(
-            'It seems like you didn\'t complete the authorization process. ' +
-            'Please click the Login button again.');
-  } else if (e.error === ERROR_CODE_ACCESS_DENIED) {
-    $('#import-calendar-message')
-        .text(
-            'You didn\'t give permission to view your Google Calendar, ' +
-            'so your calendar events cannot be viewed or imported.');
+  var $importCalendarMessage = $('#import-calendar-message'); 
+
+  var errorMessage; 
+  if (e.error === ERROR_CODES.popup_closed_by_user) {
+    errorMessage = 'It seems like you didn\'t complete the authorization process. ' +
+        'Please click the Login button again.'
+  } else if (e.error === ERROR_CODES.access_denied) {
+    errorMessage = 'You didn\'t give permission to view your Google Calendar, ' +
+        'so your calendar events cannot be viewed or imported.'
+  } else {
+    errorMessage = 'An error occurred.'; 
   }
-  $('#import-calendar-message').show();
+  $importCalendarMessage.removeClass('d-none').text(errorMessage); 
 }
 
 /** Disconnects current user authentication. */
@@ -98,11 +98,12 @@ function updateCalendarView() {
     $('#calendar-auth-button').attr('disabled', 'true');
     $('#calendar-auth-button').attr('aria-disabled', 'true');
     $('#import-calendar-button').removeClass('d-none');
-    $('#import-calendar-button').show();
+    $('#export-calendar-button').removeClass('d-none');
   } else {
     $('#calendar-auth-button').attr('disabled', 'false');
     $('#calendar-auth-button').attr('aria-disabled', 'false');
-    $('#import-calendar-button').hide();
+    $('#import-calendar-button').addClass('d-none');
+    $('#export-calendar-button').addClass('d-none');
   }
 }
 
@@ -137,27 +138,27 @@ function listUpcomingEvents() {
   // that the user has picked in the nav bar. 
   gapi.client.calendar.events
       .list({
-        'calendarId': 'primary',
-        'timeMin': timeRangeStart.toISOString(),
-        'timeMax': timeRangeEnd.toISOString(),
-        'showDeleted': false,
-        'singleEvents': true,
-        'orderBy': 'startTime'
+        calendarId: 'primary',
+        timeMin: timeRangeStart.toISOString(),
+        timeMax: timeRangeEnd.toISOString(),
+        showDeleted: false,
+        singleEvents: true,
+        orderBy: 'startTime'
       })
       .then(function(response) {
         var events = response.result.items;
+        var emptyCalendarMessage =  $('#empty-calendar-import-message'); 
 
         // Show message for no imported event if result list is empty.
         if (events.length == 0) {
           const pickedDate = $('#date-picker').val();
-          $('#empty-calendar-import-message').removeClass('d-none');
-          $('#empty-calendar-import-message').text(
+          emptyCalendarMessage.removeClass('d-none');
+          emptyCalendarMessage.text(
             'There aren\'t any events scheduled on your Google Calendar for ' + 
             pickedDate 
           ); 
-          $('#empty-calendar-import-message').show();
         } else {
-          $('#empty-calendar-import-message').hide(); 
+          emptyCalendarMessage.addClass('d-none'); 
 
           events.forEach((event) => {
             const eventName = event.summary;
@@ -205,7 +206,7 @@ function showCalendarView(user) {
   const userEmail = encodeURIComponent(user.getBasicProfile().getEmail());
 
   // Fetches the user's Calendar's time zone. 
-  gapi.client.calendar.settings.get({'setting': 'timezone'})
+  gapi.client.calendar.settings.get({setting: 'timezone'})
       .then((responseTimeZone) => {
         const userCalendarTimeZone =
             encodeURIComponent(responseTimeZone.result.value);
@@ -214,9 +215,8 @@ function showCalendarView(user) {
             '&ctz=' + userCalendarTimeZone + '&mode=WEEK';
 
         // Updates the UI so that calendar view appears.
-        $('#calendar-view').removeClass('d-none');
-        $('#calendar-view').attr('src', calendarViewUrl);
-        $('#calendar-view').show();
+        $('#calendar-view').removeClass('d-none')
+            .attr('src', calendarViewUrl);
       });
 }
 
@@ -225,10 +225,10 @@ function showCalendarView(user) {
  * Asks the user for Write access to the API scope.
  */
 function addWriteScope() {
-  hideErrorMessages();
   var GoogleUser = GoogleAuth.currentUser.get();
   GoogleUser.grant({'scope': SCOPE_READ_WRITE})
       .then((response) => {
+        $('#export-calendar-message').addClass('d-none');
         addNewEventsToGoogleCalendar();
       })
       .catch(function(error) {
@@ -238,25 +238,11 @@ function addWriteScope() {
 
 /**
  * Adds the scheduled task items back to the user's Google Calendar.
- * TODO(hollyyuqizheng): change the hard-coded part later when scheduled 
- * results are returned.
+ * TODO(hollyyuqizheng): fill in the rest of the method once 
+ * results can be returned from the scheduling algorithm. 
  */
 function addNewEventsToGoogleCalendar() { 
-  const now = new Date();
-  const fiveHoursLater = new Date();
-  fiveHoursLater.setHours(now.getHours() + 5);
-
-  const event = {
-    'summary': 'Testing',
-    'description': 'test description',
-    'start': {
-      'dateTime': now.toISOString(),
-    },
-    'end': {
-      'dateTime': fiveHoursLater.toISOString(),
-    },
-  };
-
+  const event = {};
   addOneEventToGoogleCalendar(event);
 }
 
@@ -276,23 +262,19 @@ function addOneEventToGoogleCalendar(event) {
  * for exporting
  */
 function handleExportAuthError(e) {
-  $('#export-calendar-message').removeClass('d-none');
-  if (e.error === ERROR_CODE_POPUP_CLOSED) {
-    $('#export-calendar-message')
-        .text(
-            'It seems like you didn\'t complete the authorization process. ' +
-            'Please click the Export button again.');
-  } else if (e.error === ERROR_CODE_ACCESS_DENIED) {
-    $('#export-calendar-message')
-        .text(
-            'You didn\'t give permission to update your Google Calendar, ' +
-            'so your calendar events cannot be exported.');
-  }
-  $('#export-calendar-message').show();
-}
+  var $exportCalendarMessage = $('#export-calendar-message'); 
 
-/** Hides the error messages when authentication completes succesfully. */
-function hideErrorMessages() {
-  $('#import-calendar-message').hide();
-  $('#export-calendar-message').hide();
+  var errorMessage;
+  if (e.error === ERROR_CODES.popup_closed_by_user) {
+    errorMessage = 'It seems like you didn\'t complete the authorization process. ' +
+        'Please click the Export button again.';
+  } else if (e.error === ERROR_CODES.access_denied) {
+    errorMessage = 'You didn\'t give permission to update your Google Calendar, ' +
+        'so your task schedule cannot be exported.'
+  } else {
+    errorMessage = 'An error occurred'; 
+  }
+
+  $exportCalendarMessage.removeClass('d-none')
+      .text(errorMessage); 
 }
