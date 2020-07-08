@@ -1,4 +1,4 @@
-var GoogleAuth;
+var googleAuth;
 
 // Scopes for API access to Google Calendar
 const SCOPE_READ_ONLY = 'https://www.googleapis.com/auth/calendar.readonly';
@@ -12,11 +12,10 @@ const CLIENT_ID =
     '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
 
 // Object for all error codes
-const ERROR_CODES =
-    {
-      popup_closed_by_user: 'popup_closed_by_user',
-      access_denied: 'access_denied'
-    }
+const ERROR_CODES = {
+  popup_closed_by_user: 'popup_closed_by_user',
+  access_denied: 'access_denied'
+}; 
 
 /**
  * Loads the API's client and auth2 modules.
@@ -38,10 +37,10 @@ function initClient() {
         scope: SCOPE_READ_ONLY
       })
       .then(function() {
-        GoogleAuth = gapi.auth2.getAuthInstance();
+        googleAuth = gapi.auth2.getAuthInstance();
 
         // Listen for sign-in state changes.
-        GoogleAuth.isSignedIn.listen(updateCalendarView);
+        googleAuth.isSignedIn.listen(updateCalendarView);
 
         // Handle initial sign-in state. (Determine if user is already signed
         // in.)
@@ -51,11 +50,11 @@ function initClient() {
 
 /** Signs user in if not logged in, and signs user out otherwise. */
 function handleAuth() {
-  if (GoogleAuth.isSignedIn.get()) {
-    GoogleAuth.signOut();
+  if (googleAuth.isSignedIn.get()) {
+    googleAuth.signOut();
   } else {
     // User is not signed in. Start Google auth flow.
-    GoogleAuth.signIn()
+    googleAuth.signIn()
         .then((response) => {
           var $importCalendarMessage = $('#import-calendar-message');
           $importCalendarMessage.addClass('d-none');
@@ -85,20 +84,20 @@ function handleImportAuthError(e) {
   } else {
     errorMessage = 'An error occurred.';
   }
-  $importCalendarMessage.removeClass('d-none').text(errorMessage);
+  $importCalendarMessage.text(errorMessage).removeClass('d-none');
 }
 
 /** Disconnects current user authentication. */
 function revokeAccess() {
-  GoogleAuth.disconnect();
+  googleAuth.disconnect();
 }
 
 /** Updates the calendar view and button visibility based on login status. */
 function updateCalendarView() {
-  var user = GoogleAuth.currentUser.get();
-  var isAuthorized = user.hasGrantedScopes(SCOPE_READ_ONLY);
+  const googleUser = googleAuth.currentUser.get();
+  const isAuthorized = googleUser.hasGrantedScopes(SCOPE_READ_ONLY);
   if (isAuthorized) {
-    showCalendarView(user);
+    showCalendarView(googleUser);
     $('#calendar-auth-button').attr('disabled', 'true');
     $('#calendar-auth-button').attr('aria-disabled', 'true');
     $('#import-calendar-button').removeClass('d-none');
@@ -151,17 +150,17 @@ function listUpcomingEvents() {
       })
       .then(function(response) {
         var events = response.result.items;
-        var emptyCalendarMessage = $('#empty-calendar-import-message');
+        var $emptyCalendarMessage = $('#empty-calendar-import-message');
 
         // Show message for no imported event if result list is empty.
         if (events.length == 0) {
           const pickedDate = $('#date-picker').val();
-          emptyCalendarMessage.removeClass('d-none');
-          emptyCalendarMessage.text(
-              'There aren\'t any events scheduled on your Google Calendar for ' +
-              pickedDate);
+          $emptyCalendarMessage.text(
+                  'There aren\'t any events scheduled on your Google Calendar for ' +
+                  pickedDate)
+              .removeClass('d-none');
         } else {
-          emptyCalendarMessage.addClass('d-none');
+          $emptyCalendarMessage.addClass('d-none');
 
           events.forEach((event) => {
             const eventName = event.summary;
@@ -218,7 +217,7 @@ function showCalendarView(user) {
             '&ctz=' + userCalendarTimeZone + '&mode=WEEK';
 
         // Updates the UI so that calendar view appears.
-        $('#calendar-view').removeClass('d-none').attr('src', calendarViewUrl);
+        $('#calendar-view').attr('src', calendarViewUrl).removeClass('d-none');
       });
 }
 
@@ -227,8 +226,8 @@ function showCalendarView(user) {
  * Asks the user for Write access to the API scope.
  */
 function addWriteScope() {
-  var GoogleUser = GoogleAuth.currentUser.get();
-  GoogleUser.grant({scope: SCOPE_READ_WRITE})
+  var googleUser = googleAuth.currentUser.get();
+  googleUser.grant({scope: SCOPE_READ_WRITE})
       .then((response) => {
         $('#export-calendar-message').addClass('d-none');
         addNewEventsToGoogleCalendar();
@@ -255,7 +254,7 @@ function addOneEventToGoogleCalendar(event) {
 
   request.execute(function() {
     // Refreshes the calendar view so that the new event shows up on it.
-    showCalendarView(GoogleAuth.currentUser.get());
+    showCalendarView(googleAuth.currentUser.get());
   });
 }
 
@@ -279,5 +278,5 @@ function handleExportAuthError(e) {
     errorMessage = 'An error occurred';
   }
 
-  $exportCalendarMessage.removeClass('d-none').text(errorMessage);
+  $exportCalendarMessage.text(errorMessage).removeClass('d-none');
 }
