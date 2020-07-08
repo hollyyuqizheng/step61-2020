@@ -29,7 +29,7 @@ class Task {
  * will populate the Task's information. It requires that the front end fields
  * for name, and duration to be passed in. Once it checks for the required
  * inputs, a JavaScript task class is created and passed into the
- * updateTaskList function.
+ * updateTaskList function. Return statements are used only to end the function.
  */
 function createNewTask() {
   const name = document.getElementById('new-task-name').value;
