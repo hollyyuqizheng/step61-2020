@@ -57,7 +57,8 @@ function handleAuth() {
     // User is not signed in. Start Google auth flow.
     GoogleAuth.signIn()
         .then((response) => {
-          $('#import-calendar-message').addClass('d-none');
+          var $importCalendarMessage = $('#import-calendar-message');
+          $importCalendarMessage.addClass('d-none');
         })
         .catch(function(error) {
           handleImportAuthError(error);
@@ -250,7 +251,7 @@ function addNewEventsToGoogleCalendar() {
 /** Adds an individual event to the authorized user's Google Calendar. */
 function addOneEventToGoogleCalendar(event) {
   const request = gapi.client.calendar.events.insert(
-      {'calendarId': 'primary', 'resource': event});
+      {calendarId: 'primary', resource: event});
 
   request.execute(function() {
     // Refreshes the calendar view so that the new event shows up on it.
