@@ -73,8 +73,7 @@ public class CalendarGroup {
       if (event.getStartTime().isAfter(earliestNonScheduledInstant)
           && !event.getStartTime().isAfter(endTime)) {
         possibleTimes.add(
-            TimeRange.fromStartEnd(
-                earliestNonScheduledInstant, event.getStartTime(), /* inclusive= */ true));
+            TimeRange.fromStartEnd(earliestNonScheduledInstant, event.getStartTime()));
       }
       if (earliestNonScheduledInstant.isBefore(event.getEndTime())) {
         earliestNonScheduledInstant = event.getEndTime();
@@ -82,8 +81,7 @@ public class CalendarGroup {
     }
     // The end of the work hours is potentially never included so we check.
     if (endTime.isAfter(earliestNonScheduledInstant)) {
-      possibleTimes.add(
-          TimeRange.fromStartEnd(earliestNonScheduledInstant, endTime, /* inclusive= */ true));
+      possibleTimes.add(TimeRange.fromStartEnd(earliestNonScheduledInstant, endTime));
     }
     return possibleTimes;
   }
