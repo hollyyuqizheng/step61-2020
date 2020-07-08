@@ -1,3 +1,8 @@
+const TIME_UNIT = {
+  MINUTES: 'minutes',
+  HOURS: 'hours'
+};
+
 /**
  * Models a task that is displayed on the UI.
  * This class is useful when the task information needs to be sent
@@ -100,9 +105,9 @@ function updateTaskList(newTask, lengthUnit) {
 
 /** Returns the number of minutes from the user's input and unit selection. */
 function getDurationMinutes(duration, unit) {
-  if (unit == 'minutes') {
+  if (unit == TIME_UNIT.MINUTES) {
     return duration;
-  } else if (unit == 'hours') {
+  } else if (unit == TIME_UNIT.HOURS) {
     return duration * 60;
   }
 }
