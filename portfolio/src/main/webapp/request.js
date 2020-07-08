@@ -74,7 +74,6 @@ function collectAllScheduledTasks() {
   });
 }
 
-
 /**
  * This takes in a single JSON object of a ScheduledTask (Java Class) and
  * displays that information on the result element using a card format.
@@ -106,7 +105,6 @@ function addScheduledTaskToPage(scheduledTaskWrapper, resultElement) {
   timeText.classList.add('card-text');
   timeText.innerText = 'Scheduled for: ' + taskDate;
   cardBody.appendChild(timeText);
-
 
   const eventList = document.getElementById('scheduled-task-list');
   eventList.innterHTML = '';
