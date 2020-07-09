@@ -43,11 +43,17 @@ function createNewTask() {
   const lengthUnit = $('#new-task-estimated-length-unit').val();
   const priority = parseInt($('#new-task-priority').val());
 
-  if (!validateTaskName(name).valid) {
+  if (validateTaskName(name).isValid) {
+    $('#empty-name-message').hide();
+  } else {
+    $('#empty-name-message').show();
     return;
   }
 
-  if (!validateTaskDuration(length).valid) {
+  if (validateTaskDuration(length).isValid) {
+    $('#task-length-message').hide();
+  } else {
+    $('#task-length-message').show();
     return;
   }
 
@@ -147,11 +153,9 @@ function collectAllTasks() {
  */
 function validateTaskName(name) {
   if (name == '') {
-    $('#empty-name-message').show();
-    return {valid: false, errorMessage: 'Name cannot be empty.'};
+    return {isValid: false, errorMessage: 'Name cannot be empty.'};
   } else {
-    $('#empty-name-message').hide();
-    return {valid: true, errorMessage: 'No error.'};
+    return {isValid: true, errorMessage: 'No error.'};
   }
 }
 
@@ -162,12 +166,9 @@ function validateTaskName(name) {
  * containing a bool to declare whether the input is valid and an error message.
  */
 function validateTaskDuration(duration) {
-  console.log(duration);
   if (parseInt(duration) <= 0 || !Number.isInteger(duration)) {
-    $('#task-length-message').show();
-    return {valid: false, errorMessage: 'Duration input is invalid.'};
+    return {isValid: false, errorMessage: 'Duration input is invalid.'};
   } else {
-    $('#task-length-message').hide();
-    return {valid: true, errorMessage: 'No error.'};
+    return {isValid: true, errorMessage: 'No error.'};
   }
 }
