@@ -43,17 +43,21 @@ function createNewTask() {
   const lengthUnit = $('#new-task-estimated-length-unit').val();
   const priority = parseInt($('#new-task-priority').val());
 
+  // Show error message if an input is found to be invalid.
+  // Error messages are shown by adding the class 'd-block' because the error
+  // message elements have class 'invalid-feedback' which hide the element by
+  // default.
   if (validateTaskName(name).isValid) {
-    $('#empty-name-message').hide();
+    $('#empty-name-message').removeClass('d-block');
   } else {
-    $('#empty-name-message').show();
+    $('#empty-name-message').addClass('d-block');
     return;
   }
 
   if (validateTaskDuration(length).isValid) {
-    $('#task-length-message').hide();
+    $('#task-length-message').removeClass('d-block');
   } else {
-    $('#task-length-message').show();
+    $('#task-length-message').addClass('d-block');
     return;
   }
 
