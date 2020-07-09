@@ -34,6 +34,7 @@
     <script src="calendarApi.js" onload="initiateCalendarAuth()"></script>
     <script src="sheetsApi.js"></script>
   </head>
+<<<<<<< HEAD
  
   <body onload="useTodayAsDefault(); setClosestEventTime()">
     <div class="container-fluid">
@@ -84,7 +85,7 @@
           </ul>
         </div>
       </nav>
- 
+
       <div class="row">
         <div id="new-task-wrapper" class="col-md-12 col-lg-6 col-xl-3">
           <h2>1. Add the tasks you would like to schedule for today</h2>
@@ -92,16 +93,9 @@
           <form id="new-task-form">
             <div class="form-group">
               <label for="new-task-name">Task name*:</label>
-              <input
-                type="text"
-                id="new-task-name"
-                class="form-control"
-                name="new-task-name"
-                placeholder="New Task"
-                required="true"
-              />
+              <input type="text" id="new-task-name" class="form-control" name="new-task-name" placeholder="New Task" required="true" />
+              <div class="invalid-feedback" id="empty-name-message">Name cannot be empty!</div>
             </div>
- 
             <label for="new-task-description">Task description:</label><br />
             <textarea
               id="new-task-description"
@@ -119,30 +113,29 @@
                   id="new-task-estimated-length"
                   class="form-control"
                   name="new-task-estimated-length"
-                  value="15"
                 />
+                <div class="invalid-feedback" id="task-length-message">Duration must be a positive integer!</div>
               </div>
- 
+
               <div class="col">
                 <label for="new-task-estimated-length-unit">Unit*:</label>
                 <select id="new-task-estimated-length-unit" class="form-control" name="new-task-estimated-length-unit">
-                  <option value="minutes" selected>minute(s)</option>
+                  <option value="minutes">minute(s)</option>
                   <option value="hours">hour(s)</option>
                 </select>
               </div>
- 
+
               <div class="col">
                 <label for="new-task-priority">Priority*:</label>
                 <select id="new-task-priority" class="form-control" name="new-task-priority">
                   <option value="5">5 (High)</option>
                   <option value="4">4</option>
-                  <option value="3" selected>3</option>
+                  <option value="3">3</option>
                   <option value="2">2</option>
                   <option value="1">1 (Low)</option>
                 </select>
               </div>
             </div>
- 
             <br />
             <button type="button" class="btn btn-primary" onclick="createNewTask()">Add this task</button>
           </form>
