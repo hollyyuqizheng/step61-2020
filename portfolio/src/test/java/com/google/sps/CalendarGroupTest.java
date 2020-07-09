@@ -61,7 +61,7 @@ public final class CalendarGroupTest {
 
   /** Tests for correct free times with non-overlapping events. */
   @Test
-  public void nonoverlappingEvents() {
+  public void freeTimeRangesNonOverlappingEvents() {
     // Events:       |--One--|   |--Two--|
     // Possible: |---------------------------|
     // Free:     |---|       |---|       |---|
@@ -83,25 +83,27 @@ public final class CalendarGroupTest {
 
     CalendarGroup eventGroup = new CalendarGroup(events, startTime, endTime);
 
-    Instant freeOneStart = startTime;
-    Instant freeOneEnd = eventOneStart;
-    Instant freeTwoStart = eventOneEnd;
-    Instant freeTwoEnd = eventTwoStart;
-    Instant freeThreeStart = eventTwoEnd;
-    Instant freeThreeEnd = endTime;
+    Instant freeTimeRangeOneStart = startTime;
+    Instant freeTimeRangeOneEnd = eventOneStart;
+    Instant freeTimeRangeTwoStart = eventOneEnd;
+    Instant freeTimeRangeTwoEnd = eventTwoStart;
+    Instant freeTimeRangeThreeStart = eventTwoEnd;
+    Instant freeTimeRangeThreeEnd = endTime;
 
-    TimeRange freeOne = TimeRange.fromStartEnd(freeOneStart, freeOneEnd);
-    TimeRange freeTwo = TimeRange.fromStartEnd(freeTwoStart, freeTwoEnd);
-    TimeRange freeThree = TimeRange.fromStartEnd(freeThreeStart, freeThreeEnd);
+    TimeRange freeTimeRangeOne = TimeRange.fromStartEnd(freeTimeRangeOneStart, freeTimeRangeOneEnd);
+    TimeRange freeTimeRangeTwo = TimeRange.fromStartEnd(freeTimeRangeTwoStart, freeTimeRangeTwoEnd);
+    TimeRange freeTimeRangeThree =
+        TimeRange.fromStartEnd(freeTimeRangeThreeStart, freeTimeRangeThreeEnd);
 
-    List<TimeRange> expectedFreeTimeRanges = Arrays.asList(freeOne, freeTwo, freeThree);
+    List<TimeRange> expectedFreeTimeRanges =
+        Arrays.asList(freeTimeRangeOne, freeTimeRangeTwo, freeTimeRangeThree);
     List<TimeRange> actualFreeTimeRanges = eventGroup.getFreeTimeRanges();
     Assert.assertEquals(expectedFreeTimeRanges, actualFreeTimeRanges);
   }
 
   /** Tests for getting the correct free times with overlapping events. */
   @Test
-  public void overlappingEvents() {
+  public void freeTimeRangesOverlappingEvents() {
     // Events:       |--One--|
     // Events:          |---Two--|
     // Possible: |-----------------------|
@@ -122,21 +124,21 @@ public final class CalendarGroupTest {
 
     CalendarGroup eventGroup = new CalendarGroup(events, startTime, endTime);
 
-    Instant freeOneStart = startTime;
-    Instant freeOneEnd = startTime.plusSeconds(1000);
-    Instant freeTwoStart = startTime.plusSeconds(2500);
-    Instant freeTwoEnd = endTime;
-    TimeRange freeOne = TimeRange.fromStartEnd(freeOneStart, freeOneEnd);
-    TimeRange freeTwo = TimeRange.fromStartEnd(freeTwoStart, freeTwoEnd);
+    Instant freeTimeRangeOneStart = startTime;
+    Instant freeTimeRangeOneEnd = startTime.plusSeconds(1000);
+    Instant freeTimeRangeTwoStart = startTime.plusSeconds(2500);
+    Instant freeTimeRangeTwoEnd = endTime;
+    TimeRange freeTimeRangeOne = TimeRange.fromStartEnd(freeTimeRangeOneStart, freeTimeRangeOneEnd);
+    TimeRange freeTimeRangeTwo = TimeRange.fromStartEnd(freeTimeRangeTwoStart, freeTimeRangeTwoEnd);
 
-    List<TimeRange> expectedFreeTimeRanges = Arrays.asList(freeOne, freeTwo);
+    List<TimeRange> expectedFreeTimeRanges = Arrays.asList(freeTimeRangeOne, freeTimeRangeTwo);
     List<TimeRange> actualFreeTimeRanges = eventGroup.getFreeTimeRanges();
     Assert.assertEquals(expectedFreeTimeRanges, actualFreeTimeRanges);
   }
 
   /** Tests for getting the correct free times with completely overlapping events. */
   @Test
-  public void completelyOverlappingEvents() {
+  public void freeTimeRangesCompletelyOverlappingEvents() {
     // Events:         |--One--|
     // Events:       |------Two-----|
     // Possible: |-----------------------|
@@ -157,14 +159,14 @@ public final class CalendarGroupTest {
 
     CalendarGroup eventGroup = new CalendarGroup(events, startTime, endTime);
 
-    Instant freeOneStart = startTime;
-    Instant freeOneEnd = startTime.plusSeconds(1000);
-    Instant freeTwoStart = startTime.plusSeconds(4000);
-    Instant freeTwoEnd = endTime;
-    TimeRange freeOne = TimeRange.fromStartEnd(freeOneStart, freeOneEnd);
-    TimeRange freeTwo = TimeRange.fromStartEnd(freeTwoStart, freeTwoEnd);
+    Instant freeTimeRangeOneStart = startTime;
+    Instant freeTimeRangeOneEnd = startTime.plusSeconds(1000);
+    Instant freeTimeRangeTwoStart = startTime.plusSeconds(4000);
+    Instant freeTimeRangeTwoEnd = endTime;
+    TimeRange freeTimeRangeOne = TimeRange.fromStartEnd(freeTimeRangeOneStart, freeTimeRangeOneEnd);
+    TimeRange freeTimeRangeTwo = TimeRange.fromStartEnd(freeTimeRangeTwoStart, freeTimeRangeTwoEnd);
 
-    List<TimeRange> expectedFreeTimeRanges = Arrays.asList(freeOne, freeTwo);
+    List<TimeRange> expectedFreeTimeRanges = Arrays.asList(freeTimeRangeOne, freeTimeRangeTwo);
     List<TimeRange> actualFreeTimeRanges = eventGroup.getFreeTimeRanges();
     Assert.assertEquals(expectedFreeTimeRanges, actualFreeTimeRanges);
   }
@@ -242,29 +244,34 @@ public final class CalendarGroupTest {
     CalendarGroup eventGroup = new CalendarGroup(events, startTime, endTime);
     List<TimeRange> freeTimeRanges = eventGroup.getFreeTimeRanges();
 
-    Instant freeOneStart = startTime;
-    Instant freeOneEnd = eventOneStart;
-    Instant freeTwoStart = eventOneEnd;
-    Instant freeTwoEnd = eventTwoStart;
-    Instant freeThreeStart = eventTwoEnd;
-    Instant freeThreeEnd = endTime;
+    Instant freeTimeRangeOneStart = startTime;
+    Instant freeTimeRangeOneEnd = eventOneStart;
+    Instant freeTimeRangeTwoStart = eventOneEnd;
+    Instant freeTimeRangeTwoEnd = eventTwoStart;
+    Instant freeTimeRangeThreeStart = eventTwoEnd;
+    Instant freeTimeRangeThreeEnd = endTime;
 
-    TimeRange freeOne = TimeRange.fromStartEnd(freeOneStart, freeOneEnd);
-    TimeRange freeTwo = TimeRange.fromStartEnd(freeTwoStart, freeTwoEnd);
-    TimeRange freeThree = TimeRange.fromStartEnd(freeThreeStart, freeThreeEnd);
+    TimeRange freeTimeRangeOne = TimeRange.fromStartEnd(freeTimeRangeOneStart, freeTimeRangeOneEnd);
+    TimeRange freeTimeRangeTwo = TimeRange.fromStartEnd(freeTimeRangeTwoStart, freeTimeRangeTwoEnd);
+    TimeRange freeTimeRangeThree =
+        TimeRange.fromStartEnd(freeTimeRangeThreeStart, freeTimeRangeThreeEnd);
 
-    List<TimeRange> expectedFreeTimeRangesAfterDelete = Arrays.asList(freeOne, freeThree);
-    List<TimeRange> actualFreeTimeRangesAfterDelete = eventGroup.deleteFreeTimeRange(freeTwo);
+    List<TimeRange> expectedFreeTimeRangesAfterDelete =
+        Arrays.asList(freeTimeRangeOne, freeTimeRangeThree);
+    List<TimeRange> actualFreeTimeRangesAfterDelete =
+        eventGroup.deleteFreeTimeRange(freeTimeRangeTwo);
     Assert.assertEquals(expectedFreeTimeRangesAfterDelete, actualFreeTimeRangesAfterDelete);
 
     // Creates a new time range that is 10 seconds shorter than free time One.
-    Instant freeOneEndNew = freeOneEnd.minusSeconds(10);
-    TimeRange freeOneNew = TimeRange.fromStartEnd(freeOneStart, freeOneEndNew);
+    Instant freeTimeRangeOneEndNew = freeTimeRangeOneEnd.minusSeconds(10);
+    TimeRange freeTimeRangeOneNew =
+        TimeRange.fromStartEnd(freeTimeRangeOneStart, freeTimeRangeOneEndNew);
 
     List<TimeRange> freeTimeRangesAfterModify =
         eventGroup.modifyFreeTimeRange(
-            /* originalFreeTimeRange= */ freeOne, /* newFreeTimeRange= */ freeOneNew);
-    Assert.assertEquals(freeTimeRangesAfterModify.get(0).end(), freeOneNew.end());
+            /* originalFreeTimeRange= */ freeTimeRangeOne,
+            /* newFreeTimeRange= */ freeTimeRangeOneNew);
+    Assert.assertEquals(freeTimeRangesAfterModify.get(0).end(), freeTimeRangeOneNew.end());
   }
 
   /**
@@ -295,24 +302,27 @@ public final class CalendarGroupTest {
     CalendarGroup eventGroup = new CalendarGroup(events, startTime, endTime);
     List<TimeRange> freeTimeRanges = eventGroup.getFreeTimeRanges();
 
-    Instant freeOneStart = startTime;
-    Instant freeOneEnd = eventOneStart;
-    Instant freeTwoStart = eventOneEnd;
-    Instant freeTwoEnd = eventTwoStart;
-    Instant freeThreeStart = eventTwoEnd;
-    Instant freeThreeEnd = endTime;
+    Instant freeTimeRangeOneStart = startTime;
+    Instant freeTimeRangeOneEnd = eventOneStart;
+    Instant freeTimeRangeTwoStart = eventOneEnd;
+    Instant freeTimeRangeTwoEnd = eventTwoStart;
+    Instant freeTimeRangeThreeStart = eventTwoEnd;
+    Instant freeTimeRangeThreeEnd = endTime;
 
-    TimeRange freeOne = TimeRange.fromStartEnd(freeOneStart, freeOneEnd);
-    TimeRange freeTwo = TimeRange.fromStartEnd(freeTwoStart, freeTwoEnd);
-    TimeRange freeThree = TimeRange.fromStartEnd(freeThreeStart, freeThreeEnd);
+    TimeRange freeTimeRangeOne = TimeRange.fromStartEnd(freeTimeRangeOneStart, freeTimeRangeOneEnd);
+    TimeRange freeTimeRangeTwo = TimeRange.fromStartEnd(freeTimeRangeTwoStart, freeTimeRangeTwoEnd);
+    TimeRange freeTimeRangeThree =
+        TimeRange.fromStartEnd(freeTimeRangeThreeStart, freeTimeRangeThreeEnd);
 
-    Instant freeOneEndNew = freeOneEnd.plusSeconds(10);
+    Instant freeTimeRangeOneEndNew = freeTimeRangeOneEnd.plusSeconds(10);
 
     // This new time range is 10 seconds longer than the original one,
     // so this modification is not valid.
-    TimeRange freeOneNew = TimeRange.fromStartEnd(freeOneStart, freeOneEndNew);
+    TimeRange freeTimeRangeOneNew =
+        TimeRange.fromStartEnd(freeTimeRangeOneStart, freeTimeRangeOneEndNew);
     List<TimeRange> freeTimeRangesAfterModify =
         eventGroup.modifyFreeTimeRange(
-            /* originalFreeTimeRange= */ freeOne, /* newFreeTimeRange= */ freeOneNew);
+            /* originalFreeTimeRange= */ freeTimeRangeOne,
+            /* newFreeTimeRange= */ freeTimeRangeOneNew);
   }
 }

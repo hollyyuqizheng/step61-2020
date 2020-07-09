@@ -17,16 +17,12 @@ public class CalendarGroup {
   // already adjusted based on user's working hour times
   // and the current timestamp of when the user starts
   // the scheduling process.
-  public final Instant startTime;
-  public final Instant endTime;
+  public final Instant overallStartTime;
+  public final Instant overallEndTime;
 
   // Comparator for sorting events by start time
   private static final Comparator<CalendarEvent> sortByEventStartTimeAscending =
       Comparator.comparing(CalendarEvent::getStartTime);
-
-  // Comparator for sorting free time ranges by start time
-  private static final Comparator<TimeRange> sortByTimeRangeStartTimeAscending =
-      Comparator.comparing(TimeRange::start);
 
   /**
    * @param events: a list of CalendarEvents' that represents the events already scheduled for the
@@ -35,22 +31,23 @@ public class CalendarGroup {
    *     working hour start time and the current timestamp.
    * @param endTime: end of possible scheduling blocks, of type Instant.
    */
-  public CalendarGroup(List<CalendarEvent> events, Instant startTime, Instant endTime) {
+  public CalendarGroup(
+      List<CalendarEvent> events, Instant overallStartTime, Instant overallEndTime) {
     if (events == null) {
       throw new IllegalArgumentException("Calendar Group needs a collection of events");
     }
-    if (startTime == null) {
+    if (overallStartTime == null) {
       throw new IllegalArgumentException("Calendar Group needs the start of scheduling hours");
     }
-    if (endTime == null) {
+    if (overallEndTime == null) {
       throw new IllegalArgumentException("Calendar Group needs the end of scheduling hours");
     }
-    if (startTime.isAfter(endTime)) {
+    if (overallStartTime.isAfter(overallEndTime)) {
       throw new IllegalArgumentException("Start time cannot be after end time");
     }
     this.events = events;
-    this.startTime = startTime;
-    this.endTime = endTime;
+    this.overallStartTime = overallStartTime;
+    this.overallEndTime = overallEndTime;
     this.allFreeTimeRanges = calculateFreeTimeRanges();
   }
 
@@ -66,22 +63,24 @@ public class CalendarGroup {
 
     // This represents the earliest time that we can schedule a window for the
     // meeting. As events are processed, this changes to their end times.
-    Instant earliestNonScheduledInstant = startTime;
+    Instant earliestNonScheduledInstant = overallStartTime;
+
     for (CalendarEvent event : events) {
       // Make sure that there is some time between the events and it is not
       // later than the person's scheduling hours' ending time.
       if (event.getStartTime().isAfter(earliestNonScheduledInstant)
-          && !event.getStartTime().isAfter(endTime)) {
+          && !event.getStartTime().isAfter(overallEndTime)) {
         possibleTimes.add(
             TimeRange.fromStartEnd(earliestNonScheduledInstant, event.getStartTime()));
       }
+      // Check if the earliest non scheduled time needs to be shifted to later.
       if (earliestNonScheduledInstant.isBefore(event.getEndTime())) {
         earliestNonScheduledInstant = event.getEndTime();
       }
     }
     // The end of the work hours is potentially never included so we check.
-    if (endTime.isAfter(earliestNonScheduledInstant)) {
-      possibleTimes.add(TimeRange.fromStartEnd(earliestNonScheduledInstant, endTime));
+    if (overallEndTime.isAfter(earliestNonScheduledInstant)) {
+      possibleTimes.add(TimeRange.fromStartEnd(earliestNonScheduledInstant, overallEndTime));
     }
     return possibleTimes;
   }
@@ -97,16 +96,11 @@ public class CalendarGroup {
    * @return the modifed list of free time ranges.
    */
   public List<TimeRange> deleteFreeTimeRange(TimeRange timeRange) {
-    boolean exist = false;
-    for (TimeRange freeTimeRange : allFreeTimeRanges) {
-      if (freeTimeRange.equals(timeRange)) {
-        exist = true;
-      }
-    }
-    if (!exist) {
+    if (allFreeTimeRanges.contains(timeRange)) {
+      allFreeTimeRanges.remove(timeRange);
+    } else {
       throw new IllegalArgumentException("This time range does not represent any free time range.");
     }
-    allFreeTimeRanges.remove(timeRange);
     return allFreeTimeRanges;
   }
 
@@ -126,7 +120,7 @@ public class CalendarGroup {
     allFreeTimeRanges.add(newTimeRange);
 
     // Sorts all free time ranges before returning.
-    Collections.sort(allFreeTimeRanges, sortByTimeRangeStartTimeAscending);
+    Collections.sort(allFreeTimeRanges, TimeRange.sortByTimeRangeStartTimeAscending);
     return allFreeTimeRanges;
   }
 }

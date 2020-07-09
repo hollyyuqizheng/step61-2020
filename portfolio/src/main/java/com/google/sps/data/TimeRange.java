@@ -16,6 +16,7 @@ package com.google.sps.data;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Comparator;
 
 /**
  * Class representing a span of time, enforcing properties (e.g. start comes before end) and
@@ -24,6 +25,10 @@ import java.time.Instant;
 public final class TimeRange {
   private final Instant start;
   private final Duration duration;
+
+  // Comparator for sorting time ranges by start time
+  public static final Comparator<TimeRange> sortByTimeRangeStartTimeAscending =
+      Comparator.comparing(TimeRange::start);
 
   private TimeRange(Instant start, Duration duration) {
     this.start = start;
