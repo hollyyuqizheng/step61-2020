@@ -21,11 +21,6 @@
   width: 100%;
 }
 
-#event-end-time-warning,
-#event-duplicate-warning {
-  visibility: hidden;
-}
-
 #new-event-list-wrapper {
   width: 80%;
 }

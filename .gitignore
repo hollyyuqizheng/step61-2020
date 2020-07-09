@@ -4,7 +4,7 @@ package-lock.json
 node_modules/
 
 # Ignore generated Maven build files
-target/
+portfolio/target/
 
 # Ignore editor config
 .idea

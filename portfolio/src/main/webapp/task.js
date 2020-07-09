@@ -11,8 +11,6 @@ const TIME_UNIT = {
  * converted into a JSON string.
  */
 class Task {
-  // TODO(raulcruise): could you add the type for each param please?
-
   /**
    * All fields are required except description, which will be null
    * when not set.
