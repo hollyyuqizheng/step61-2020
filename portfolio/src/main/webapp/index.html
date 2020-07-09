@@ -32,7 +32,7 @@
     <script src="request.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
     <script src="calendarApi.js" ></script>
-    <!-- <script src="sheetsApi.js"></script> -->
+    <script src="sheetsApi.js"></script>
   </head>
  
   <body onload="useTodayAsDefault(); setClosestEventTime()">
@@ -253,9 +253,9 @@
             Looks good to me! Add them to my Google Calendar
           </button>
           <div class="d-none" id="export-calendar-message"></div>
-
+ 
           <div id="sheets-message"></div>
-          <button class="btn btn-primary" onclick="handleClientLoad()">Sign into Sheets</button>
+          <button class="btn btn-primary" onclick="handleClientLoad()">Handle Client Load</button>
           <button id="sheets-export-button" class="btn btn-primary" class="d-none">Export to Google Sheets</button>
           <button id="sheets-sign-out-button" class="btn btn-primary" class="d-none">Sign out of Google Sheets</button>
           <button id="sheets-sign-in-button" class="btn btn-primary">Sign in to Google Sheets</button>
