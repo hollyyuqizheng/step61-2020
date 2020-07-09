@@ -155,7 +155,7 @@ function validateTaskName(name) {
   if (name == '') {
     return {isValid: false, errorMessage: 'Name cannot be empty.'};
   } else {
-    return {isValid: true, errorMessage: 'No error.'};
+    return {isValid: true, errorMessage: null};
   }
 }
 
@@ -169,6 +169,6 @@ function validateTaskDuration(duration) {
   if (parseInt(duration) <= 0 || !Number.isInteger(duration)) {
     return {isValid: false, errorMessage: 'Duration input is invalid.'};
   } else {
-    return {isValid: true, errorMessage: 'No error.'};
+    return {isValid: true, errorMessage: null};
   }
 }
