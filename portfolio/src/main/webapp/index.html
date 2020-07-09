@@ -73,6 +73,7 @@
           <div class="form-group">
             <label for="new-task-name">Task name:</label>
             <input type="text" id="new-task-name" class="form-control" name="new-task-name" placeholder="New Task" />
+            <div class="invalid-feedback" id="empty-name-message">Name cannot be empty!</div>
           </div>
 
           <label for="new-task-description">Task description:</label><br />
@@ -81,14 +82,14 @@
             class="form-control"
             name="new-task-description"
             placeholder="Description"
-          >
-          </textarea>
+          ></textarea>
           <br />
 
           <div class="form-row">
             <div class="col">
               <label for="new-task-estimated-length">Duration:</label>
               <input type="text" id="new-task-estimated-length" class="form-control" name="new-task-estimated-length" />
+              <div class="invalid-feedback" id="task-length-message">Duration must be a positive integer!</div>
             </div>
 
             <div class="col">

@@ -39,15 +39,15 @@ class Task {
 function createNewTask() {
   const name = $('#new-task-name').val();
   const description = $('#new-task-description').val();
-  const length = $('#new-task-estimated-length').val();
+  const length = parseInt($('#new-task-estimated-length').val());
   const lengthUnit = $('#new-task-estimated-length-unit').val();
-  const priority = $('#new-task-priority').val();
+  const priority = parseInt($('#new-task-priority').val());
 
-  if (name == '') {
+  if (!validateTaskName(name).valid) {
     return;
   }
 
-  if (parseInt(length) <= 0 || length == '') {
+  if (!validateTaskDuration(length).valid) {
     return;
   }
 
@@ -137,4 +137,37 @@ function collectAllTasks() {
   });
 
   return allTaskJson;
+}
+
+/**
+ * This method checks that the name input is not an empty string.
+ * In the case that an empty string is recieved, an error message is displayed.
+ * The method returns an object containing a bool to declare whether the input
+ * is valid and an error message.
+ */
+function validateTaskName(name) {
+  if (name == '') {
+    $('#empty-name-message').show();
+    return {valid: false, errorMessage: 'Name cannot be empty.'};
+  } else {
+    $('#empty-name-message').hide();
+    return {valid: true, errorMessage: 'No error.'};
+  }
+}
+
+
+/**
+ * This method checks that the duration input by the user is a positive integer.
+ * If it is not, an error message is displayed. The method returns an object
+ * containing a bool to declare whether the input is valid and an error message.
+ */
+function validateTaskDuration(duration) {
+  console.log(duration);
+  if (parseInt(duration) <= 0 || !Number.isInteger(duration)) {
+    $('#task-length-message').show();
+    return {valid: false, errorMessage: 'Duration input is invalid.'};
+  } else {
+    $('#task-length-message').hide();
+    return {valid: true, errorMessage: 'No error.'};
+  }
 }
