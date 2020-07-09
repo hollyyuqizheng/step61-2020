@@ -34,49 +34,100 @@
     <script src="sheetsApi.js" onload="handleClientLoad()"></script>
     <script src="https://apis.google.com/js/api.js"></script>
   </head>
-
   <body>
     <div class="container-fluid">
-      <div class="navbar-brand navbar-light" id="nav-bar">
-        <h1>Welcome to your automatic task scheduler</h1>
-      </div>
-
+      <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Task Scheduler</a>
+        <div class="collapse navbar-collapse" id="navbar-supported-content">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbar-dropdown"
+                role="button"
+                data-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                Scheduling Preferences
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbar-dropdown">
+                <a>Working Hours:</a>
+                <form class="px-4 py-3">
+                  <input
+                    type="time"
+                    id="working-hour-start"
+                    name="working-hour-start"
+                    class="form-control"
+                    value="09:00"
+                  />
+                  <span>to</span>
+                  <input type="time" id="working-hour-end" name="working-hour-end" class="form-control" value="17:00" />
+                </form>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </nav>
       <div class="row">
         <div id="new-task-wrapper" class="col-md-12 col-lg-6 col-xl-3">
-          <h2>What are your working hours for today?</h2>
-          <span>
-            <input type="time" id="working-hour-start" name="working-hour-start" value="09:00" />
-            to
-            <input type="time" id="working-hour-end" name="working-hour-end" value="17:00" />
-          </span>
-
           <h2>Add the tasks you would like to schedule for today</h2>
-          <div id="new-task-form">
-            <label for="new-task-name">Task name:</label>
-            <input type="text" id="new-task-name" name="new-task-name" /><br />
-            <label for="new-task-description">Task description:</label><br />
-            <textarea id="new-task-description" name="new-task-description" cols="30" rows="10"></textarea><br />
-            <label for="new-task-estimated-length">Estimated length:</label>
-            <input type="text" id="new-task-estimated-length" name="new-task-estimated-length" />
-            <select id="new-task-estimated-length-unit" name="new-task-estimated-length-unit">
-              <option value="minute">minutes(s)</option>
-              <option value="hour">hour(s)</option>
-              <option value="day">day(s)</option>
-            </select>
-            <br />
-            <label for="new-task-priority">Task's priority:</label>
-            <select id="new-task-priority" name="new-task-priority">
-              <option value="5">5 (High)</option>
-              <option value="4">4</option>
-              <option value="3">3</option>
-              <option value="2">2</option>
-              <option value="1">1 (Low)</option> </select
-            ><br />
-            <button type="button" class="btn btn-primary">Add this task</button>
-          </div>
+          <form id="new-task-form">
+            <div class="form-group">
+              <label for="new-task-name">Task name:</label>
+              <input type="text" id="new-task-name" class="form-control" name="new-task-name" placeholder="New Task" />
+              <div class="invalid-feedback" id="empty-name-message">Name cannot be empty!</div>
+            </div>
 
-          <div id="new-task-list-wrapper">
-            <h2>Tasks added:</h2>
+            <label for="new-task-description">Task description:</label><br />
+            <textarea
+              id="new-task-description"
+              class="form-control"
+              name="new-task-description"
+              placeholder="Description"
+            ></textarea>
+            <br />
+
+            <div class="form-row">
+              <div class="col">
+                <label for="new-task-estimated-length">Duration:</label>
+                <input
+                  type="text"
+                  id="new-task-estimated-length"
+                  class="form-control"
+                  name="new-task-estimated-length"
+                />
+                <div class="invalid-feedback" id="task-length-message">Duration must be a positive integer!</div>
+              </div>
+
+              <div class="col">
+                <label for="new-task-estimated-length-unit">Unit:</label>
+                <select id="new-task-estimated-length-unit" class="form-control" name="new-task-estimated-length-unit">
+                  <option value="minutes">minute(s)</option>
+                  <option value="hours">hour(s)</option>
+                </select>
+              </div>
+
+              <div class="col">
+                <label for="new-task-priority">Priority:</label>
+                <select id="new-task-priority" class="form-control" name="new-task-priority">
+                  <option value="5">5 (High)</option>
+                  <option value="4">4</option>
+                  <option value="3">3</option>
+                  <option value="2">2</option>
+                  <option value="1">1 (Low)</option>
+                </select>
+              </div>
+            </div>
+            <br />
+            <button type="button" class="btn btn-primary" onclick="createNewTask()">Add this task</button>
+          </form>
+
+          <br />
+          <h2>Tasks added:</h2>
+          <div class="scrollable" id="new-task-list-wrapper">
+            <div id="new-task-list"></div>
           </div>
         </div>
 
