@@ -174,3 +174,7 @@ function validateTaskDuration(duration) {
     return {isValid: true, errorMessage: null};
   }
 }
+
+module.exports.getDurationMinutes = getDurationMinutes;
+module.exports.validateTaskDuration = validateTaskDuration;
+module.exports.validateTaskName = validateTaskName;
