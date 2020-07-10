@@ -27,30 +27,28 @@ class ScheduleRequest {
 
 // Once a call is made to the server for scheduling this array will be a local
 // copy of the results.
-var scheduledTasks = []
+var scheduledTasks = [];
 
-    /**
-     * Gets all of the scheduling information from the UI and returns a
-     * ScheduleRequest with all of the data.
-     */
-    function
-    createRequestFromUiInformation() {
-      const startTime = document.getElementById('working-hour-start').value;
-      const endTime = document.getElementById('working-hour-end').value;
-      const events = collectAllEvents();
-      const tasks = collectAllTasks();
-      const algorithmType = document.getElementById('algorithm-type').value;
-      const scheduleRequest = new ScheduleRequest(
-          events, tasks, getTimeObject(startTime), getTimeObject(endTime),
-          algorithmType);
-      return scheduleRequest;
-    }
+/**
+ * Gets all of the scheduling information from the UI and returns a
+ * ScheduleRequest with all of the data.
+ */
+function createRequestFromUiInformation() {
+  const startTime = document.getElementById('working-hour-start').value;
+  const endTime = document.getElementById('working-hour-end').value;
+  const events = collectAllEvents();
+  const tasks = collectAllTasks();
+  const algorithmType = document.getElementById('algorithm-type').value;
+  const scheduleRequest = new ScheduleRequest(
+      events, tasks, getTimeObject(startTime), getTimeObject(endTime),
+      algorithmType);
+  return scheduleRequest;
+}
 
 /**
  * Gets called when the user hits 'Start Scheduling'.
  */
-function
-startScheduling() {
+function startScheduling() {
   const scheduleRequest = createRequestFromUiInformation();
   // Create the request to send to the server using the data we collected from
   // the web form.
@@ -72,8 +70,7 @@ function updateResultsOnPage(scheduledTaskArray) {
  * Handles sending the ScheduleRequest object to the servlet and returns the
  * scheduled tasks.
  */
-function
-fetchScheduledTasksFromServlet() {
+function fetchScheduledTasksFromServlet() {
   const scheduleRequest = createRequestFromUiInformation();
   const json = JSON.stringify(scheduleRequest);
   return fetch('/schedule', {method: 'POST', body: json})
@@ -91,8 +88,7 @@ fetchScheduledTasksFromServlet() {
 /**
  * Returns the local copy of the latest scheduled tasks.
  */
-function
-collectAllScheduledTasks() {
+function collectAllScheduledTasks() {
   return scheduledTasks;
 }
 
