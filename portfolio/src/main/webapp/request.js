@@ -87,7 +87,6 @@ function addScheduledTaskToPage(scheduledTaskWrapper, resultElement) {
   taskDate.setTime(taskTimeSeconds * 1000);
   const taskPriority = task.priority.priority;
   resultElement.innerText += taskName;
-  resultElement.innerText += taskName;
 
   const newResultCard = document.createElement('div');
   newResultCard.classList.add('card');
