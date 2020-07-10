@@ -176,7 +176,8 @@ function handleExportSchedule() {
 
   var spreadsheetProperties = {
     title: 'Your Scheduled Tasks'
-    // TODO(tomasalvarez): Add desired creation properties.
+    // TODO(tomasalvarez): Include James suggestion of adding the creation time
+    //     in the title of the spreadsheet.
   };
   
   var request = gapi.client.sheets.spreadsheets.create(
