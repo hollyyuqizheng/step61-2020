@@ -31,7 +31,6 @@
     <script src="calendar.js"></script>
     <script src="request.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
-    <!-- <script src="calendarApi.js" onload="initiateCalendarAuth()"></script> -->
     <script src="calendarApi.js"></script>
     <script src="sheetsApi.js"></script>
   </head>
@@ -221,8 +220,7 @@
         <div id="calendar-wrapper" class="col-md-12 col-lg-6 col-xl-3">
           <div id="calendar-view-wrapper">
             <iframe title="Your Google Calendar" id="calendar-view" class="d-none" scrolling="yes"></iframe>
-            <!-- <button type="button" class="btn btn-primary" id="calendar-auth-button" onclick="initiateCalendarAuth()"> -->
-            <button type="button" class="btn btn-primary" id="calendar-auth-button"> 
+            <button type="button" class="btn btn-primary" id="calendar-auth-button" onclick="initiateCalendarAuth()">
               Log in to Google Calendar
             </button>
             <button type="button" class="btn btn-primary" id="calendar-logout-button"> 
