@@ -182,6 +182,10 @@ public final class CalendarEventsGroupTest {
     Assert.assertEquals(expectedFreeTimeRanges, actualFreeTimeRanges);
   }
 
+  /**
+   * If the event lies outside the working hours, the entire possible scheduling time range should
+   * be returned.
+   */
   @Test
   public void eventAfterOverallEndTime() {
     // Events:                                  |-A-|
