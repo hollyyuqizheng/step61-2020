@@ -115,7 +115,8 @@ function handleAuthorizationError(error) {
  * message on the UI.
  */
 function handleExportError(reason) {
-  $('#sheets-message').removeClass('d-none')
+  $('#sheets-message')
+      .removeClass('d-none')
       .text('Error: ' + reason.result.error.message)
       .show();
 }
@@ -126,10 +127,10 @@ function handleExportError(reason) {
  */
 function makeSheetsValuesFromScheduledTasks(scheduledTasks, values) {
   // I think this code is shorter without a forEach() and I also do not
-  // know how to make this work with a forEach(). 
-  for (index = 0; index < scheduledTasks.length; index++) { 
-    values.push(singleScheduledTaskToSheetsArray(scheduledTasks[index])); 
-  } 
+  // know how to make this work with a forEach().
+  for (index = 0; index < scheduledTasks.length; index++) {
+    values.push(singleScheduledTaskToSheetsArray(scheduledTasks[index]));
+  }
 }
 
 /**
@@ -142,7 +143,7 @@ function singleScheduledTaskToSheetsArray(scheduledTask) {
   const task = scheduledTask.task;
   const taskName = task.name;
   // Changes seconds into minutes.
-  const taskDurationMinutes = task.duration.seconds/60;
+  const taskDurationMinutes = task.duration.seconds / 60;
   const taskDescription = task.description.value;
   const taskPriority = task.priority.priority;
   const taskTimeSeconds = scheduledTask.startTime.seconds;
@@ -167,7 +168,8 @@ function handleExportSchedule() {
   const scheduledTaskCount = scheduledTasks.length;
   // If the person has yet to schedule something
   if (scheduledTaskCount == 0) {
-    $('#sheets-message').removeClass('d-none')
+    $('#sheets-message')
+        .removeClass('d-none')
         .text('Cannot export empty schedule.')
         .show();
     return;
@@ -185,17 +187,25 @@ function handleExportSchedule() {
   var request = gapi.client.sheets.spreadsheets.create(
       {properties: spreadsheetProperties});
   request.then((response) => {
-    var values = [['Task', 'Scheduled Time', 'Duration (minutes)', 'Description', 'Priority']];
-    
+    var values = [[
+      'Task', 'Scheduled Time', 'Duration (minutes)', 'Description', 'Priority'
+    ]];
+    // This is using the new scheduledTasks variable which is a local copy
+    // of the latest results from scheduling.
     makeSheetsValuesFromScheduledTasks(scheduledTasks, values);
     console.log(values);
+    // This is a blank row in the spreadsheet so you can see the totals easier.
     values.push([]);
-    values.push([scheduledTaskCount.toString()+" Tasks Total", "",  "=SUM(C2:C" + (scheduledTaskCount+1).toString() + ") & \" Total Minutes Scheduled\""])
+    values.push([
+      scheduledTaskCount.toString() + ' Tasks Total', '',
+      '=SUM(C2:C' + (scheduledTaskCount + 1).toString() +
+          ') & " Total Minutes Scheduled"'
+    ])
 
     var data = {
       // This is +3 because we have the initial row with titles and the final
-      // rows with some totals
-      'range': 'Sheet1!A1:E' + (scheduledTaskCount+3).toString(),
+      // rows with some totals.
+      'range': 'Sheet1!A1:E' + (scheduledTaskCount + 3).toString(),
       'majorDimension': 'ROWS',
       'values': values
     }  // Additional ranges to update.
@@ -204,9 +214,17 @@ function handleExportSchedule() {
     gapi.client.sheets.spreadsheets.values
         .batchUpdate(
             {spreadsheetId: response.result.spreadsheetId, resource: body})
-        .then((response) => {
-          var result = response.result;
-          console.log(`${result.totalUpdatedCells} cells updated.`);
-        });
+        .then(
+            function(response) {
+              //  This displays the link back to the user.
+              $('#sheets-url-container').removeClass('d-none');
+              $('#sheets-url-container')
+                  .text(
+                      'Done. Here is the URL to your spreadsheet: ' +
+                      response.result.spreadsheetUrl);
+            },
+            function(reason) {
+              handleExportError(reason);
+            });
   });
 }
