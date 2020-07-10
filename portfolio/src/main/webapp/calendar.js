@@ -317,7 +317,7 @@ function checkDatePicker() {
   }
 }
 
-exports._test = {
+module.exports._test = {
   parseTodayString : parseTodayString,
   getClosestNextHour : getClosestNextHour,
   isWorkHourValid : isWorkHourValid
