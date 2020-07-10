@@ -1,5 +1,6 @@
 package com.google.sps.data;
 
+import com.google.common.collect.Lists;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +48,7 @@ public class CalendarEventsGroup {
     if (overallStartTime.isAfter(overallEndTime)) {
       throw new IllegalArgumentException("Start time cannot be after end time");
     }
-    this.events = events;
+    this.events = Lists.newArrayList(events);
     this.overallStartTime = overallStartTime;
     this.overallEndTime = overallEndTime;
   }
@@ -70,7 +71,7 @@ public class CalendarEventsGroup {
       // Make sure that there is some time between the events and it is not
       // later than the person's scheduling hours' ending time.
       if (event.getStartTime().isAfter(earliestNonScheduledInstant)) {
-        if (event.getEndTime().isAfter(overallEndTime)) {
+        if (event.getStartTime().isAfter(overallEndTime)) {
           possibleTimes.add(TimeRange.fromStartEnd(earliestNonScheduledInstant, overallEndTime));
         } else {
           possibleTimes.add(

@@ -44,7 +44,7 @@ public final class CalendarEventsGroupTest {
     Instant endTime = eventTwoEnd.plusSeconds(1000);
 
     List<CalendarEvent> events =
-        Arrays.asList(
+        ImmutableList.of(
             new CalendarEvent("event one", eventOneStart, eventOneEnd),
             new CalendarEvent("event two", eventTwoStart, eventTwoEnd));
 
@@ -84,7 +84,7 @@ public final class CalendarEventsGroupTest {
     Instant eventTwoEnd = eventTwoStart.plusSeconds(1000);
 
     List<CalendarEvent> events =
-        Arrays.asList(
+        ImmutableList.of(
             new CalendarEvent("event one", eventOneStart, eventOneEnd),
             new CalendarEvent("event two", eventTwoStart, eventTwoEnd));
 
@@ -118,7 +118,7 @@ public final class CalendarEventsGroupTest {
     Instant eventTwoEnd = eventTwoStart.plusSeconds(3000);
 
     List<CalendarEvent> events =
-        Arrays.asList(
+        ImmutableList.of(
             new CalendarEvent("event one", eventOneStart, eventOneEnd),
             new CalendarEvent("event two", eventTwoStart, eventTwoEnd));
 
@@ -151,7 +151,7 @@ public final class CalendarEventsGroupTest {
     Instant eventTwoEnd = eventTwoStart.plusSeconds(1000);
 
     List<CalendarEvent> events =
-        Arrays.asList(
+        ImmutableList.of(
             new CalendarEvent("event one", eventOneStart, eventOneEnd),
             new CalendarEvent("event two", eventTwoStart, eventTwoEnd));
 
@@ -198,9 +198,84 @@ public final class CalendarEventsGroupTest {
     Instant eventStartTime = overallEndTime.plusSeconds(5000);
     Instant eventEndTime = eventStartTime.plusSeconds(5000);
     List<CalendarEvent> events =
-        Arrays.asList(new CalendarEvent("event", eventStartTime, eventEndTime));
+        ImmutableList.of(new CalendarEvent("event", eventStartTime, eventEndTime));
     CalendarEventsGroup eventGroup =
         new CalendarEventsGroup(events, overallStartTime, overallEndTime);
+
+    List<TimeRange> expectedFreeTimeRanges = Arrays.asList(targetFreeTime);
+    List<TimeRange> actualFreeTimeRanges = eventGroup.getFreeTimeRanges();
+    Assert.assertEquals(expectedFreeTimeRanges, actualFreeTimeRanges);
+  }
+
+  /** The event is partially within scheduling hours. */
+  @Test
+  public void eventPartiallyOverlapWorkHoursEnd() {
+    // Events:            |------------A-----------|
+    // Possible: |---------------------------|
+    // Free:     |--------|
+    Instant overallStartTime = Instant.now();
+    Instant overallEndTime = overallStartTime.plusSeconds(10000);
+
+    Instant eventStartTime = overallStartTime.plusSeconds(1000);
+    Instant eventEndTime = eventStartTime.plusSeconds(10000);
+    List<CalendarEvent> events =
+        ImmutableList.of(new CalendarEvent("event", eventStartTime, eventEndTime));
+    CalendarEventsGroup eventGroup =
+        new CalendarEventsGroup(events, overallStartTime, overallEndTime);
+
+    TimeRange targetFreeTime = TimeRange.fromStartEnd(overallStartTime, eventStartTime);
+
+    List<TimeRange> expectedFreeTimeRanges = Arrays.asList(targetFreeTime);
+    List<TimeRange> actualFreeTimeRanges = eventGroup.getFreeTimeRanges();
+    Assert.assertEquals(expectedFreeTimeRanges, actualFreeTimeRanges);
+  }
+
+  /** The event is partially within scheduling hours. */
+  @Test
+  public void eventPartiallyOverlapWorkHoursStart() {
+    // Events:   |------------A-----------|
+    // Possible:      |---------------------------|
+    // Free:                              |-------|
+    Instant overallStartTime = Instant.now();
+    Instant overallEndTime = overallStartTime.plusSeconds(10000);
+
+    Instant eventStartTime = overallStartTime.minusSeconds(1000);
+    Instant eventEndTime = eventStartTime.plusSeconds(10000);
+    List<CalendarEvent> events =
+        ImmutableList.of(new CalendarEvent("event", eventStartTime, eventEndTime));
+    CalendarEventsGroup eventGroup =
+        new CalendarEventsGroup(events, overallStartTime, overallEndTime);
+
+    TimeRange targetFreeTime = TimeRange.fromStartEnd(eventEndTime, overallEndTime);
+
+    List<TimeRange> expectedFreeTimeRanges = Arrays.asList(targetFreeTime);
+    List<TimeRange> actualFreeTimeRanges = eventGroup.getFreeTimeRanges();
+    Assert.assertEquals(expectedFreeTimeRanges, actualFreeTimeRanges);
+  }
+
+  /** Events that overlap and whose overall time is outside working hours. */
+  @Test
+  public void overlappingEventsOutsideWorkHours() {
+    // Events:   |---------A---------|
+    //                      |-------B-------|
+    // Possible:      |---------------------------|
+    // Free:                                |-----|
+    Instant overallStartTime = Instant.now();
+    Instant overallEndTime = overallStartTime.plusSeconds(10000);
+
+    Instant eventOneStartTime = overallStartTime.minusSeconds(1000);
+    Instant eventOneEndTime = eventOneStartTime.plusSeconds(3000);
+    Instant eventTwoStartTime = overallStartTime.plusSeconds(1000);
+    Instant eventTwoEndTime = eventTwoStartTime.plusSeconds(2000);
+
+    List<CalendarEvent> events =
+        ImmutableList.of(
+            new CalendarEvent("event one", eventOneStartTime, eventOneEndTime),
+            new CalendarEvent("event two", eventTwoStartTime, eventTwoEndTime));
+    CalendarEventsGroup eventGroup =
+        new CalendarEventsGroup(events, overallStartTime, overallEndTime);
+
+    TimeRange targetFreeTime = TimeRange.fromStartEnd(eventTwoEndTime, overallEndTime);
 
     List<TimeRange> expectedFreeTimeRanges = Arrays.asList(targetFreeTime);
     List<TimeRange> actualFreeTimeRanges = eventGroup.getFreeTimeRanges();
