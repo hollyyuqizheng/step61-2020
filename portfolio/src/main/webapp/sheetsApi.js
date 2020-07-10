@@ -166,7 +166,6 @@ function singleScheduledTaskToSheetsArray(scheduledTask) {
  */
 function handleExportSchedule() {
   const scheduledTaskCount = scheduledTasks.length;
-  // If the person has yet to schedule something
   if (scheduledTaskCount == 0) {
     $('#sheets-message')
         .removeClass('d-none')
