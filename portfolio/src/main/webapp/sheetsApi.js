@@ -1,15 +1,14 @@
 // Client ID and API key from the Developer Console
-const CLIENT_ID =
-    '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
-const API_KEY = '';
+// const CLIENT_ID =
+//     '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
 
 // Array of API discovery doc URLs for APIs used by the quickstart
-const DISCOVERY_DOCS =
-    ['https://sheets.googleapis.com/$discovery/rest?version=v4'];
+const DISCOVERY_DOCS_SHEETS =
+    'https://sheets.googleapis.com/$discovery/rest?version=v4';
 
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
-const SCOPE_READ_WRITE = 'https://www.googleapis.com/auth/spreadsheets';
+const SCOPE_SHEETS_READ_WRITE = 'https://www.googleapis.com/auth/spreadsheets';
 
 // Error codes that the process can throw
 const ERROR_CODE = {
@@ -29,32 +28,58 @@ function handleClientLoad() {
  * listeners.
  */
 function initClient() {
-  gapi.client
+
+  if (!gapi.auth2.getAuthInstance()) {
+    gapi.client
       .init({
         apiKey: API_KEY,
         clientId: CLIENT_ID,
-        discoveryDocs: DISCOVERY_DOCS,
-        scope: SCOPE_READ_WRITE
+        discoveryDocs: DISCOVERY_DOCS_SHEETS,
+        scope: SCOPE_SHEETS_READ_WRITE
       })
       .then(
-          function() {
-            var exportButton = document.getElementById('sheets-export-button');
-            var signOutButton =
-                document.getElementById('sheets-sign-out-button');
-            var signInButton = document.getElementById('sheets-sign-in-button');
+            function() {
+              var exportButton = document.getElementById('sheets-export-button');
+              var signOutButton =
+                  document.getElementById('sheets-sign-out-button');
+              var signInButton = document.getElementById('sheets-sign-in-button');
 
-            // Listen for sign-in state changes.
-            gapi.auth2.getAuthInstance().isSignedIn.listen(handleButtons);
+              // TODO: listen for scope changes instead 
+              gapi.auth2.getAuthInstance().isSignedIn.listen(handleButtons);
 
-            // Handle the initial sign-in state.
-            handleButtons();
-            exportButton.onclick = handleExportSchedule;
-            signOutButton.onclick = handleSignOut;
-            signInButton.onclick = handleSignIn;
-          },
-          function(error) {
-            handleError(error);
-          });
+              // Handle the initial sign-in state.
+              handleButtons();
+              exportButton.onclick = handleExportSchedule;
+              signOutButton.onclick = handleSignOut;
+              signInButton.onclick = handleSignIn;
+            },
+            function(error) {
+              handleError(error);
+            });
+  } else {
+    var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
+    googleUser.grant({scope: SCOPE_SHEETS_READ_WRITE})
+      .then(
+            function() {
+              var exportButton = document.getElementById('sheets-export-button');
+              var signOutButton =
+                  document.getElementById('sheets-sign-out-button');
+              var signInButton = document.getElementById('sheets-sign-in-button');
+
+              // Listen for sign-in state changes.
+              //gapi.auth2.getAuthInstance().isSignedIn.listen(handleButtons);
+
+              // Handle the initial sign-in state.
+              handleButtons();
+              exportButton.onclick = handleExportSchedule;
+              signOutButton.onclick = handleSignOut;
+              //signInButton.onclick = handleSignIn;
+            },
+            function(error) {
+              handleError(error);
+            });
+  }
+      
 }
 
 /**
