@@ -31,7 +31,8 @@
     <script src="calendar.js"></script>
     <script src="request.js"></script>
     <script src="https://apis.google.com/js/api.js"></script>
-    <script src="calendarApi.js" onload="initiateCalendarAuth()"></script>
+    <!-- <script src="calendarApi.js" onload="initiateCalendarAuth()"></script> -->
+    <script src="calendarApi.js"></script>
     <script src="sheetsApi.js"></script>
   </head>
  
@@ -44,7 +45,7 @@
             <li class="nav-item nav-link">
               Date to schedule for:
               <!-- The default date will be set to current date by one of the onload functions -->
-              <input type="date" id="date-picker" value="2020-07-01" onchange="checkDatePicker()" />
+              <input type="date" id="date-picker" value="2020-07-01" onchange="checkDatePicker(); setClosestEventTime()" />
               <small class="d-none" id="date-picker-warning">
                 The date you have picked is earlier than today. Please choose a different date to schedule tasks for.
               </small>

@@ -164,53 +164,112 @@ function eventsEqual(eventA, eventB) {
       (eventA.startTime.getTime() === eventB.startTime.getTime()) &&
       (eventA.endTime.getTime() === eventB.endTime.getTime());
 }
+
+/** Retrives the date that the user has picked for the scheduling. */
+function getUserPickedDate() {
+  const userPickedDate = $('#date-picker').val().split('-');
+  const year = userPickedDate[0];
+  const month = userPickedDate[1];
+  const date = userPickedDate[2];
+ 
+  const pickedDate = new Date();
+  pickedDate.setFullYear(year);
+  pickedDate.setMonth(month - 1);  // month is zero-indexed.
+  pickedDate.setDate(date);
+ 
+  return pickedDate;
+}
  
 /** Sets the date picker to the current date as the default. */
 function useTodayAsDefault() {
   const today = new Date();
   const year = today.getFullYear();
-  let month = today.getMonth() + 1;  // month is zero-indexed
- 
+  const month = today.getMonth() + 1;  // month is zero-indexed
+  const date = today.getDate();
+  
+  const todayString = parseTodayString(year, month, date);
+  $('#date-picker').val(todayString);
+}
+
+/** 
+ * Parses the current day's date into a dash separated string. 
+ * The parameters are of type String. 
+ */
+function parseTodayString(year, month, date) {
   // Adds leading 0 as padding for month and date strings.
   if (parseInt(month) < 10) {
     month = '0' + month;
   }
-  let date = today.getDate();
+  
   if (parseInt(date) < 10) {
     date = '0' + date;
   }
-  $('#date-picker').val(year + '-' + month + '-' + date);
+  const todayString = year + '-' + month + '-' + date;
+  return todayString; 
 }
  
 /**
  * Sets the default calendar event start and times.
  * The default start time is set to the closet hour.
- * If the closest hour is outside working hours, use working hour
- * instead of the actual closest hour.
  * The default end time is set to the end of working hour.
  */
 function setClosestEventTime() {
-  const now = new Date();
-  let closestHour = now.getHours() + 1;
- 
   const workHourStartString = $('#working-hour-start').val();
-  const workHourStart = parseInt(workHourStartString.split(':')[0]);
   const workHourEndString = $('#working-hour-end').val();
+
+  const userPickedDate = getUserPickedDate();
+  var defaultEventStartHour; 
+
+  if (isToday(userPickedDate)) {
+    // If user picked today to schedule for, 
+    // the default event starts on the next hour if it is before
+    // working hour ends. 
+    const now = new Date();
+    const nextHour = now.getHours() + 1;
+    defaultEventStartHour = getClosestNextHour(nextHour, workHourStartString, workHourEndString);
+  } else {
+    defaultEventStartHour = workHourStartString; 
+  }
+   
+  $('#new-event-start-time').val(defaultEventStartHour);
+  $('#new-event-end-time').val(workHourEndString);
+}
+
+/** Checks if a date is today. */
+function isToday(date) {
+  const today = new Date();
+  return (date.getFullYear() === today.getFullYear()
+      && date.getMonth() === today.getMonth()
+      && date.getDate() === today.getDate());
+}
+
+/** 
+ * Gets the closest next hour compared to the current time.
+ * This hour is displayed as the placeholder for creating new event's 
+ * start time. 
+ * If the closest hour is before working hour start time, sets it to
+ * working hour start time. If the closest hour is after working hour end
+ * time, sets it to working hour end time. 
+ * This function is called if the user picks today to schedule for. 
+ * @return closest next hour in HH:00 format. 
+ */
+function getClosestNextHour(nextHour, workHourStartString, workHourEndString) {
+  const workHourStart = parseInt(workHourStartString.split(':')[0]);
   const workHourEnd = parseInt(workHourEndString.split(':')[0]);
- 
-  if (closestHour < workHourStart) {
+
+  var closestHour = nextHour; 
+  if (nextHour <= workHourStart) {
     closestHour = workHourStartString;
-  } else if (closestHour > workHourEnd) {
+  } else if (nextHour >= workHourEnd) {
     closestHour = workHourEndString;
   } else {
-    if (closestHour < 10) {
-      closestHour = '0' + closestHour;
+    if (nextHour < 10) {
+      closestHour = '0' + nextHour;
     }
     closestHour += ':00';
   }
- 
-  $('#new-event-start-time').val(closestHour);
-  $('#new-event-end-time').val(workHourEndString);
+
+  return closestHour; 
 }
  
 /** Checks the validity of the user's working hours input. */
@@ -222,10 +281,9 @@ function checkWorkHourRange() {
   const workHourEndHour = parseInt($('#working-hour-end').val().split(':')[0]);
   const workHourEndMinute =
       parseInt($('#working-hour-end').val().split(':')[1]);
- 
-  if (workHourStartHour > workHourEndHour ||
-      (workHourStartHour == workHourEndHour) &&
-          (workHourStartMinute > workHourEndMinute)) {
+  
+  if (isWorkHourValid(
+        workHourStartHour, workHourEndHour, workHourStartMinute, workHourEndMinute)) {
     $('#working-hour-warning').removeClass('d-none');
     $('#working-hour-warning').text('Start time cannot be after end time.');
   } else {
@@ -234,6 +292,17 @@ function checkWorkHourRange() {
     // the inputted working hours are valid.
     setClosestEventTime();
   }
+}
+
+/** 
+ * Checks if the working hour start time is before end time. 
+ * All arguments are of type integer. 
+ */
+function isWorkHourValid(
+    workHourStartHour, workHourEndHour, workHourStartMinute, workHourEndMinute) {
+  return workHourStartHour < workHourEndHour ||
+      ((workHourStartHour == workHourEndHour) &&
+          (workHourStartMinute < workHourEndMinute)); 
 }
  
 /** Checks if the date the user has picked is before the current date. */
@@ -246,4 +315,10 @@ function checkDatePicker() {
   } else {
     $('#date-picker-warning').addClass('d-none');
   }
+}
+
+exports._test = {
+  parseTodayString : parseTodayString,
+  getClosestNextHour : getClosestNextHour,
+  isWorkHourValid : isWorkHourValid
 }
