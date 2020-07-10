@@ -69,10 +69,13 @@ public class CalendarEventsGroup {
     for (CalendarEvent event : events) {
       // Make sure that there is some time between the events and it is not
       // later than the person's scheduling hours' ending time.
-      if (event.getStartTime().isAfter(earliestNonScheduledInstant)
-          && !event.getStartTime().isAfter(overallEndTime)) {
-        possibleTimes.add(
-            TimeRange.fromStartEnd(earliestNonScheduledInstant, event.getStartTime()));
+      if (event.getStartTime().isAfter(earliestNonScheduledInstant)) {
+        if (event.getEndTime().isAfter(overallEndTime)) {
+          possibleTimes.add(TimeRange.fromStartEnd(earliestNonScheduledInstant, overallEndTime));
+        } else {
+          possibleTimes.add(
+              TimeRange.fromStartEnd(earliestNonScheduledInstant, event.getStartTime()));
+        }
       }
       // Check if the earliest non scheduled time needs to be shifted to later.
       if (earliestNonScheduledInstant.isBefore(event.getEndTime())) {
@@ -83,6 +86,7 @@ public class CalendarEventsGroup {
     if (overallEndTime.isAfter(earliestNonScheduledInstant)) {
       possibleTimes.add(TimeRange.fromStartEnd(earliestNonScheduledInstant, overallEndTime));
     }
+
     return possibleTimes;
   }
 

@@ -2,7 +2,7 @@ package com.google.sps;
 
 import com.google.common.collect.ImmutableList;
 import com.google.sps.data.CalendarEvent;
-import com.google.sps.data.CalendarGroup;
+import com.google.sps.data.CalendarEventsGroup;
 import com.google.sps.data.TimeRange;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -26,7 +26,7 @@ public final class CalendarEventsGroupTest {
     List<CalendarEvent> events =
         ImmutableList.of(new CalendarEvent("event", startTime, endTimeAfter));
 
-    CalendarGroup eventGroup = new CalendarGroup(events, startTime, endTimeBefore);
+    CalendarEventsGroup eventGroup = new CalendarEventsGroup(events, startTime, endTimeBefore);
   }
 
   /** Tests for correct free times with non-overlapping events. */
@@ -48,7 +48,7 @@ public final class CalendarEventsGroupTest {
             new CalendarEvent("event one", eventOneStart, eventOneEnd),
             new CalendarEvent("event two", eventTwoStart, eventTwoEnd));
 
-    CalendarGroup eventGroup = new CalendarGroup(events, startTime, endTime);
+    CalendarEventsGroup eventGroup = new CalendarEventsGroup(events, startTime, endTime);
 
     Instant freeTimeRangeOneStart = startTime;
     Instant freeTimeRangeOneEnd = eventOneStart;
@@ -88,7 +88,7 @@ public final class CalendarEventsGroupTest {
             new CalendarEvent("event one", eventOneStart, eventOneEnd),
             new CalendarEvent("event two", eventTwoStart, eventTwoEnd));
 
-    CalendarGroup eventGroup = new CalendarGroup(events, startTime, endTime);
+    CalendarEventsGroup eventGroup = new CalendarEventsGroup(events, startTime, endTime);
 
     Instant freeTimeRangeOneStart = startTime;
     Instant freeTimeRangeOneEnd = startTime.plusSeconds(1000);
@@ -122,7 +122,7 @@ public final class CalendarEventsGroupTest {
             new CalendarEvent("event one", eventOneStart, eventOneEnd),
             new CalendarEvent("event two", eventTwoStart, eventTwoEnd));
 
-    CalendarGroup eventGroup = new CalendarGroup(events, startTime, endTime);
+    CalendarEventsGroup eventGroup = new CalendarEventsGroup(events, startTime, endTime);
 
     Instant freeTimeRangeOneStart = startTime;
     Instant freeTimeRangeOneEnd = startTime.plusSeconds(1000);
@@ -155,7 +155,7 @@ public final class CalendarEventsGroupTest {
             new CalendarEvent("event one", eventOneStart, eventOneEnd),
             new CalendarEvent("event two", eventTwoStart, eventTwoEnd));
 
-    CalendarGroup eventGroup = new CalendarGroup(events, startTime, endTime);
+    CalendarEventsGroup eventGroup = new CalendarEventsGroup(events, startTime, endTime);
     List<TimeRange> freeTimeRanges = eventGroup.getFreeTimeRanges();
     Assert.assertTrue(freeTimeRanges.isEmpty());
   }
@@ -175,7 +175,28 @@ public final class CalendarEventsGroupTest {
     Instant endTime = startTime.plusSeconds(10000);
     TimeRange targetFreeTime = TimeRange.fromStartEnd(startTime, endTime);
 
-    CalendarGroup eventGroup = new CalendarGroup(events, startTime, endTime);
+    CalendarEventsGroup eventGroup = new CalendarEventsGroup(events, startTime, endTime);
+
+    List<TimeRange> expectedFreeTimeRanges = Arrays.asList(targetFreeTime);
+    List<TimeRange> actualFreeTimeRanges = eventGroup.getFreeTimeRanges();
+    Assert.assertEquals(expectedFreeTimeRanges, actualFreeTimeRanges);
+  }
+
+  @Test
+  public void eventAfterOverallEndTime() {
+    // Events:                                  |-A-|
+    // Possible: |---------------------------|
+    // Free:     |---------------------------|
+    Instant overallStartTime = Instant.now();
+    Instant overallEndTime = overallStartTime.plusSeconds(10000);
+    TimeRange targetFreeTime = TimeRange.fromStartEnd(overallStartTime, overallEndTime);
+
+    Instant eventStartTime = overallEndTime.plusSeconds(5000);
+    Instant eventEndTime = eventStartTime.plusSeconds(5000);
+    List<CalendarEvent> events =
+        Arrays.asList(new CalendarEvent("event", eventStartTime, eventEndTime));
+    CalendarEventsGroup eventGroup =
+        new CalendarEventsGroup(events, overallStartTime, overallEndTime);
 
     List<TimeRange> expectedFreeTimeRanges = Arrays.asList(targetFreeTime);
     List<TimeRange> actualFreeTimeRanges = eventGroup.getFreeTimeRanges();
