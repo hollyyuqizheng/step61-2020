@@ -1,129 +1,185 @@
-/**
- * Models the requests sent to the algorithm for scheduling. This class is
- * useful when the request information needs to be sent to the scheduling
- * servlet through a POST request. This class contains all the request
- * information that can be easily converted into a JSON string.
- */
-class ScheduleRequest {
-  /**
-   * All fields are required for this object.
-   * @param events: events happening the day of the scheduling. This is an
-   *     array of JavaScript CalendarEvent objects.
-   * @param tasks: the tasks a user would like to schedule on that day. This is
-   *     an array of JavaScript Task objects.
-   * @param startTime: a JavaScript Date object representing the start time.
-   * @param endTime: a JavaScript Date object representing the end time.
-   * @param algorithmType: a string representation of the algorithm type that
-   *     the user can select fromt the UI.
-   */
-  constructor(events, tasks, startTime, endTime, algorithmType) {
-    this.events = events;
-    this.tasks = tasks;
-    this.startTime = startTime;
-    this.endTime = endTime;
-    this.algorithmType = algorithmType;
-  }
-}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Task Scheduler</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+      integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk"
+      crossorigin="anonymous"
+    />
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script
+      src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+      integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+      integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+      integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="task.js"></script>
+    <script src="calendar.js"></script>
+    <script src="request.js"></script>
+    <script src="calendarAPI.js"></script>
+    <script src="sheetsApi.js" onload="handleClientLoad()"></script>
+    <script src="https://apis.google.com/js/api.js"></script>
+  </head>
 
-// Once a call is made to the server for scheduling this array will be a local
-// copy of the results.
-var scheduledTasks = [];
+  <body>
+    <div class="container-fluid">
+      <div class="navbar-brand navbar-light" id="nav-bar">
+        <h1>Welcome to your automatic task scheduler</h1>
+      </div>
 
-/**
- * Gets all of the scheduling information from the UI and returns a
- * ScheduleRequest with all of the data.
- */
-function createRequestFromUiInformation() {
-  const startTime = document.getElementById('working-hour-start').value;
-  const endTime = document.getElementById('working-hour-end').value;
-  const events = collectAllEvents();
-  const tasks = collectAllTasks();
-  const algorithmType = document.getElementById('algorithm-type').value;
-  const scheduleRequest = new ScheduleRequest(
-      events, tasks, getTimeObject(startTime), getTimeObject(endTime),
-      algorithmType);
-  return scheduleRequest;
-}
+      <div class="row">
+        <div id="new-task-wrapper" class="col-md-12 col-lg-6 col-xl-3">
+          <h2>What are your working hours for today?</h2>
+          <span>
+            <input type="time" id="working-hour-start" name="working-hour-start" value="09:00" />
+            to
+            <input type="time" id="working-hour-end" name="working-hour-end" value="17:00" />
+          </span>
 
-/**
- * Gets called when the user hits 'Start Scheduling'.
- */
-function startScheduling() {
-  const scheduleRequest = createRequestFromUiInformation();
-  // Create the request to send to the server using the data we collected from
-  // the web form.
-  fetchScheduledTasksFromServlet(scheduleRequest).then((scheduledTaskArray) => {
-    updateResultsOnPage(scheduledTaskArray);
-  });
-}
+          <h2>Add the tasks you would like to schedule for today</h2>
+          <div id="new-task-form">
+            <label for="new-task-name">Task name:</label>
+            <input type="text" id="new-task-name" name="new-task-name" /><br />
+            <label for="new-task-description">Task description:</label><br />
+            <textarea id="new-task-description" name="new-task-description" cols="30" rows="10"></textarea><br />
+            <label for="new-task-estimated-length">Estimated length:</label>
+            <input type="text" id="new-task-estimated-length" name="new-task-estimated-length" />
+            <select id="new-task-estimated-length-unit" name="new-task-estimated-length-unit">
+              <option value="minute">minutes(s)</option>
+              <option value="hour">hour(s)</option>
+              <option value="day">day(s)</option>
+            </select>
+            <br />
+            <label for="new-task-priority">Task's priority:</label>
+            <select id="new-task-priority" name="new-task-priority">
+              <option value="5">5 (High)</option>
+              <option value="4">4</option>
+              <option value="3">3</option>
+              <option value="2">2</option>
+              <option value="1">1 (Low)</option> </select
+            ><br />
+            <button type="button" class="btn btn-primary">Add this task</button>
+          </div>
 
-/**
- * Updates the UI to show the results of a query.
- */
-function updateResultsOnPage(scheduledTaskArray) {
-  const resultElement = document.getElementById('scheduled-task-list');
-  resultElement.innerHTML = '';
-  scheduledTaskArray.forEach(addScheduledTaskToPage, resultElement);
-}
+          <div id="new-task-list-wrapper">
+            <h2>Tasks added:</h2>
+          </div>
+        </div>
 
-/**
- * Handles sending the ScheduleRequest object to the servlet and returns the
- * scheduled tasks.
- */
-function fetchScheduledTasksFromServlet() {
-  const scheduleRequest = createRequestFromUiInformation();
-  const json = JSON.stringify(scheduleRequest);
-  return fetch('/schedule', {method: 'POST', body: json})
-      .then((response) => {
-        // This is still a Promise.
-        return response.json();
-      })
-      // Turns result from a Promise into its Array value.
-      .then((array) => {
-        scheduledTasks = array;
-        return scheduledTasks;
-      });
-}
+        <div id="new-event-wrapper" class="col-md-12 col-lg-6 col-xl-3">
+          <h2>Add any pre-scheduled events here</h2>
+          <h4>We will not schedule any tasks during these time slots.</h4>
+          <form id="new-event-form">
+            <div class="form-group">
+              <label for="new-event-name">Event name:</label>
+              <input
+                type="text"
+                class="form-control"
+                aria-describedby="new-event-name"
+                id="new-event-name"
+                name="new-event-name"
+                value="New Event"
+              />
+            </div>
 
-/**
- * Returns the local copy of the latest scheduled tasks.
- */
-function collectAllScheduledTasks() {
-  return scheduledTasks;
-}
+            <div class="row">
+              <div class="col">
+                <div class="form-group">
+                  <label for="new-event-start-time">Start time:</label>
+                  <input
+                    type="time"
+                    class="form-control"
+                    aria-describedby="new-event-start-time"
+                    id="new-event-start-time"
+                    name="new-event-end-time"
+                    value="09:00"
+                  />
+                  <small id="new-event-time-help-text" class="form-text text-muted"
+                    >The times you enter will be in your current timezone.</small
+                  >
+                </div>
+              </div>
+              <div class="col">
+                <div class="form-group">
+                  <label for="new-event-end-time">End time:</label>
+                  <input
+                    type="time"
+                    class="form-control"
+                    aria-describedby="new-event-end-time"
+                    id="new-event-end-time"
+                    name="new-event-end-time"
+                    value="17:00"
+                  />
+                </div>
+              </div>
+            </div>
 
-/**
- * This takes in a single JSON object of a ScheduledTask (Java Class) and
- * displays that information on the result element using a card format.
- */
-function addScheduledTaskToPage(scheduledTaskWrapper, resultElement) {
-  const task = scheduledTaskWrapper.task;
-  const taskName = task.name;
-  const taskTimeSeconds = scheduledTaskWrapper.startTime.seconds;
-  const taskDate = new Date();
-  // This is x1000 because the functions takes milliseconds
-  taskDate.setTime(taskTimeSeconds * 1000);
-  const taskPriority = task.priority.priority;
-  resultElement.innerText += taskName;
+            <button type="button" class="btn btn-primary" onclick="createNewCalendarEventUserInput()">
+              Add this event
+            </button>
 
-  const newResultCard = document.createElement('div');
-  newResultCard.classList.add('card');
+            <div class="alert alert-secondary d-none" role="alert" id="event-warning"></div>
+          </form>
 
-  const cardBody = document.createElement('div');
-  cardBody.classList.add('card-body');
-  newResultCard.appendChild(cardBody);
+          <div id="new-event-list-wrapper">
+            <h2>Events added:</h2>
+            <div class="scrollable">
+              <div id="new-event-list"></div>
+            </div>
+          </div>
+        </div>
 
-  const cardTitle = document.createElement('h4');
-  cardTitle.classList.add('card-title');
-  cardTitle.innerText = taskName;
-  cardBody.appendChild(cardTitle);
+        <div id="calendar-view-wrapper" class="col-md-12 col-lg-6 col-xl-3">
+          <!-- Experimenting with my own Google Calendar right now, will change later. (hollyyuqizheng) -->
+          <iframe
+            id="calendar-view"
+            src="https://calendar.google.com/calendar/embed?src=hollyyuqizheng%40google.com&ctz=America%2FNew_York&mode=WEEK"
+            height="100%"
+            width="100%"
+            scrolling="yes"
+          >
+          </iframe>
+          <button type="button" class="btn btn-primary" id="calendar-auth-button" onclick="initiateCalendarAuth()">
+            Log in to Google Calendar
+          </button>
+          <button type="button" class="btn btn-primary" id="import-calendar-button" onclick="listUpcomingEvents()">
+            Import from Google Calendar
+          </button>
+          <div id="import-calendar-message"></div>
+        </div>
 
-  const timeText = document.createElement('p');
-  timeText.classList.add('card-text');
-  timeText.innerText = 'Scheduled for: ' + taskDate;
-  cardBody.appendChild(timeText);
-
-  const eventList = document.getElementById('scheduled-task-list');
-  eventList.innterHTML = '';
-  eventList.appendChild(newResultCard);
-}
+        <div id="schedule-result-wrapper" class="col-md-12 col-lg-6 col-xl-3">
+          <button type="button" class="btn btn-primary" onclick="startScheduling()">
+            Start scheduling!
+          </button>
+          <h2>Your tasks are scheduled here!</h2>
+          <div id="scheduled-task-list-wrapper">
+            <h2>Tasks Scheduled:</h2>
+            <div class="scrollable">
+              <div id="scheduled-task-list"></div>
+            </div>
+          </div>
+          <div id="sheets-message"></div>
+          <button id="sheets-export-button" class="btn btn-primary" class="d-none">Export to Google Sheets</button>
+          <button id="sheets-sign-out-button" class="btn btn-primary" class="d-none">Sign out of Google Sheets</button>
+          <button id="sheets-sign-in-button" class="btn btn-primary">Sign in to Google Sheets</button>
+          <div id="sheets-url-container" class="d-none"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
