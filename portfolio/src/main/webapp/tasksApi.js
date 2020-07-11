@@ -93,7 +93,7 @@ function importAllTasks() {
 
                         const newTask =
                             new Task(task.title, task.notes, '60', '3');
-                        updateTaskList(newTask);
+                        updateTaskList(newTask, TIME_UNIT.MINUTES);
                       }
                     }
                   });
