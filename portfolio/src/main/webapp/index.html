@@ -32,7 +32,14 @@
     <script src="request.js"></script>
     <script src="calendarAPI.js"></script>
     <script src="sheetsApi.js" onload="handleClientLoad()"></script>
-    <script src="https://apis.google.com/js/api.js"></script>
+    <script src="tasksApi.js" onload="handleClientLoadTasks()"></script>
+    <script
+      async
+      defer
+      src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};handleClientLoadTasks()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()"
+    ></script>
   </head>
   <body>
     <div class="container-fluid">
@@ -122,6 +129,8 @@
             </div>
             <br />
             <button type="button" class="btn btn-primary" onclick="createNewTask()">Add this task</button>
+            <button type="button" class="btn btn-primary" id="connect-tasks-btn" onclick="handleAuthClick()"></button>
+            <div class="input-group" id="import-menu-wrapper"></div>
           </form>
 
           <br />
