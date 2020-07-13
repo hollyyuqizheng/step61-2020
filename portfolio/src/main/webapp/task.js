@@ -37,6 +37,7 @@ class Task {
 function createNewTask() {
   const name = $('#new-task-name').val();
   const description = $('#new-task-description').val();
+  // TODO(raulcruise): Create a JavaScript class for duration
   const length = parseInt($('#new-task-estimated-length').val());
   const lengthUnit = $('#new-task-estimated-length-unit').val();
   const priority = parseInt($('#new-task-priority').val());
@@ -174,3 +175,7 @@ function validateTaskDuration(duration) {
     return {isValid: true, errorMessage: null};
   }
 }
+
+module.exports.getDurationMinutes = getDurationMinutes;
+module.exports.validateTaskDuration = validateTaskDuration;
+module.exports.validateTaskName = validateTaskName;
