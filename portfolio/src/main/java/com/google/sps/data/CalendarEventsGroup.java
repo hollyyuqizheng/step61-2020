@@ -49,6 +49,8 @@ public class CalendarEventsGroup {
       throw new IllegalArgumentException("Start time cannot be after end time");
     }
     this.events = Lists.newArrayList(events);
+    Collections.sort(this.events, sortByEventStartTimeAscending);
+
     this.overallStartTime = overallStartTime;
     this.overallEndTime = overallEndTime;
   }
@@ -59,8 +61,6 @@ public class CalendarEventsGroup {
    * modified by hollyyuqizheng.
    */
   public List<TimeRange> getFreeTimeRanges() {
-    Collections.sort(events, sortByEventStartTimeAscending);
-
     List<TimeRange> possibleTimes = new ArrayList<TimeRange>();
 
     // This represents the earliest time that we can schedule a window for the
@@ -95,9 +95,8 @@ public class CalendarEventsGroup {
    * Adds a new event into the event group. Returns the new collection of events, sorted based on
    * start time.
    */
-  public List<CalendarEvent> addNewEvent(CalendarEvent event) {
+  public void addNewEvent(CalendarEvent event) {
     events.add(event);
     Collections.sort(events, sortByEventStartTimeAscending);
-    return events;
   }
 }
