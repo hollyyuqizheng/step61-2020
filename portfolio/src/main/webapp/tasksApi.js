@@ -68,9 +68,10 @@ function updateSigninStatus(isSignedIn) {
   }
   updateButtonText(isSignedIn);
 }
-
-// Iterate through all the user's tasklists and pass
-// them to updateTaskList().
+/**
+ *Iterate through all the user's tasklists and pass
+ *them to updateTaskList().
+ */
 function importAllTasks() {
   if (GoogleAuth.isSignedIn.get()) {
     gapi.client.tasks.tasklists.list({'maxResults': 100})
@@ -83,7 +84,7 @@ function importAllTasks() {
   }
 }
 
-// Import a single tasklist identified by its id.
+/** Import a single tasklist identified by its id. */
 function importTasklist(tasklistId) {
   gapi.client.tasks.tasks
       .list({'tasklist': tasklistId, 'maxResults': 100, 'showCompleted': false})
@@ -96,8 +97,10 @@ function importTasklist(tasklistId) {
       });
 }
 
-// Populate the import-menu-wrapper div with an import menu when the user is 
-// logged in.
+/**
+ *Populate the import-menu-wrapper div with an import menu when the user is 
+ *logged in.
+ */
 function drawImportMenu() {
   // Create a div element to hold the custom select.
   const customSelect = document.getElementById('import-menu-wrapper');
