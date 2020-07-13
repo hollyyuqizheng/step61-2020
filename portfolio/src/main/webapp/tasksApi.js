@@ -112,14 +112,11 @@ function drawImportMenu() {
   // Add all Tasklists of user to the select.
   gapi.client.tasks.tasklists.list({'maxResults': 30}).then(function(response) {
     var tasklists = response.result.items;
-    if (tasklists && tasklists.length > 0) {
-      for (var i = 0; i < tasklists.length; i++) {
-        var tasklist = tasklists[i];
-        option = tasklistSelect.appendChild(document.createElement('option'));
-        option.setAttribute('value', tasklist.id);
-        option.innerText = tasklist.title;
-      }
-    }
+    tasklists.forEach(tasklist => {
+      option = tasklistSelect.appendChild(document.createElement('option'));
+      option.setAttribute('value', tasklist.id);
+      option.innerText = tasklist.title;
+    });
   });
 
   // Append the select to the div holding our input group.
