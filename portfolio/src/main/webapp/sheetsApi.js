@@ -35,21 +35,7 @@ function initClient() {
         discoveryDocs: [DISCOVERY_URL_CALENDAR, DISCOVERY_DOCS_SHEETS],
         scope: SCOPE_SHEETS_READ_WRITE
       })
-      .then(
-            function() {
-              var exportButton = document.getElementById('sheets-export-button');
-              var signOutButton =
-                  document.getElementById('sheets-sign-out-button');
-              var signInButton = document.getElementById('sheets-sign-in-button');
-
-              gapi.auth2.getAuthInstance().isSignedIn.listen(handleApiButtons);
-
-              // Handle the initial sign-in state.
-              handleSheetsButtons();
-              exportButton.onclick = handleExportSchedule;
-              signOutButton.onclick = handleSignOut;
-              signInButton.onclick = handleSignIn;
-            },
+      .then(finishSheetsInit(),
             function(error) {
               handleError(error);
             });
@@ -57,27 +43,35 @@ function initClient() {
     console.log("sheets: auth exists, grant scope"); 
     var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
     googleUser.grant({scope: SCOPE_SHEETS_READ_WRITE})
-      .then(
-            function() {
-              var exportButton = document.getElementById('sheets-export-button');
-              var signOutButton =
-                  document.getElementById('sheets-sign-out-button');
-              var signInButton = document.getElementById('sheets-sign-in-button');
-
-              // Listen for sign-in state changes.
-              gapi.auth2.getAuthInstance().isSignedIn.listen(handleApiButtons);
-
-              // Handle the initial sign-in state.
-              handleSheetsButtons();
-              exportButton.onclick = handleExportSchedule;
-              signOutButton.onclick = handleSignOut;
-              signInButton.onclick = handleSignIn;
-            },
+      .then(finishSheetsInit(),
             function(error) {
               handleError(error);
             });
   }
       
+}
+
+/**
+ * Runs after the promise is returned from gapi.client.init.
+ * Assigns onclick functions to buttons related to Sheets.
+ * Assign a listener to the signed-in status of the current user,
+ * which will call the handleApiButtons library function that 
+ * handles the display of all API-related buttons. 
+ */
+function finishSheetsInit() {
+  var exportButton = document.getElementById('sheets-export-button');
+  var signOutButton =
+      document.getElementById('sheets-sign-out-button');
+  var signInButton = document.getElementById('sheets-sign-in-button');
+
+  // Listen for sign-in state changes.
+  gapi.auth2.getAuthInstance().isSignedIn.listen(handleApiButtons);
+
+  // Handle the initial sign-in state.
+  handleSheetsButtons();
+  exportButton.onclick = handleExportSchedule;
+  signOutButton.onclick = handleSignOut;
+  signInButton.onclick = handleSignIn;
 }
 
 /**

@@ -72,6 +72,7 @@ function finishCalendarInit() {
 function displayCalendarButtons() {
   const $logInButton = $('#calendar-auth-button');
   const $logOutButton = $('#calendar-logout-button');
+  // TODO: googleAuth could be null at this point. 
   if (googleAuth.isSignedIn.get()) {
     $logInButton.addClass('d-none'); 
     $logOutButton.removeClass('d-none');
