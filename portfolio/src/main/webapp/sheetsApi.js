@@ -24,7 +24,6 @@ function handleClientLoad() {
  */
 function initClient() {
   console.log("sheets: init client");
-
   if (!gapi.auth2.getAuthInstance()) {
     console.log("sheets: no auth, normal init"); 
     fetchApiKey();
@@ -43,12 +42,8 @@ function initClient() {
     console.log("sheets: auth exists, grant scope"); 
     var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
     googleUser.grant({scope: SCOPE_SHEETS_READ_WRITE})
-      .then(finishSheetsInit(),
-            function(error) {
-              handleError(error);
-            });
-  }
-      
+      .then(handleSheetsButtons());
+  }  
 }
 
 /**
@@ -59,19 +54,8 @@ function initClient() {
  * handles the display of all API-related buttons. 
  */
 function finishSheetsInit() {
-  var exportButton = document.getElementById('sheets-export-button');
-  var signOutButton =
-      document.getElementById('sheets-sign-out-button');
-  var signInButton = document.getElementById('sheets-sign-in-button');
-
-  // Listen for sign-in state changes.
   gapi.auth2.getAuthInstance().isSignedIn.listen(handleApiButtons);
-
-  // Handle the initial sign-in state.
-  handleSheetsButtons();
-  exportButton.onclick = handleExportSchedule;
-  signOutButton.onclick = handleSignOut;
-  signInButton.onclick = handleSignIn;
+  handleSignIn(); 
 }
 
 /**
@@ -79,8 +63,10 @@ function finishSheetsInit() {
  * redirecting errors.
  */
 function handleSignIn() {
-  gapi.auth2.getAuthInstance().signIn().catch(function(error) {
-    handleAuthorizationError(error);
+  gapi.auth2.getAuthInstance().signIn()
+    .then(handleSheetsButtons())
+    .catch(function(error) {
+      handleAuthorizationError(error);
   });
 }
 
@@ -96,16 +82,11 @@ function handleSignOut() {
  * Called when the sign-in state changes and updates the UI appropriately.
  */
 function handleSheetsButtons() {
-  $('#sheets-export-button').addClass('d-none');
-  if (gapi.auth2.getAuthInstance().isSignedIn.get()) {
-    $('#sheets-export-button').removeClass('d-none');
-    $('#sheets-sign-out-button').removeClass('d-none');
-    $('#sheets-sign-in-button').addClass('d-none');
-  } else {
-    $('#sheets-export-button').addClass('d-none');
-    $('#sheets-sign-out-button').addClass('d-none');
-    $('#sheets-sign-in-button').removeClass('d-none');
-  }
+  const exportButton = document.getElementById('sheets-export-button');
+  const signOutButton =
+      document.getElementById('sheets-sign-out-button');
+  exportButton.onclick = handleExportSchedule;
+  signOutButton.onclick = handleSignOut;
 }
 
 /**
@@ -113,7 +94,7 @@ function handleSheetsButtons() {
  * message on the UI.
  */
 function handleAuthorizationError(error) {
-  var $sheetsMessage = document.getElementById('sheets-message');
+  var $sheetsMessage = $('#sheets-message');
   $sheetsMessage.removeClass('d-none');
   if (error.error === ERROR_CODE.POPUP_CLOSED) {
     $sheetsMessage.text('You closed out of the popup, please log in again.');
@@ -130,7 +111,7 @@ function handleAuthorizationError(error) {
  * message on the UI.
  */
 function handleExportError(reason) {
-  var $sheetsMessage = document.getElementById('sheets-message');
+  var $sheetsMessage = $('#sheets-message');
   $sheetsMessage.removeClass('d-none')
       .text('Error: ' + reason.result.error.message)
       .show();

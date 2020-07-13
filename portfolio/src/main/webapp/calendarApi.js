@@ -1,5 +1,3 @@
-var googleAuth;
- 
 // Scopes for API access to Google Calendar
 const SCOPE_CALENDAR_READ_ONLY = 'https://www.googleapis.com/auth/calendar.readonly';
 const SCOPE_CALENDAR_READ_WRITE = 'https://www.googleapis.com/auth/calendar';
@@ -24,13 +22,13 @@ function initiateCalendarAuth() {
  
 /** Starts authentication flow based on current user's login status. */
 function initCalendarClient() {
-  //console.log("calendar: initCalendarClient");
+  console.log("calendar: initCalendarClient");
 
   // If the user has not logged into their Google account yet, 
   // initializes the gapi.client object, which app uses to make API requests.
   // Initially, the scope is read-only to view user's Google Calendar.
-  if (!googleAuth) {
-    //console.log("calendar: no user, normal init");
+  if (!gapi.auth2.getAuthInstance()) {
+    console.log("calendar: no user, normal init");
     fetchApiKey();
     
     gapi.client
@@ -42,12 +40,14 @@ function initCalendarClient() {
       })
       .then(finishCalendarInit());
   } else {
-    //console.log("calendar: already auth exists, grant scope");
+    console.log("calendar: already auth exists, grant scope");
     // This is the case that the user has logged into their Google account. 
     // Grants the read-only scope of Calendar to the current user. 
     var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
     googleUser.grant({scope: SCOPE_CALENDAR_READ_ONLY})
-        .then(finishCalendarInit());
+        .then((response) => {
+          updateCalendarView(); 
+        } );
   }
   
 }
@@ -58,34 +58,13 @@ function initCalendarClient() {
  * that handle all API buttons' display accordingly. 
  */
 function finishCalendarInit() {
-  googleAuth = gapi.auth2.getAuthInstance();
- 
-  // Listen for sign-in state changes.
-  googleAuth.isSignedIn.listen(handleApiButtons);
-  
-  // const $logOutButton = $('#calendar-logout-button');
-  // $logOutButton.click(handleCalendarSignOut);
+  gapi.auth2.getAuthInstance().isSignedIn.listen(handleApiButtons);
   handleCalendarSignIn(); 
-}
-
-/** Toggles the visibility of log in/out button based on user's sign-in status. */
-function displayCalendarButtons() {
-  const $logInButton = $('#calendar-auth-button');
-  const $logOutButton = $('#calendar-logout-button');
-  // TODO: googleAuth could be null at this point. 
-  if (googleAuth.isSignedIn.get()) {
-    $logInButton.addClass('d-none'); 
-    $logOutButton.removeClass('d-none');
-  } else {
-    $logInButton.removeClass('d-none'); 
-    $logOutButton.addClass('d-none'); 
-  }
 }
  
 /** Signs user in. */
 function handleCalendarSignIn() {
-  // User is not signed in. Start Google auth flow.
-  googleAuth.signIn()
+  gapi.auth2.getAuthInstance().signIn()
       .then((response) => {
         var $importCalendarMessage = $('#import-calendar-message');
         $importCalendarMessage.addClass('d-none');
@@ -98,7 +77,8 @@ function handleCalendarSignIn() {
 
 /** Signs user out of Google account. */
 function handleCalendarSignOut() {
-  googleAuth.signOut(); 
+  // TODO: logging out should also hide the calendar view
+  gapi.auth2.getAuthInstance().signOut(); 
 }
  
 /**
@@ -125,43 +105,48 @@ function handleImportAuthError(e) {
  
 /** Disconnects current user authentication. */
 function revokeCalendarAccess() {
-  googleAuth.disconnect();
+  gapi.auth2.getAuthInstance().disconnect();
 }
- 
+
 /** Updates the calendar view and button visibility based on login status. */
 function updateCalendarView() {
-  const googleUser = googleAuth.currentUser.get();
+  const googleUser = gapi.auth2.getAuthInstance().currentUser.get();
   const isAuthorized = googleUser.hasGrantedScopes(SCOPE_CALENDAR_READ_ONLY);
   if (isAuthorized) {
+    console.log("show calendar view"); 
     showCalendarView(googleUser);
     $('#import-calendar-button').removeClass('d-none');
     $('#export-calendar-button').removeClass('d-none');
   } else {
+    console.log("not authorized to show calendar view");
     $('#import-calendar-button').addClass('d-none');
     $('#export-calendar-button').addClass('d-none');
   }
 }
-
 /**
  * Retrieves the logged in user's Google email and uses that email
  * to embed the user's Google Calendar on the UI.
  * The calendar is displayed in the user's Google Calendar's time zone.
  */
 function showCalendarView(user) {
-  const userEmail = encodeURIComponent(user.getBasicProfile().getEmail());
+  const googleUser = gapi.auth2.getAuthInstance().currentUser.get();
+  const isAuthorized = googleUser.hasGrantedScopes(SCOPE_CALENDAR_READ_ONLY);
+  if (isAuthorized) {
+    const userEmail = encodeURIComponent(user.getBasicProfile().getEmail());
  
-  // Fetches the user's Calendar's time zone.
-  gapi.client.calendar.settings.get({setting: 'timezone'})
-      .then((responseTimeZone) => {
-        const userCalendarTimeZone =
-            encodeURIComponent(responseTimeZone.result.value);
-        const calendarViewUrl =
-            'https://calendar.google.com/calendar/embed?src=' + userEmail +
-            '&ctz=' + userCalendarTimeZone + '&mode=WEEK';
- 
-        // Updates the UI so that calendar view appears.
-        $('#calendar-view').attr('src', calendarViewUrl).removeClass('d-none');
-      });
+    // Fetches the user's Calendar's time zone.
+    gapi.client.calendar.settings.get({setting: 'timezone'})
+        .then((responseTimeZone) => {
+          const userCalendarTimeZone =
+              encodeURIComponent(responseTimeZone.result.value);
+          const calendarViewUrl =
+              'https://calendar.google.com/calendar/embed?src=' + userEmail +
+              '&ctz=' + userCalendarTimeZone + '&mode=WEEK';
+  
+          // Updates the UI so that calendar view appears.
+          $('#calendar-view').attr('src', calendarViewUrl).removeClass('d-none');
+        });
+  } 
 }
  
 /** Retrives the date that the user has picked for the scheduling. */
@@ -258,7 +243,7 @@ function listUpcomingEvents() {
  * Asks the user for Write access to the API scope.
  */
 function addCalendarWriteScope() {
-  var googleUser = googleAuth.currentUser.get();
+  var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
   googleUser.grant({scope: SCOPE_CALENDAR_READ_WRITE})
       .then((response) => {
         $('#export-calendar-message').addClass('d-none');
@@ -286,7 +271,7 @@ function addOneEventToGoogleCalendar(event) {
  
   request.execute(function() {
     // Refreshes the calendar view so that the new event shows up on it.
-    showCalendarView(googleAuth.currentUser.get());
+    showCalendarView(gapi.auth2.getAuthInstance().currentUser.get());
   });
 }
  
