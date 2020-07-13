@@ -76,29 +76,9 @@ function importAllTasks() {
     gapi.client.tasks.tasklists.list({'maxResults': 100})
         .then(function(response) {
           var taskLists = response.result.items;
-          if (taskLists && taskLists.length > 0) {
-            for (var i = 0; i < taskLists.length; i++) {
-              var taskList = taskLists[i];
-              gapi.client.tasks.tasks
-                  .list({
-                    'tasklist': taskList.id,
-                    'maxResults': 100,
-                    'showCompleted': false
-                  })
-                  .then(function(taskResponse) {
-                    var tasks = taskResponse.result.items;
-                    if (tasks && tasks.length > 0) {
-                      for (var j = 0; j < tasks.length; j++) {
-                        task = tasks[j];
-
-                        const newTask =
-                            new Task(task.title, task.notes, '60', '3');
-                        updateTaskList(newTask, TIME_UNIT.MINUTES);
-                      }
-                    }
-                  });
-            }
-          }
+          taskLists.forEach(tasklist => {
+            importTasklist(tasklist.id);
+          });
         });
   }
 }
@@ -109,15 +89,11 @@ function importTasklist(tasklistId) {
       .list({'tasklist': tasklistId, 'maxResults': 100, 'showCompleted': false})
       .then(function(taskResponse) {
         var tasks = taskResponse.result.items;
-        if (tasks && tasks.length > 0) {
-          for (var i = 0; i < tasks.length; i++) {
-            task = tasks[i];
-
-            const newTask = new Task(task.title, task.notes, '60', '3');
-            updateTaskList(newTask);
-          }
-        }
-      })
+        tasks.forEach(task => {
+          const newTask = new Task(task.title, task.notes, '60', '3');
+          updateTaskList(newTask, TIME_UNIT.MINUTES);
+        });
+      });
 }
 
 // Populate the import-menu-wrapper div with an import menu when the user is 

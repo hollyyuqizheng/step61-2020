@@ -70,12 +70,12 @@ function createNewTask() {
 
 /** Display Task information from user input. */
 function updateTaskList(newTask, lengthUnit) {
-  const newEventCard = document.createElement('div');
-  newEventCard.classList.add('card');
+  const newTaskCard = document.createElement('div');
+  newTaskCard.classList.add('card');
 
   const cardBody = document.createElement('div');
   cardBody.classList.add('card-body');
-  newEventCard.appendChild(cardBody);
+  newTaskCard.appendChild(cardBody);
 
   const cardTitle = document.createElement('h4');
   cardTitle.classList.add('card-title');
@@ -166,23 +166,21 @@ function updateTaskList(newTask, lengthUnit) {
 
   cardBody.appendChild(inputRow);
 
-  // WORK IN HERE
-
   const deleteButton = document.createElement('button');
   deleteButton.classList.add('btn');
   deleteButton.classList.add('btn-danger');
-  deleteButton.innerText = 'Delete this event';
+  deleteButton.innerText = 'Delete this task';
   cardBody.appendChild(deleteButton);
 
-  const eventList = document.getElementById('new-task-list');
-  eventList.innterHTML = '';
-  eventList.appendChild(newEventCard);
+  const taskList = document.getElementById('new-task-list');
+  taskList.innterHTML = '';
+  taskList.appendChild(newTaskCard);
 
   ID_COUNTER++;
 
-  // The delete button removes the event's card from the UI.
-  deleteButton.onclick = function(newEventCard) {
-    newEventCard.target.closest('div.card').remove();
+  // The delete button removes the task's card from the UI.
+  deleteButton.onclick = function(newTaskCard) {
+    newTaskCard.target.closest('div.card').remove();
   }
 }
 
@@ -218,8 +216,6 @@ function collectAllTasks() {
     const task = new Task(taskName, taskDescription, getDurationMinutes(taskLength, taskLengthUnit), taskPriority);
     const taskJson = JSON.stringify(task);
     allTaskJson.push(taskJson);
-    console.log(task);
-
   });
   return allTaskJson;
 }
