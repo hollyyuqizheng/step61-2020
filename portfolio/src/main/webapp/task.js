@@ -148,6 +148,11 @@ function collectAllTasks() {
   return allTaskJson;
 }
 
+function clearTasks() {
+  const taskList = document.getElementById('new-task-list');
+  taskList.innerHTML = '';
+}
+
 /**
  * This method checks that the name input is not an empty string.
  * In the case that an empty string is recieved, an error message is displayed.
