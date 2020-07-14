@@ -1,17 +1,3 @@
-// Scopes for API access to Google Calendar
-const SCOPE_CALENDAR_READ_ONLY = 'https://www.googleapis.com/auth/calendar.readonly';
-const SCOPE_CALENDAR_READ_WRITE = 'https://www.googleapis.com/auth/calendar';
- 
-// For the discovery document for Google Calendar API.
-const DISCOVERY_URL_CALENDAR =
-    'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
- 
-// Object for all error codes
-const ERROR_CODES = {
-  popup_closed_by_user: 'popup_closed_by_user',
-  access_denied: 'access_denied'
-}; 
- 
 /**
  * Loads the API's client and auth2 modules.
  * Calls the initCalendarClient function after the modules load.
@@ -22,34 +8,42 @@ function initiateCalendarAuth() {
  
 /** Starts authentication flow based on current user's login status. */
 function initCalendarClient() {
-  console.log("calendar: initCalendarClient");
-
   // If the user has not logged into their Google account yet, 
   // initializes the gapi.client object, which app uses to make API requests.
   // Initially, the scope is read-only to view user's Google Calendar.
-  if (!gapi.auth2.getAuthInstance()) {
-    console.log("calendar: no user, normal init");
-    fetchApiKey();
-    
-    gapi.client
+
+  // if (!gapi.auth2.getAuthInstance()) {
+  //   fetchApiKey();
+  //   gapi.client
+  //     .init({
+  //       apiKey: API_KEY,
+  //       clientId: CLIENT_ID,
+  //       discoveryDocs: [DISCOVERY_DOCS_CALENDAR, DISCOVERY_DOCS_SHEETS, DISCOVERY_DOCS_TASKS],
+  //       scope: SCOPE_CALENDAR_READ_ONLY + ' ' 
+  //           + SCOPE_SHEETS_READ_WRITE + ' ' 
+  //           + SCOPE_TASKS_READ_ONLY
+  //     })
+  //     .then(handleCalendarSignIn());
+  // } else {
+  //   // This is the case that the user has logged into their Google account. 
+  //   // Grants the read-only scope of Calendar to the current user. 
+  //   var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
+  //   googleUser.grant({scope: SCOPE_CALENDAR_READ_ONLY})
+  //       .then((response) => {
+  //         updateCalendarView(); 
+  //       } );
+  // }
+
+  gapi.client
       .init({
         apiKey: API_KEY,
         clientId: CLIENT_ID,
-        discoveryDocs: [DISCOVERY_URL_CALENDAR, DISCOVERY_DOCS_SHEETS],
-        scope: SCOPE_CALENDAR_READ_ONLY
+        discoveryDocs: [DISCOVERY_DOCS_CALENDAR, DISCOVERY_DOCS_SHEETS, DISCOVERY_DOCS_TASKS],
+        scope: SCOPE_CALENDAR_READ_ONLY + ' ' 
+            + SCOPE_SHEETS_READ_WRITE + ' ' 
+            + SCOPE_TASKS_READ_ONLY
       })
-      .then(finishCalendarInit());
-  } else {
-    console.log("calendar: already auth exists, grant scope");
-    // This is the case that the user has logged into their Google account. 
-    // Grants the read-only scope of Calendar to the current user. 
-    var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
-    googleUser.grant({scope: SCOPE_CALENDAR_READ_ONLY})
-        .then((response) => {
-          updateCalendarView(); 
-        } );
-  }
-  
+      .then(handleCalendarSignIn());
 }
 
 /** 
@@ -57,10 +51,11 @@ function initCalendarClient() {
  * Attaches a listener to the signed-in status of the user 
  * that handle all API buttons' display accordingly. 
  */
-function finishCalendarInit() {
-  gapi.auth2.getAuthInstance().isSignedIn.listen(handleApiButtons);
-  handleCalendarSignIn(); 
-}
+// function finishCalendarInit() {
+//   console.log('finish calendar init'); 
+//   gapi.auth2.getAuthInstance().isSignedIn.listen(handleApiButtons);
+//   handleCalendarSignIn(); 
+// }
  
 /** Signs user in. */
 function handleCalendarSignIn() {
@@ -68,17 +63,12 @@ function handleCalendarSignIn() {
       .then((response) => {
         var $importCalendarMessage = $('#import-calendar-message');
         $importCalendarMessage.addClass('d-none');
+        handleApiButtons(); 
         updateCalendarView(); 
       })
       .catch(function(error) {
         handleImportAuthError(error);
       });
-}
-
-/** Signs user out of Google account. */
-function handleCalendarSignOut() {
-  // TODO: logging out should also hide the calendar view
-  gapi.auth2.getAuthInstance().signOut(); 
 }
  
 /**
@@ -113,16 +103,15 @@ function updateCalendarView() {
   const googleUser = gapi.auth2.getAuthInstance().currentUser.get();
   const isAuthorized = googleUser.hasGrantedScopes(SCOPE_CALENDAR_READ_ONLY);
   if (isAuthorized) {
-    console.log("show calendar view"); 
     showCalendarView(googleUser);
     $('#import-calendar-button').removeClass('d-none');
     $('#export-calendar-button').removeClass('d-none');
   } else {
-    console.log("not authorized to show calendar view");
     $('#import-calendar-button').addClass('d-none');
     $('#export-calendar-button').addClass('d-none');
   }
 }
+
 /**
  * Retrieves the logged in user's Google email and uses that email
  * to embed the user's Google Calendar on the UI.
@@ -247,6 +236,8 @@ function addCalendarWriteScope() {
   googleUser.grant({scope: SCOPE_CALENDAR_READ_WRITE})
       .then((response) => {
         $('#export-calendar-message').addClass('d-none');
+        // const scheduledTasks = collectAllScheduledTasks();
+        // addNewEventsToGoogleCalendar(scheduledTasks);
         addNewEventsToGoogleCalendar();
       })
       .catch(function(error) {
@@ -260,7 +251,47 @@ function addCalendarWriteScope() {
  * results can be returned from the scheduling algorithm.
  */
 function addNewEventsToGoogleCalendar() {
-  const event = {};
+  
+  // scheduledTasks.forEach((scheduledTask) => {
+  //   const task = scheduledTask.task;
+
+  //   const taskStartTimeSeconds = scheduledTask.startTime.seconds;
+  //   const taskStartTime = new Date();
+  //   // This is x1000 because the functions takes milliseconds
+  //   taskStartTime.setTime(taskStartTimeSeconds * 1000);
+
+  //   const taskEndTime = new Date();
+  //   taskEndTime.setTime((taskStartTimeSeconds + task.duration.seconds) * 1000); 
+
+  //   const currentScheduledTask = {
+  //       summary: task.name,
+  //       description: task.description.value,
+  //       start: {
+  //         dateTime: taskStartTime.toISOString(),
+  //       },
+  //       end: {
+  //         dateTime: taskEndTime.toISOString(),
+  //       },
+  //   };
+
+  //   addOneEventToGoogleCalendar(currentScheduledTask);
+  // }); 
+
+  const now = new Date();
+  const fiveHoursLater = new Date();
+  fiveHoursLater.setHours(now.getHours() + 5);
+
+  const event = {
+    summary: 'Testing',
+    description: 'test description',
+    start: {
+      dateTime: now.toISOString(),
+    },
+    end: {
+      dateTime: fiveHoursLater.toISOString(),
+    },
+  };
+
   addOneEventToGoogleCalendar(event);
 }
  

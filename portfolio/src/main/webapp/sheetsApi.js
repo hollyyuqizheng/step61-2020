@@ -1,16 +1,3 @@
-// Discovery Docs for Sheets
-const DISCOVERY_DOCS_SHEETS =
-    'https://sheets.googleapis.com/$discovery/rest?version=v4';
-
-// Authorization scope for read-write access to Sheets 
-const SCOPE_SHEETS_READ_WRITE = 'https://www.googleapis.com/auth/spreadsheets';
-
-// Error codes that the process can throw
-const ERROR_CODE = {
-  POPUP_CLOSED: 'popup_closed_by_user',
-  ACCESS_DENIED: 'access_denied'
-};
-
 /**
  * On load, called to load the auth2 library and API client library.
  */
@@ -34,7 +21,7 @@ function initClient() {
         discoveryDocs: [DISCOVERY_URL_CALENDAR, DISCOVERY_DOCS_SHEETS],
         scope: SCOPE_SHEETS_READ_WRITE
       })
-      .then(finishSheetsInit(),
+      .then(handleSignIn(),
             function(error) {
               handleError(error);
             });
@@ -42,7 +29,7 @@ function initClient() {
     console.log("sheets: auth exists, grant scope"); 
     var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
     googleUser.grant({scope: SCOPE_SHEETS_READ_WRITE})
-      .then(handleSheetsButtons());
+      .then(handleApiButtons());
   }  
 }
 
@@ -53,10 +40,10 @@ function initClient() {
  * which will call the handleApiButtons library function that 
  * handles the display of all API-related buttons. 
  */
-function finishSheetsInit() {
-  gapi.auth2.getAuthInstance().isSignedIn.listen(handleApiButtons);
-  handleSignIn(); 
-}
+// function finishSheetsInit() {
+//   gapi.auth2.getAuthInstance().isSignedIn.listen(handleApiButtons);
+//   handleSignIn(); 
+// }
 
 /**
  * Called when the sign-in button is clicked. Handles signing in the user and
@@ -64,29 +51,10 @@ function finishSheetsInit() {
  */
 function handleSignIn() {
   gapi.auth2.getAuthInstance().signIn()
-    .then(handleSheetsButtons())
+    .then(handleApiButtons())
     .catch(function(error) {
       handleAuthorizationError(error);
   });
-}
-
-/**
- * Called when the sign-out button is clicked, handles signing out the user.
- */
-function handleSignOut() {
-  gapi.auth2.getAuthInstance().signOut();
-}
-
-
-/**
- * Called when the sign-in state changes and updates the UI appropriately.
- */
-function handleSheetsButtons() {
-  const exportButton = document.getElementById('sheets-export-button');
-  const signOutButton =
-      document.getElementById('sheets-sign-out-button');
-  exportButton.onclick = handleExportSchedule;
-  signOutButton.onclick = handleSignOut;
 }
 
 /**

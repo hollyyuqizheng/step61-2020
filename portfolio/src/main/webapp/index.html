@@ -34,6 +34,7 @@
     <script src="apiLibrary.js"></script>
     <script src="calendarApi.js"></script>
     <script src="sheetsApi.js"></script>
+    <script src="tasksApi.js"></script>
   </head>
  
   <body onload="useTodayAsDefault(); setClosestEventTime()">
@@ -138,6 +139,8 @@
             </div>
             <br />
             <button type="button" class="btn btn-primary" onclick="createNewTask()">Add this task</button>
+            <button type="button" class="btn btn-primary d-none" id="connect-tasks-btn" onclick="handleClientLoadTasks()">Import from Tasks</button>
+            <div class="input-group" id="import-menu-wrapper"></div>
           </form>
           <br />
           <h2>Tasks added:</h2>
@@ -153,6 +156,7 @@
           <form id="new-event-form">
             <div class="form-group">
               <label for="new-event-name">Event name*:</label>
+              <div class="invalid-feedback" id="empty-event-name-message">Event's name cannot be empty!</div>
               <input
                 type="text"
                 class="form-control"
@@ -168,6 +172,7 @@
               <div class="col">
                 <div class="form-group">
                   <label for="new-event-start-time">Start time*:</label>
+                  <div class="invalid-feedback" id="empty-event-start-time">Event's start time cannot be empty!</div>
                   <input
                     type="time"
                     class="form-control"
@@ -185,6 +190,7 @@
               <div class="col">
                 <div class="form-group">
                   <label for="new-event-end-time">End time*:</label>
+                  <div class="invalid-feedback" id="empty-event-end-time">Event's end time cannot be empty!</div>
                   <input
                     type="time"
                     class="form-control"
@@ -224,7 +230,7 @@
             <button type="button" class="btn btn-primary" id="calendar-auth-button" onclick="initiateCalendarAuth()">
               Log in to Google Calendar
             </button>
-            <button type="button" class="btn btn-primary d-none" id="calendar-logout-button" onclick="handleCalendarSignOut()"> 
+            <button type="button" class="btn btn-primary d-none" id="calendar-logout-button" onclick="logOutAllApis()"> 
               Log out of Google Calendar
             </button>
           </div>
@@ -251,10 +257,7 @@
           <div class="d-none" id="export-calendar-message"></div>
  
           <div id="sheets-message"></div>
-          <button class="btn btn-primary" onclick="handleClientLoad()">Grant Sheets scope</button>
-          <button id="sheets-export-button" class="btn btn-primary" class="d-none">Export to Google Sheets</button>
-          <button id="sheets-sign-out-button" class="btn btn-primary" class="d-none">Sign out of Google Sheets</button>
-          <button id="sheets-sign-in-button" class="btn btn-primary">Sign in to Google Sheets</button>
+          <button id="sheets-export-button" class="btn btn-primary d-none" onclick="handleExportSchedule()">Export to Google Sheets</button>
           <div id="sheets-url-container" class="d-none"></div>
         </div>
       </div>
