@@ -12,11 +12,9 @@ const TASKS_DISCOVERY_DOCS =
 var TASKS_API_KEY = '';
 
 function fetchApiKey() {
-  fetch('./appConfigServlet')
-      .then(response => response.json())
-      .then((responseJson) => {
-        TASKS_API_KEY = responseJson['API_KEY'];
-      });
+  fetch('./appConfigServlet').then(response => {
+    TASKS_API_KEY = response.json()['API_KEY'];
+  });
 }
 
 function handleClientLoadTasks() {
@@ -77,19 +75,20 @@ function updateSigninStatus(isSignedIn) {
  * them to updateTaskList().
  */
 function importAllTasks() {
-  if (GoogleAuth.isSignedIn.get()) {
-    gapi.client.tasks.tasklists.list({maxResults: 100})
-        .then(function(response) {
-          var taskLists = response.result.items;
-
-          // Check that the variable exists so that no error is thrown.
-          if (taskLists) {
-            taskLists.forEach(tasklist => {
-              importTasklist(tasklist.id);
-            });
-          }
-        });
+  if (!GoogleAuth.isSignedIn.get()) {
+    return;
   }
+
+  gapi.client.tasks.tasklists.list({maxResults: 100}).then(function(response) {
+    var taskLists = response.result.items;
+
+    // Check that the variable exists so that no error is thrown.
+    if (taskLists) {
+      taskLists.forEach(tasklist => {
+        importTasklist(tasklist.id);
+      });
+    }
+  });
 }
 
 /** Import a single tasklist identified by its id. */
