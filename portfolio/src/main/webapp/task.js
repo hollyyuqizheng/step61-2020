@@ -87,7 +87,6 @@ function updateTaskList(newTask, lengthUnit) {
   descriptionText.innerText = newTask.description;
   cardBody.appendChild(descriptionText);
 
-  // WORK IN HERE
   // Create row for all modifiable content
   const inputRow = document.createElement('div');
   inputRow.classList.add('form-row');
@@ -103,7 +102,11 @@ function updateTaskList(newTask, lengthUnit) {
   const durationInput = document.createElement('input');
   durationInput.classList.add('form-control');
   durationInput.setAttribute('id', 'duration-input-' + ID_COUNTER);
-  durationInput.setAttribute('value', newTask.duration);
+  if (lengthUnit == TIME_UNIT.HOURS) {
+    durationInput.setAttribute('value', newTask.duration / 60);
+  } else {
+    durationInput.setAttribute('value', newTask.duration);
+  }
 
   durationColumn.appendChild(durationLabel);
   durationColumn.appendChild(durationInput);
