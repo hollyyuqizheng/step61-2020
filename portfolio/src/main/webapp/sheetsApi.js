@@ -11,6 +11,8 @@ const DISCOVERY_DOCS_SHEETS =
 // included, separated by spaces.
 const SCOPE_READ_WRITE_SHEETS = 'https://www.googleapis.com/auth/spreadsheets';
 
+const URL_DOCUMENT_BEGINNING = "https://docs.google.com/spreadsheets/d/";
+
 // Error codes that the process can throw
 const ERROR_CODE_SHEETS = {
   POPUP_CLOSED: 'popup_closed_by_user',
@@ -34,7 +36,8 @@ function initClientSheets() {
         apiKey: API_KEY_SHEETS,
         clientId: CLIENT_ID_SHEETS,
         discoveryDocs: DISCOVERY_DOCS_SHEETS,
-        scope: SCOPE_READ_WRITE_SHEETS
+        scope: SCOPE_READ_WRITE_SHEETS,
+        consent: 'consent'
       })
       .then(
           function() {
@@ -126,8 +129,6 @@ function handleExportError(reason) {
  * spreadsheet.
  */
 function makeSheetsValuesFromScheduledTasks(scheduledTasks, values) {
-  // I think this code is shorter without a forEach() and I also do not
-  // know how to make this work with a forEach().
   for (index = 0; index < scheduledTasks.length; index++) {
     values.push(singleScheduledTaskToSheetsArray(scheduledTasks[index]));
   }
@@ -179,7 +180,7 @@ function handleExportSchedule() {
     // TODO(tomasalvarez): Include James suggestion of adding the creation time
     //     in the title of the spreadsheet.
   };
-  
+
   var request = gapi.client.sheets.spreadsheets.create(
       {properties: spreadsheetProperties});
   request.then((response) => {
@@ -189,7 +190,6 @@ function handleExportSchedule() {
     // This is using the new scheduledTasks variable which is a local copy
     // of the latest results from scheduling.
     makeSheetsValuesFromScheduledTasks(scheduledTasks, values);
-    console.log(values);
     // This is a blank row in the spreadsheet so you can see the totals easier.
     values.push([]);
     values.push([
@@ -212,12 +212,13 @@ function handleExportSchedule() {
             {spreadsheetId: response.result.spreadsheetId, resource: body})
         .then(
             function(response) {
+              console.log(response.result.responses[0].spreadsheetId);
               //  This displays the link back to the user.
               $('#sheets-url-container').removeClass('d-none');
               $('#sheets-url-container')
                   .text(
-                      'Done. Here is the URL to your spreadsheet: ' +
-                      response.result.spreadsheetUrl);
+                      'Here is the URL to your spreadsheet: ' +
+                      URL_DOCUMENT_BEGINNING + response.result.responses[0].spreadsheetId);
             },
             function(reason) {
               handleExportError(reason);
