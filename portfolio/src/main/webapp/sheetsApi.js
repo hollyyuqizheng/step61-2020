@@ -177,7 +177,7 @@ function handleExportSchedule() {
 
   var spreadsheetProperties = {
     title: 'Your Scheduled Tasks'
-    // TODO(tomasalvarez): Include James suggestion of adding the creation time
+    // TODO(tomasalvarez): Include suggestions of adding the creation time
     //     in the title of the spreadsheet.
   };
 
