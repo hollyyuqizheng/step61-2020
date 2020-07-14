@@ -82,9 +82,8 @@ function importAllTasks() {
         .then(function(response) {
           var taskLists = response.result.items;
 
-          // Check that the response returns something that isn't undefined
-          // so that no error will be thrown.
-          if (typeof taskLists != 'undefined') {
+          // Check that the variable exists so that no error is thrown.
+          if (taskLists) {
             taskLists.forEach(tasklist => {
               importTasklist(tasklist.id);
             });
@@ -99,7 +98,7 @@ function importTasklist(tasklistId) {
       .list({'tasklist': tasklistId, 'maxResults': 100, 'showCompleted': false})
       .then(function(taskResponse) {
         var tasks = taskResponse.result.items;
-        if (typeof tasks != 'undefined') {
+        if (tasks) {
           tasks.forEach(task => {
             const newTask = new Task(task.title, task.notes, '60', '3');
             updateTaskList(newTask, TIME_UNIT.MINUTES);
@@ -126,7 +125,7 @@ function drawImportMenu() {
   // Add all Tasklists of user to the select.
   gapi.client.tasks.tasklists.list({'maxResults': 30}).then(function(response) {
     var tasklists = response.result.items;
-    if (typeof tasklists != 'undefined') {
+    if (tasklists) {
       tasklists.forEach(tasklist => {
         option = tasklistSelect.appendChild(document.createElement('option'));
         option.setAttribute('value', tasklist.id);
