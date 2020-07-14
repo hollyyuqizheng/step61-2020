@@ -274,20 +274,23 @@ function getClosestNextHour(nextHour, workHourStartString, workHourEndString) {
  
 /** Checks the validity of the user's working hours input. */
 function checkWorkHourRange() {
+  const workHourStartParts = $('#working-hour-start').val().split(':'); 
   const workHourStartHour =
-      parseInt($('#working-hour-start').val().split(':')[0]);
+      parseInt(workHourStartParts[0]);
   const workHourStartMinute =
-      parseInt($('#working-hour-start').val().split(':')[1]);
-  const workHourEndHour = parseInt($('#working-hour-end').val().split(':')[0]);
+      parseInt(workHourStartParts[1]);
+
+  const workHourEndParts = $('#working-hour-end').val().split(':'); 
+  const workHourEndHour = parseInt(workHourEndParts[0]);
   const workHourEndMinute =
-      parseInt($('#working-hour-end').val().split(':')[1]);
+      parseInt(workHourEndParts[1]);
   
+  const $workHourWarning = $('#working-hour-warning'); 
   if (!isWorkHourValid(
         workHourStartHour, workHourEndHour, workHourStartMinute, workHourEndMinute)) {
-    $('#working-hour-warning').removeClass('d-none');
-    $('#working-hour-warning').text('Working hours are not valid.');
+    $workHourWarning.removeClass('d-none').text('Working hours are not valid.');
   } else {
-    $('#working-hour-warning').addClass('d-none');
+    $workHourWarning.addClass('d-none');
     // Only sets the default times for calendar events if
     // the inputted working hours are valid.
     setClosestEventTime();
