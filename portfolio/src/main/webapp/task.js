@@ -3,7 +3,7 @@ const TIME_UNIT = {
   HOURS: 'hours'
 };
 
-var ID_COUNTER = 0;
+var TASK_ID_COUNTER = 0;
 
 /**
  * Models a task that is displayed on the UI.
@@ -96,12 +96,12 @@ function updateTaskList(newTask, lengthUnit) {
   durationColumn.classList.add('col');
 
   const durationLabel = document.createElement('label');
-  durationLabel.setAttribute('for', 'duration-input-' + ID_COUNTER);
+  durationLabel.setAttribute('for', 'duration-input-' + TASK_ID_COUNTER);
   durationLabel.innerText = 'Duration:';
 
   const durationInput = document.createElement('input');
   durationInput.classList.add('form-control');
-  durationInput.setAttribute('id', 'duration-input-' + ID_COUNTER);
+  durationInput.setAttribute('id', 'duration-input-' + TASK_ID_COUNTER);
   if (lengthUnit == TIME_UNIT.HOURS) {
     durationInput.setAttribute('value', newTask.duration / 60);
   } else {
@@ -117,12 +117,12 @@ function updateTaskList(newTask, lengthUnit) {
   unitColumn.classList.add('col');
 
   const unitLabel = document.createElement('label');
-  unitLabel.setAttribute('for', 'unit-select-' + ID_COUNTER);
+  unitLabel.setAttribute('for', 'unit-select-' + TASK_ID_COUNTER);
   unitLabel.innerText = 'Unit:';
 
   const unitSelect = document.createElement('select');
   unitSelect.classList.add('form-control');
-  unitSelect.setAttribute('id', 'unit-select-' + ID_COUNTER);
+  unitSelect.setAttribute('id', 'unit-select-' + TASK_ID_COUNTER);
   unitSelect.setAttribute('selected', lengthUnit);
 
   var option = unitSelect.appendChild(document.createElement('option'));
@@ -148,12 +148,12 @@ function updateTaskList(newTask, lengthUnit) {
   priorityColumn.classList.add('col');
 
   const priorityLabel = document.createElement('label');
-  priorityLabel.setAttribute('for', 'priority-select-' + ID_COUNTER);
+  priorityLabel.setAttribute('for', 'priority-select-' + TASK_ID_COUNTER);
   priorityLabel.innerText = 'Priority:';
 
   const prioritySelect = document.createElement('select');
   prioritySelect.classList.add('form-control');
-  prioritySelect.setAttribute('id', 'priority-select-' + ID_COUNTER);
+  prioritySelect.setAttribute('id', 'priority-select-' + TASK_ID_COUNTER);
 
   for (var i = 1; i <= 5; i++) {
     option = prioritySelect.appendChild(document.createElement('option'));
