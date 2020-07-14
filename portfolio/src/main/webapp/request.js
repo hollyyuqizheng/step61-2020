@@ -33,14 +33,17 @@ var scheduledTasks = [];
  * Gets all of the scheduling information from the UI and returns a
  * ScheduleRequest with all of the data.
  */
-function createRequestFromUiInformation() {
+function createScheduleRequestFromDom() {
   const startTime = document.getElementById('working-hour-start').value;
   const endTime = document.getElementById('working-hour-end').value;
   const events = collectAllEvents();
   const tasks = collectAllTasks();
   const algorithmType = document.getElementById('algorithm-type').value;
   const scheduleRequest = new ScheduleRequest(
-      events, tasks, getTimeObject(startTime), getTimeObject(endTime),
+      events,
+      tasks,
+      getTimeObject(startTime),
+      getTimeObject(endTime),
       algorithmType);
   return scheduleRequest;
 }
@@ -48,22 +51,22 @@ function createRequestFromUiInformation() {
 /**
  * Gets called when the user hits 'Start Scheduling'.
  */
-function startScheduling() {
-  const scheduleRequest = createRequestFromUiInformation();
+function onClickStartScheduling() {
+  const scheduleRequest = createScheduleRequestFromDom();
   // Create the request to send to the server using the data we collected from
   // the web form.
   fetchScheduledTasksFromServlet(scheduleRequest).then((scheduledTaskArray) => {
-    updateResultsOnPage(scheduledTaskArray);
+    handleScheduledTaskArray(scheduledTaskArray);
   });
 }
 
 /**
  * Updates the UI to show the results of a query.
  */
-function updateResultsOnPage(scheduledTaskArray) {
+function handleScheduledTaskArray(scheduledTaskArray) {
   const resultElement = document.getElementById('scheduled-task-list');
   resultElement.innerHTML = '';
-  scheduledTaskArray.forEach(addScheduledTaskToPage, resultElement);
+  scheduledTaskArray.forEach(addScheduledTaskToDom, resultElement);
 }
 
 /**
@@ -71,15 +74,11 @@ function updateResultsOnPage(scheduledTaskArray) {
  * scheduled tasks.
  */
 function fetchScheduledTasksFromServlet() {
-  const scheduleRequest = createRequestFromUiInformation();
+  const scheduleRequest = createScheduleRequestFromDom();
   const json = JSON.stringify(scheduleRequest);
   return fetch('/schedule', {method: 'POST', body: json})
       .then((response) => {
-        // This is still a Promise.
-        return response.json();
-      })
-      // Turns result from a Promise into its Array value.
-      .then((array) => {
+        var array = response.json();
         scheduledTasks = array;
         return scheduledTasks;
       });
@@ -96,7 +95,7 @@ function collectAllScheduledTasks() {
  * This takes in a single JSON object of a ScheduledTask (Java Class) and
  * displays that information on the result element using a card format.
  */
-function addScheduledTaskToPage(scheduledTaskWrapper, resultElement) {
+function addScheduledTaskToDom(scheduledTaskWrapper, resultElement) {
   const task = scheduledTaskWrapper.task;
   const taskName = task.name;
   const taskTimeSeconds = scheduledTaskWrapper.startTime.seconds;
