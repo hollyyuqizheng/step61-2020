@@ -12,7 +12,7 @@ public class CalendarEventsGroup {
 
   // This variable that represents a group of calendar events will
   // always be sorted in ascending order based on their start time.
-  public List<CalendarEvent> events;
+  public final List<CalendarEvent> events;
 
   // These two variables represent the start and end of
   // possible schedule time. When these times are passed in
