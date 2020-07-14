@@ -187,7 +187,8 @@ function handleTaskAuthError(e) {
         .text(
             'Please complete the entire sign in process if you wish to import Tasks.');
   } else if (e.error == 'access_denied') {
-    $('#task-link-error').text('Access denied. Please try again later.');
+    $('#task-link-error').text('You have denied this app from accessing your tasks,' +
+            'please allow access if you wish to import tasks.');
   } else {
     $('#task-link-error')
         .text(
