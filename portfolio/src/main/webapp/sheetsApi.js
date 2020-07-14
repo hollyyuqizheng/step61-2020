@@ -1,17 +1,17 @@
 // Client ID and API key from the Developer Console
-const CLIENT_ID_SHEETS =
+const SHEETS_CLIENT_ID =
     '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
-const API_KEY_SHEETS = '';
+const SHEETS_API_KEY = '';
 
 // Array of API discovery doc URLs for APIs used by the quickstart
-const DISCOVERY_DOCS_SHEETS =
+const SHEETS_DISCOVERY_DOCS =
     ['https://sheets.googleapis.com/$discovery/rest?version=v4'];
 
 // Authorization scopes required by the API; multiple scopes can be
 // included, separated by spaces.
-const SCOPE_READ_WRITE_SHEETS = 'https://www.googleapis.com/auth/spreadsheets';
+const SCOPE_SHEETS_READ_WRITE = 'https://www.googleapis.com/auth/spreadsheets';
 
-const URL_DOCUMENT_BEGINNING = "https://docs.google.com/spreadsheets/d/";
+const URL_DOCUMENT_BEGINNING = 'https://docs.google.com/spreadsheets/d/';
 
 // Error codes that the process can throw
 const ERROR_CODE_SHEETS = {
@@ -33,19 +33,19 @@ function handleClientLoadSheets() {
 function initClientSheets() {
   gapi.client
       .init({
-        apiKey: API_KEY_SHEETS,
-        clientId: CLIENT_ID_SHEETS,
-        discoveryDocs: DISCOVERY_DOCS_SHEETS,
-        scope: SCOPE_READ_WRITE_SHEETS,
+        apiKey: SHEETS_API_KEY,
+        clientId: SHEETS_CLIENT_ID,
+        discoveryDocs: SHEETS_DISCOVERY_DOCS,
+        scope: SCOPE_SHEETS_READ_WRITE,
         consent: 'consent'
       })
       .then(
           function() {
-            var exportButtonSheets =
+            var sheetsExportButton =
                 document.getElementById('sheets-export-button');
-            var signOutButtonSheets =
+            var sheetsSignOutButton =
                 document.getElementById('sheets-sign-out-button');
-            var signInButtonSheets =
+            var sheetsSignInButton =
                 document.getElementById('sheets-sign-in-button');
 
             // Listen for sign-in state changes.
@@ -53,9 +53,9 @@ function initClientSheets() {
 
             // Handle the initial sign-in state.
             handleUiSheets();
-            exportButtonSheets.onclick = handleExportSchedule;
-            signOutButtonSheets.onclick = handleSignOut;
-            signInButtonSheets.onclick = handleSignIn;
+            sheetsExportButton.onclick = handleExportSchedule;
+            sheetsSignOutButton.onclick = handleSignOut;
+            sheetsSignInButton.onclick = handleSignIn;
           },
           function(error) {
             handleError(error);
@@ -119,17 +119,19 @@ function handleAuthorizationError(error) {
  */
 function handleExportError(reason) {
   $('#sheets-message')
-      .removeClass('d-none')
       .text('Error: ' + reason.result.error.message)
+      .removeClass('d-none')
       .show();
 }
 
 /**
  * Helps the SheetsApi requests easily create the values it needs for a
  * spreadsheet.
+ * @param scheduledTasks: An array of JSON ScheduledTask objects
+ * @param values: An empty array where the parsed data will be put
  */
 function makeSheetsValuesFromScheduledTasks(scheduledTasks, values) {
-  for (index = 0; index < scheduledTasks.length; index++) {
+  for (var index = 0; index < scheduledTasks.length; index++) {
     values.push(singleScheduledTaskToSheetsArray(scheduledTasks[index]));
   }
 }
@@ -169,8 +171,8 @@ function handleExportSchedule() {
   const scheduledTaskCount = scheduledTasks.length;
   if (scheduledTaskCount == 0) {
     $('#sheets-message')
-        .removeClass('d-none')
         .text('Cannot export empty schedule.')
+        .removeClass('d-none')
         .show();
     return;
   }
@@ -193,7 +195,8 @@ function handleExportSchedule() {
     // This is a blank row in the spreadsheet so you can see the totals easier.
     values.push([]);
     values.push([
-      scheduledTaskCount.toString() + ' Tasks Total', '',
+      scheduledTaskCount.toString() + ' Tasks Total',
+      '',
       '=SUM(C2:C' + (scheduledTaskCount + 1).toString() +
           ') & " Total Minutes Scheduled"'
     ])
@@ -201,9 +204,9 @@ function handleExportSchedule() {
     var data = {
       // This is +3 because we have the initial row with titles and the final
       // rows with some totals.
-      'range': 'Sheet1!A1:E' + (scheduledTaskCount + 3).toString(),
-      'majorDimension': 'ROWS',
-      'values': values
+      range: 'Sheet1!A1:E' + (scheduledTaskCount + 3).toString(),
+      majorDimension: 'ROWS',
+      values: values
     }  // Additional ranges to update.
 
     var body = {data: data, valueInputOption: 'USER_ENTERED'};
@@ -213,11 +216,12 @@ function handleExportSchedule() {
         .then(
             function(response) {
               //  This displays the link back to the user.
-              $('#sheets-url-container').removeClass('d-none');
               $('#sheets-url-container')
-                  .text(
-                      'Here is the URL to your spreadsheet: ' +
-                      URL_DOCUMENT_BEGINNING + response.result.responses[0].spreadsheetId);
+                  .attr(
+                      'href',
+                      URL_DOCUMENT_BEGINNING +
+                          response.result.responses[0].spreadsheetId)
+                  .removeClass('d-none');
             },
             function(reason) {
               handleExportError(reason);
