@@ -200,6 +200,5 @@ function handleTaskAuthError(e) {
 }
 
 function clearAuthErrorPrompt() {
-  $('#task-link-error').text('');
-  $('#task-link-error').removeClass('d-block');
+  $('#task-link-error').text('').removeClass('d-block');
 }
