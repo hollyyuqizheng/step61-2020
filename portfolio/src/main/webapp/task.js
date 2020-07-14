@@ -3,6 +3,8 @@ const TIME_UNIT = {
   HOURS: 'hours'
 };
 
+var ID_COUNTER = 0;
+
 /**
  * Models a task that is displayed on the UI.
  * This class is useful when the task information needs to be sent
@@ -63,17 +65,17 @@ function createNewTask() {
       name, description, getDurationMinutes(length, lengthUnit),
       parseInt(priority));
 
-  updateTaskList(newTask);
+  updateTaskList(newTask, lengthUnit);
 }
 
 /** Display Task information from user input. */
 function updateTaskList(newTask, lengthUnit) {
-  const newEventCard = document.createElement('div');
-  newEventCard.classList.add('card');
+  const newTaskCard = document.createElement('div');
+  newTaskCard.classList.add('card');
 
   const cardBody = document.createElement('div');
   cardBody.classList.add('card-body');
-  newEventCard.appendChild(cardBody);
+  newTaskCard.appendChild(cardBody);
 
   const cardTitle = document.createElement('h4');
   cardTitle.classList.add('card-title');
@@ -85,38 +87,116 @@ function updateTaskList(newTask, lengthUnit) {
   descriptionText.innerText = newTask.description;
   cardBody.appendChild(descriptionText);
 
-  const duration = document.createElement('p');
-  duration.classList.add('card-text');
-  duration.innerText = newTask.duration;
-  cardBody.appendChild(duration);
+  // WORK IN HERE
+  // Create row for all modifiable content
+  const inputRow = document.createElement('div');
+  inputRow.classList.add('form-row');
 
-  const priority = document.createElement('p');
-  priority.classList.add('card-text');
-  priority.innerText = newTask.taskPriority;
-  cardBody.appendChild(priority);
+  // Create a column for duration
+  const durationColumn = document.createElement('div');
+  durationColumn.classList.add('col');
+
+  const durationLabel = document.createElement('label');
+  durationLabel.setAttribute('for', 'duration-input-' + ID_COUNTER);
+  durationLabel.innerText = 'Duration:';
+
+  const durationInput = document.createElement('input');
+  durationInput.classList.add('form-control');
+  durationInput.setAttribute('id', 'duration-input-' + ID_COUNTER);
+
+  if (lengthUnit === TIME_UNIT.HOURS) {
+    // Task duration is set in minutes, so divide that duration by 60
+    // to get the number of hous. 
+    durationInput.setAttribute('value', newTask.duration / 60);
+  } else {
+    durationInput.setAttribute('value', newTask.duration);
+  }
+  
+  durationColumn.appendChild(durationLabel);
+  durationColumn.appendChild(durationInput);
+  inputRow.appendChild(durationColumn);
+
+  // Create a column for unit
+  const unitColumn = document.createElement('div');
+  unitColumn.classList.add('col');
+
+  const unitLabel = document.createElement('label');
+  unitLabel.setAttribute('for', 'unit-select-' + ID_COUNTER);
+  unitLabel.innerText = 'Unit:';
+
+  const unitSelect = document.createElement('select');
+  unitSelect.classList.add('form-control');
+  unitSelect.setAttribute('id', 'unit-select-' + ID_COUNTER);
+  unitSelect.setAttribute('selected', lengthUnit);
+
+  var option = unitSelect.appendChild(document.createElement('option'));
+  option.setAttribute('value', TIME_UNIT.MINUTES);
+  option.innerText = 'minute(s)';
+
+  var optionTwo = unitSelect.appendChild(document.createElement('option'));
+  optionTwo.setAttribute('value', TIME_UNIT.HOURS);
+  optionTwo.innerText = 'hour(s)';
+
+  if (lengthUnit == TIME_UNIT.MINUTES) {
+    option.setAttribute('selected', '');
+  } else {
+    optionTwo.setAttribute('selected', '');
+  }
+
+  unitColumn.appendChild(unitLabel);
+  unitColumn.appendChild(unitSelect);
+  inputRow.appendChild(unitColumn);
+
+  // Create a column for priority
+  const priorityColumn = document.createElement('div');
+  priorityColumn.classList.add('col');
+
+  const priorityLabel = document.createElement('label');
+  priorityLabel.setAttribute('for', 'priority-select-' + ID_COUNTER);
+  priorityLabel.innerText = 'Priority:';
+
+  const prioritySelect = document.createElement('select');
+  prioritySelect.classList.add('form-control');
+  prioritySelect.setAttribute('id', 'priority-select-' + ID_COUNTER);
+
+  for (var i = 1; i <= 5; i++) {
+    option = prioritySelect.appendChild(document.createElement('option'));
+    option.innerText = i;
+    if (i == newTask.taskPriority) {
+      option.setAttribute('selected', '');
+    }
+  }
+
+  priorityColumn.appendChild(priorityLabel);
+  priorityColumn.appendChild(prioritySelect);
+  inputRow.appendChild(priorityColumn);
+
+  cardBody.appendChild(inputRow);
 
   const deleteButton = document.createElement('button');
   deleteButton.classList.add('btn');
   deleteButton.classList.add('btn-danger');
-  deleteButton.innerText = 'Delete this event';
+  deleteButton.innerText = 'Delete this task';
   cardBody.appendChild(deleteButton);
 
-  const eventList = document.getElementById('new-task-list');
-  eventList.innterHTML = '';
-  eventList.appendChild(newEventCard);
+  const taskList = document.getElementById('new-task-list');
+  taskList.innterHTML = '';
+  taskList.appendChild(newTaskCard);
 
-  // The delete button removes the event's card from the UI.
-  deleteButton.onclick = function(newEventCard) {
-    newEventCard.target.closest('div.card').remove();
+  ID_COUNTER++;
+
+  // The delete button removes the task's card from the UI.
+  deleteButton.onclick = function(newTaskCard) {
+    newTaskCard.target.closest('div.card').remove();
   }
 }
 
 /** Returns the number of minutes from the user's input and unit selection. */
 function getDurationMinutes(duration, unit) {
   if (unit == TIME_UNIT.MINUTES) {
-    return duration;
+    return parseInt(duration);
   } else if (unit == TIME_UNIT.HOURS) {
-    return duration * 60;
+    return parseInt(duration) * 60;
   }
 }
 
@@ -126,7 +206,7 @@ function getDurationMinutes(duration, unit) {
  * cards used to display input Task information.
  */
 function collectAllTasks() {
-  const allTaskJson = new Array();
+  const allTasks = new Array();
 
   // Get task list element to run through cards collecting data.
   const taskList = document.getElementById('new-task-list');
@@ -136,15 +216,19 @@ function collectAllTasks() {
 
     const taskName = taskBody.childNodes[0].innerText;
     const taskDescription = taskBody.childNodes[1].innerText;
-    const taskLength = taskBody.childNodes[2].innerText;
-    const taskPriority = taskBody.childNodes[3].innerText;
+    const taskLength = taskBody.childNodes[2].childNodes[0].childNodes[1].value;
+    const taskLengthUnit =
+        taskBody.childNodes[2].childNodes[1].childNodes[1].value;
+    const taskPriority =
+        parseInt(taskBody.childNodes[2].childNodes[2].childNodes[1].value);
 
-    const task = new Task(taskName, taskDescription, taskLength, taskPriority);
-    const taskJson = JSON.stringify(task);
-    allTaskJson.push(taskJson);
+    const task = new Task(
+        taskName, taskDescription,
+        getDurationMinutes(taskLength, taskLengthUnit), taskPriority);
+    //const taskJson = JSON.stringify(task);
+    allTasks.push(task);
   });
-
-  return allTaskJson;
+  return allTasks;
 }
 
 /**
@@ -160,7 +244,6 @@ function validateTaskName(name) {
     return {isValid: true, errorMessage: null};
   }
 }
-
 
 /**
  * This method checks that the duration input by the user is a positive integer.

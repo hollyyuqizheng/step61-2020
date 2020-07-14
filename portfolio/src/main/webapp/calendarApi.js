@@ -236,9 +236,8 @@ function addCalendarWriteScope() {
   googleUser.grant({scope: SCOPE_CALENDAR_READ_WRITE})
       .then((response) => {
         $('#export-calendar-message').addClass('d-none');
-        // const scheduledTasks = collectAllScheduledTasks();
-        // addNewEventsToGoogleCalendar(scheduledTasks);
-        addNewEventsToGoogleCalendar();
+        const scheduledTasks = collectAllScheduledTasks();
+        addNewEventsToGoogleCalendar(scheduledTasks);
       })
       .catch(function(error) {
         handleExportAuthError(error);
@@ -247,52 +246,32 @@ function addCalendarWriteScope() {
  
 /**
  * Adds the scheduled task items back to the user's Google Calendar.
- * TODO(hollyyuqizheng): fill in the rest of the method once
- * results can be returned from the scheduling algorithm.
  */
 function addNewEventsToGoogleCalendar() {
-  
-  // scheduledTasks.forEach((scheduledTask) => {
-  //   const task = scheduledTask.task;
+  scheduledTasks.forEach((scheduledTask) => {
+    const task = scheduledTask.task;
 
-  //   const taskStartTimeSeconds = scheduledTask.startTime.seconds;
-  //   const taskStartTime = new Date();
-  //   // This is x1000 because the functions takes milliseconds
-  //   taskStartTime.setTime(taskStartTimeSeconds * 1000);
+    const taskStartTimeSeconds = scheduledTask.startTime.seconds;
+    const taskStartTime = new Date();
+    // This is x1000 because the functions takes milliseconds
+    taskStartTime.setTime(taskStartTimeSeconds * 1000);
 
-  //   const taskEndTime = new Date();
-  //   taskEndTime.setTime((taskStartTimeSeconds + task.duration.seconds) * 1000); 
+    const taskEndTime = new Date();
+    taskEndTime.setTime((taskStartTimeSeconds + task.duration.seconds) * 1000); 
 
-  //   const currentScheduledTask = {
-  //       summary: task.name,
-  //       description: task.description.value,
-  //       start: {
-  //         dateTime: taskStartTime.toISOString(),
-  //       },
-  //       end: {
-  //         dateTime: taskEndTime.toISOString(),
-  //       },
-  //   };
+    const currentScheduledTask = {
+        summary: task.name,
+        description: task.description.value,
+        start: {
+          dateTime: taskStartTime.toISOString(),
+        },
+        end: {
+          dateTime: taskEndTime.toISOString(),
+        },
+    };
 
-  //   addOneEventToGoogleCalendar(currentScheduledTask);
-  // }); 
-
-  const now = new Date();
-  const fiveHoursLater = new Date();
-  fiveHoursLater.setHours(now.getHours() + 5);
-
-  const event = {
-    summary: 'Testing',
-    description: 'test description',
-    start: {
-      dateTime: now.toISOString(),
-    },
-    end: {
-      dateTime: fiveHoursLater.toISOString(),
-    },
-  };
-
-  addOneEventToGoogleCalendar(event);
+    addOneEventToGoogleCalendar(currentScheduledTask);
+  }); 
 }
  
 /** Adds an individual event to the authorized user's Google Calendar. */

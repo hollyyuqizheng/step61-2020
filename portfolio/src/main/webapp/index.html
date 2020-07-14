@@ -70,19 +70,32 @@
               />
               <small class="d-none" id="working-hour-warning"></small>
             </li>
-            <li class="nav-item dropdown">
+
+            <!-- <li class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle"
+                href="#"
                 id="navbarDropdown"
                 role="button"
                 data-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false"
               >
-                Scheduling algorithm preferences
+                Algorithm Type
               </a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdown"></div>
-            </li>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a>Choose Algorithm:</a>
+                <form>
+                  <select id="algorithm-type" class="form-control" name="algorithm-type">
+                    <option value="SHORTEST_TASK_FIRST" select>Shortest Task First</option>
+                    <option value="LONGEST_TASK_FIRST">Longest Task First</option>
+                  </select>
+                </form>
+              </div>
+            </li> -->
+            <li class="nav-item nav-link">
+              <div class="nav-link" id="algorithm-type">SHORTEST_TASK_FIRST</div>
+            </li> 
           </ul>
         </div>
       </nav>
@@ -94,18 +107,19 @@
           <form id="new-task-form">
             <div class="form-group">
               <label for="new-task-name">Task name*:</label>
-              <input type="text" id="new-task-name" class="form-control" name="new-task-name" placeholder="New Task" required="true" />
+              <input type="text" id="new-task-name" class="form-control" name="new-task-name" placeholder="New Task" />
               <div class="invalid-feedback" id="empty-name-message">Name cannot be empty!</div>
             </div>
+
             <label for="new-task-description">Task description:</label><br />
             <textarea
               id="new-task-description"
               class="form-control"
               name="new-task-description"
               placeholder="Description"
-            ></textarea
-            ><br />
- 
+            ></textarea>
+            <br />
+
             <div class="form-row">
               <div class="col">
                 <label for="new-task-estimated-length">Duration*:</label>
@@ -139,14 +153,16 @@
             </div>
             <br />
             <button type="button" class="btn btn-primary" onclick="createNewTask()">Add this task</button>
-            <button type="button" class="btn btn-primary d-none" id="connect-tasks-btn" onclick="handleClientLoadTasks()">Import from Tasks</button>
+            <button type="button" class="btn btn-primary d-none" id="connect-tasks-btn" onclick="initClientTasks()">Link Tasks</button>
             <div class="input-group" id="import-menu-wrapper"></div>
-          </form>
+         </form>
+
           <br />
           <h2>Tasks added:</h2>
           <div class="scrollable" id="new-task-list-wrapper">
             <div id="new-task-list"></div>
           </div>
+          <button type="button" class="btn btn-warning" onclick="clearTasks()">Clear Tasks</button>
         </div>
  
         <div id="new-event-wrapper" class="col-md-12 col-lg-6 col-xl-3">
@@ -228,10 +244,10 @@
           <div id="calendar-view-wrapper">
             <iframe title="Your Google Calendar" id="calendar-view" class="d-none" scrolling="yes"></iframe>
             <button type="button" class="btn btn-primary" id="calendar-auth-button" onclick="initiateCalendarAuth()">
-              Log in to Google Calendar
+              Log in to your Google account
             </button>
             <button type="button" class="btn btn-primary d-none" id="calendar-logout-button" onclick="logOutAllApis()"> 
-              Log out of Google Calendar
+              Log out of your Google account
             </button>
           </div>
           <button
@@ -250,7 +266,11 @@
             Start scheduling!
           </button>
           <h2>3. Your tasks are scheduled here!</h2>
-          <div id="schedule-result-list"></div>
+          <div id="scheduled-task-list"></div>
+          <h4 id="empty-scheduled-task-message" class="d-none">
+            Sorry, but it looks like none of your tasks can be scheduled for the date
+            you have picked. You have such a busy schedule! 
+          </h4>
           <button type="button" class="btn btn-primary d-none" id="export-calendar-button" onclick="addCalendarWriteScope()">
             Looks good to me! Add them to my Google Calendar
           </button>

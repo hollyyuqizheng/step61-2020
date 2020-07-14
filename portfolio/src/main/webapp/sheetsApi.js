@@ -1,37 +1,39 @@
+const URL_DOCUMENT_BEGINNING = "https://docs.google.com/spreadsheets/d/"; 
+
 /**
  * On load, called to load the auth2 library and API client library.
  */
-function handleClientLoad() {
-  gapi.load('client:auth2', initClient);
-}
+// function handleClientLoad() {
+//   gapi.load('client:auth2', initClient);
+// }
 
 /**
  * Initializes the API client library and sets up sign-in state
  * listeners.
  */
-function initClient() {
-  console.log("sheets: init client");
-  if (!gapi.auth2.getAuthInstance()) {
-    console.log("sheets: no auth, normal init"); 
-    fetchApiKey();
-    gapi.client
-      .init({
-        apiKey: API_KEY,
-        clientId: CLIENT_ID,
-        discoveryDocs: [DISCOVERY_URL_CALENDAR, DISCOVERY_DOCS_SHEETS],
-        scope: SCOPE_SHEETS_READ_WRITE
-      })
-      .then(handleSignIn(),
-            function(error) {
-              handleError(error);
-            });
-  } else {
-    console.log("sheets: auth exists, grant scope"); 
-    var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
-    googleUser.grant({scope: SCOPE_SHEETS_READ_WRITE})
-      .then(handleApiButtons());
-  }  
-}
+// function initClient() {
+//   console.log("sheets: init client");
+//   if (!gapi.auth2.getAuthInstance()) {
+//     console.log("sheets: no auth, normal init"); 
+//     fetchApiKey();
+//     gapi.client
+//       .init({
+//         apiKey: API_KEY,
+//         clientId: CLIENT_ID,
+//         discoveryDocs: [DISCOVERY_URL_CALENDAR, DISCOVERY_DOCS_SHEETS],
+//         scope: SCOPE_SHEETS_READ_WRITE
+//       })
+//       .then(handleSignIn(),
+//             function(error) {
+//               handleError(error);
+//             });
+//   } else {
+//     console.log("sheets: auth exists, grant scope"); 
+//     var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
+//     googleUser.grant({scope: SCOPE_SHEETS_READ_WRITE})
+//       .then(handleApiButtons());
+//   }  
+// }
 
 /**
  * Runs after the promise is returned from gapi.client.init.
@@ -79,6 +81,56 @@ function handleAuthorizationError(error) {
  * message on the UI.
  */
 function handleExportError(reason) {
+  $('#sheets-message')
+      .removeClass('d-none')
+      .text('Error: ' + reason.result.error.message)
+      .show();
+}
+
+/**
+ * Helps the SheetsApi requests easily create the values it needs for a
+ * spreadsheet.
+ */
+function makeSheetsValuesFromScheduledTasks(scheduledTasks, values) {
+  // I think this code is shorter without a forEach() and I also do not
+  // know how to make this work with a forEach().
+  for (index = 0; index < scheduledTasks.length; index++) {
+    values.push(singleScheduledTaskToSheetsArray(scheduledTasks[index]));
+  }
+}
+
+/**
+ * This takes in a single JSON object of a ScheduledTask (Java Class) and
+ * turns it into the correct format for the Sheets API
+ */
+function singleScheduledTaskToSheetsArray(scheduledTask) {
+  var scheduledTaskAsSheetsArray = [];
+
+  const task = scheduledTask.task;
+  const taskName = task.name;
+  // Changes seconds into minutes.
+  const taskDurationMinutes = task.duration.seconds / 60;
+  const taskDescription = task.description.value;
+  const taskPriority = task.priority.priority;
+  const taskTimeSeconds = scheduledTask.startTime.seconds;
+  const taskDate = new Date();
+  // This is x1000 because the functions takes milliseconds
+  taskDate.setTime(taskTimeSeconds * 1000);
+
+  scheduledTaskAsSheetsArray.push(taskName);
+  scheduledTaskAsSheetsArray.push(taskDate.toString());
+  scheduledTaskAsSheetsArray.push(taskDurationMinutes);
+  scheduledTaskAsSheetsArray.push(taskDescription);
+  scheduledTaskAsSheetsArray.push(taskPriority);
+
+  return scheduledTaskAsSheetsArray;
+}
+
+/**
+ * Called when the export process throws an error and displays the error
+ * message on the UI.
+ */
+function handleExportError(reason) {
   var $sheetsMessage = $('#sheets-message');
   $sheetsMessage.removeClass('d-none')
       .text('Error: ' + reason.result.error.message)
@@ -90,28 +142,69 @@ function handleExportError(reason) {
  * Also displays the link to the spreadsheet as text on the UI.
  */
 function handleExportSchedule() {
+  const scheduledTaskCount = scheduledTasks.length;
+  if (scheduledTaskCount == 0) {
+    $('#sheets-message')
+        .removeClass('d-none')
+        .text('Cannot export empty schedule.')
+        .show();
+    return;
+  }
+
   var spreadsheetProperties = {
     title: 'Your Scheduled Tasks'
-    // TODO(tomasalvarez): Add desired creation properties.
+    // TODO(tomasalvarez): Include James suggestion of adding the creation time
+    //     in the title of the spreadsheet.
   };
-
-  var spreadsheetBody = {
-      // TODO(tomasalvarez): Add desired properties to the request body.
-  };
-
+  
   var request = gapi.client.sheets.spreadsheets.create(
       {properties: spreadsheetProperties});
-  request.then(
-      function(response) {
-        // TODO(tomasalvarez): Change code below to process the `response` 
-        // object. Currently just displays the link back to the user.
-        $('#sheets-url-container').removeClass('d-none');
-        $('#sheets-url-container')
-            .text(
-                'Done. Here is the URL to your spreadsheet: ' +
-                response.result.spreadsheetUrl);
-      },
-      function(reason) {
-        handleExportError(reason);
-      });
+
+  request.then((response) => {
+    var values = [[
+      'Task', 'Scheduled Time', 'Duration (minutes)', 'Description', 'Priority'
+    ]];
+    // This is using the new scheduledTasks variable which is a local copy
+    // of the latest results from scheduling.
+    makeSheetsValuesFromScheduledTasks(scheduledTasks, values);
+    //console.log(values);
+
+    // This is a blank row in the spreadsheet so you can see the totals easier.
+    values.push([]);
+    values.push([
+      scheduledTaskCount.toString() + ' Tasks Total', '',
+      '=SUM(C2:C' + (scheduledTaskCount + 1).toString() +
+          ') & " Total Minutes Scheduled"'
+    ])
+
+    var data = {
+      // This is +3 because we have the initial row with titles and the final
+      // rows with some totals.
+      'range': 'Sheet1!A1:E' + (scheduledTaskCount + 3).toString(),
+      'majorDimension': 'ROWS',
+      'values': values
+    }  // Additional ranges to update.
+
+    var body = {data: data, valueInputOption: 'USER_ENTERED'};
+    
+    gapi.client.sheets.spreadsheets.values
+        .batchUpdate(
+            {spreadsheetId: response.result.spreadsheetId, resource: body})
+        .then(
+            function(response) {
+              //  This displays the link back to the user.
+              $('#sheets-url-container').removeClass('d-none');
+              $('#sheets-url-container')
+                  .html(
+                      'Done. Here is the ' + 
+                      '<a href=' + 
+                      URL_DOCUMENT_BEGINNING + 
+                      response.result.responses[0].spreadsheetId + 
+                      ' target="_blank">link</a>' + ' to your spreadsheet!');                  
+            },
+            function(reason) {
+              handleExportError(reason);
+            });
+  });
+
 }

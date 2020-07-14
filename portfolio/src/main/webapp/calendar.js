@@ -154,7 +154,7 @@ function collectAllEvents() {
     const event = new CalendarEvent(eventName, startTime, endTime);
     return event;
   });
- 
+  //console.log(allEventsOnPage); 
   return allEventsOnPage;
 }
  
@@ -282,10 +282,10 @@ function checkWorkHourRange() {
   const workHourEndMinute =
       parseInt($('#working-hour-end').val().split(':')[1]);
   
-  if (isWorkHourValid(
+  if (!isWorkHourValid(
         workHourStartHour, workHourEndHour, workHourStartMinute, workHourEndMinute)) {
     $('#working-hour-warning').removeClass('d-none');
-    $('#working-hour-warning').text('Start time cannot be after end time.');
+    $('#working-hour-warning').text('Working hours are not valid.');
   } else {
     $('#working-hour-warning').addClass('d-none');
     // Only sets the default times for calendar events if
@@ -317,8 +317,8 @@ function checkDatePicker() {
   }
 }
 
-// module.exports._test = {
-//   parseTodayString : parseTodayString,
-//   getClosestNextHour : getClosestNextHour,
-//   isWorkHourValid : isWorkHourValid
-// }
+module.exports._test = {
+  parseTodayString : parseTodayString,
+  getClosestNextHour : getClosestNextHour,
+  isWorkHourValid : isWorkHourValid
+}
