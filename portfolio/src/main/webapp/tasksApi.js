@@ -73,8 +73,8 @@ function updateSigninStatus(isSignedIn) {
 }
 
 /**
- *Iterate through all the user's tasklists and pass
- *them to updateTaskList().
+ * Iterate through all the user's tasklists and pass
+ * them to updateTaskList().
  */
 function importAllTasks() {
   if (GoogleAuth.isSignedIn.get()) {
@@ -108,8 +108,8 @@ function importTasklist(tasklistId) {
 }
 
 /**
- *Populate the import-menu-wrapper div with an import menu when the user is
- *logged in.
+ * Populate the import-menu-wrapper div with an import menu when the user is
+ * logged in.
  */
 function drawImportMenu() {
   // Create a div element to hold the custom select.
@@ -186,7 +186,9 @@ function handleTaskAuthError(e) {
         .text(
             'Please complete the entire sign in process if you wish to import Tasks.');
   } else if (e.error == 'access_denied') {
-    $('#task-link-error').text('You have denied this app from accessing your tasks,' +
+    $('#task-link-error')
+        .text(
+            'You have denied this app from accessing your tasks,' +
             'please allow access if you wish to import tasks.');
   } else {
     $('#task-link-error')
