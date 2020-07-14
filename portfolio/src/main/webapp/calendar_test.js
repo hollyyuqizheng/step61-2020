@@ -1,5 +1,5 @@
 var assert = require('assert');
-var calendar = require('../calendar.js'); 
+var calendar = require('./calendar.js'); 
 
 /**
  * In general, these tests are for date/time string parsing and validity.
@@ -12,13 +12,13 @@ var calendar = require('../calendar.js');
  * Invalid inputs in this aspect will not be tested in the following tests. 
  */
 
-describe('#parseTodayString', function () {
+describe('#constructTodayString', function () {
   describe('extra zero padding', function () {
     it('should return \'2020-01-02\'', function () {
       const year = '2020';
       const month = '1';
       const date = '2'; 
-      assert.equal(calendar._test.parseTodayString(year, month, date), '2020-01-02');
+      assert.equal(calendar._test.constructTodayString(year, month, date), '2020-01-02');
     });
   });
 
@@ -27,7 +27,7 @@ describe('#parseTodayString', function () {
       const year = '2020';
       const month = '11';
       const date = '22'; 
-      assert.equal(calendar._test.parseTodayString(year, month, date), '2020-11-22');
+      assert.equal(calendar._test.constructTodayString(year, month, date), '2020-11-22');
     });
   });
 });
@@ -37,7 +37,7 @@ describe('#getClosestNextHour', function() {
     it('should return 17:00', function() {
       const workHourStartString = '09:00';
       const workHourEndString = '17:00';
-      const nextHour = '17';
+      const nextHour = 17;
       assert.equal(calendar._test.getClosestNextHour(
           nextHour, workHourStartString, workHourEndString), '17:00'); 
     });
@@ -47,7 +47,7 @@ describe('#getClosestNextHour', function() {
     it('should return 16:00', function() {
       const workHourStartString = '09:00';
       const workHourEndString = '17:00';
-      const nextHour = '16';
+      const nextHour = 16;
       assert.equal(calendar._test.getClosestNextHour(
           nextHour, workHourStartString, workHourEndString), '16:00'); 
     });
@@ -57,7 +57,7 @@ describe('#getClosestNextHour', function() {
     it('should return 17:00', function() {
       const workHourStartString = '09:00';
       const workHourEndString = '17:00';
-      const nextHour = '20';
+      const nextHour = 20;
       assert.equal(calendar._test.getClosestNextHour(
           nextHour, workHourStartString, workHourEndString), '17:00'); 
     });
@@ -67,7 +67,7 @@ describe('#getClosestNextHour', function() {
     it('should return 09:00', function() {
       const workHourStartString = '09:00';
       const workHourEndString = '17:00';
-      const nextHour = '5';
+      const nextHour = 5;
       assert.equal(calendar._test.getClosestNextHour(
           nextHour, workHourStartString, workHourEndString), '09:00'); 
     });
@@ -77,22 +77,32 @@ describe('#getClosestNextHour', function() {
     it('should return 08:00', function() {
       const workHourStartString = '06:00';
       const workHourEndString = '17:00';
-      const nextHour = '8';
+      const nextHour = 8;
       assert.equal(calendar._test.getClosestNextHour(
           nextHour, workHourStartString, workHourEndString), '08:00'); 
     });
   });
 
+  describe('end of day', function() {
+    it('should return 00:00', function() {
+      const workHourStartString = '00:00';
+      const workHourEndString = '17:00';
+      const nextHour = 24;
+      assert.equal(calendar._test.getClosestNextHour(
+          nextHour, workHourStartString, workHourEndString), '00:00'); 
+    });
+  });
+
 });
 
-describe('#isWorkHourValid', function () {
+describe('#isWorkingHourValid', function () {
   describe('valid working hour', function () {
     it('9:30 - 17:00 is a valid working hour', function () {
       const workHourStartHour = 9;
       const workHourStartMinute = 30;
       const workHourEndHour = 17;
       const workHourEndMinute = 0;
-      assert.equal(calendar._test.isWorkHourValid(
+      assert.equal(calendar._test.isWorkingHourValid(
           workHourStartHour,
           workHourEndHour,
           workHourStartMinute,
@@ -106,7 +116,7 @@ describe('#isWorkHourValid', function () {
       const workHourStartMinute = 30;
       const workHourEndHour = 9;
       const workHourEndMinute = 0;
-      assert.equal(calendar._test.isWorkHourValid(
+      assert.equal(calendar._test.isWorkingHourValid(
           workHourStartHour,
           workHourEndHour,
           workHourStartMinute,
@@ -120,7 +130,7 @@ describe('#isWorkHourValid', function () {
       const workHourStartMinute = 30;
       const workHourEndHour = 6;
       const workHourEndMinute = 0;
-      assert.equal(calendar._test.isWorkHourValid(
+      assert.equal(calendar._test.isWorkingHourValid(
           workHourStartHour,
           workHourEndHour,
           workHourStartMinute,
