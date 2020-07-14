@@ -212,7 +212,6 @@ function handleExportSchedule() {
             {spreadsheetId: response.result.spreadsheetId, resource: body})
         .then(
             function(response) {
-              console.log(response.result.responses[0].spreadsheetId);
               //  This displays the link back to the user.
               $('#sheets-url-container').removeClass('d-none');
               $('#sheets-url-container')
