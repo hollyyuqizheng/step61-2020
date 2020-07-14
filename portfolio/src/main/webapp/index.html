@@ -219,7 +219,12 @@
             Start scheduling!
           </button>
           <h2>Your tasks are scheduled here!</h2>
-          <div id="schedule-result-list"></div>
+          <div id="scheduled-task-list-wrapper">
+            <h2>Tasks Scheduled:</h2>
+            <div class="scrollable">
+              <div id="scheduled-task-list"></div>
+            </div>
+          </div>
           <div id="sheets-message"></div>
           <button id="sheets-export-button" class="btn btn-primary" class="d-none">Export to Google Sheets</button>
           <button id="sheets-sign-out-button" class="btn btn-primary" class="d-none">Sign out of Google Sheets</button>
