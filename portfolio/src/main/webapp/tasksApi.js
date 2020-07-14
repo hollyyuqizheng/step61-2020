@@ -33,10 +33,10 @@ function initClientTasks() {
   // 'scope' field specifies space-delimited list of access scopes.
   gapi.client
       .init({
-        'apiKey': TASKS_API_KEY,
-        'clientId': TASKS_CLIENT_ID,
-        'discoveryDocs': [TASKS_DISCOVERY_DOCS],
-        'scope': SCOPE_TASKS_READ
+        apiKey: TASKS_API_KEY,
+        clientId: TASKS_CLIENT_ID,
+        discoveryDocs: [TASKS_DISCOVERY_DOCS],
+        scope: SCOPE_TASKS_READ
       })
       .then(function() {
         GoogleAuth = gapi.auth2.getAuthInstance();
@@ -78,7 +78,7 @@ function updateSigninStatus(isSignedIn) {
  */
 function importAllTasks() {
   if (GoogleAuth.isSignedIn.get()) {
-    gapi.client.tasks.tasklists.list({'maxResults': 100})
+    gapi.client.tasks.tasklists.list({maxResults: 100})
         .then(function(response) {
           var taskLists = response.result.items;
 
@@ -95,7 +95,7 @@ function importAllTasks() {
 /** Import a single tasklist identified by its id. */
 function importTasklist(tasklistId) {
   gapi.client.tasks.tasks
-      .list({'tasklist': tasklistId, 'maxResults': 100, 'showCompleted': false})
+      .list({tasklist: tasklistId, maxResults: 100, showCompleted: false})
       .then(function(taskResponse) {
         var tasks = taskResponse.result.items;
         if (tasks) {
@@ -123,7 +123,7 @@ function drawImportMenu() {
   option.innerText = 'All Tasklists';
 
   // Add all Tasklists of user to the select.
-  gapi.client.tasks.tasklists.list({'maxResults': 30}).then(function(response) {
+  gapi.client.tasks.tasklists.list({maxResults: 30}).then(function(response) {
     var tasklists = response.result.items;
     if (tasklists) {
       tasklists.forEach(tasklist => {
