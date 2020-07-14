@@ -51,12 +51,15 @@ function initClientTasks() {
 }
 
 function handleAuthClick() {
+  clearAuthErrorPrompt();
   if (GoogleAuth.isSignedIn.get()) {
     // User is authorized and has clicked "Sign out" button.
     GoogleAuth.signOut();
   } else {
     // User is not signed in. Start Google auth flow.
-    GoogleAuth.signIn();
+    GoogleAuth.signIn().catch(error => {
+      handleTaskAuthError(error);
+    });
   }
 }
 
@@ -68,6 +71,7 @@ function updateSigninStatus(isSignedIn) {
   }
   updateButtonText(isSignedIn);
 }
+
 /**
  *Iterate through all the user's tasklists and pass
  *them to updateTaskList().
@@ -77,9 +81,14 @@ function importAllTasks() {
     gapi.client.tasks.tasklists.list({'maxResults': 100})
         .then(function(response) {
           var taskLists = response.result.items;
-          taskLists.forEach(tasklist => {
-            importTasklist(tasklist.id);
-          });
+
+          // Check that the response returns something that isn't undefined
+          // so that no error will be thrown.
+          if (typeof taskLists != 'undefined') {
+            taskLists.forEach(tasklist => {
+              importTasklist(tasklist.id);
+            });
+          }
         });
   }
 }
@@ -90,15 +99,17 @@ function importTasklist(tasklistId) {
       .list({'tasklist': tasklistId, 'maxResults': 100, 'showCompleted': false})
       .then(function(taskResponse) {
         var tasks = taskResponse.result.items;
-        tasks.forEach(task => {
-          const newTask = new Task(task.title, task.notes, '60', '3');
-          updateTaskList(newTask, TIME_UNIT.MINUTES);
-        });
+        if (typeof tasks != 'undefined') {
+          tasks.forEach(task => {
+            const newTask = new Task(task.title, task.notes, '60', '3');
+            updateTaskList(newTask, TIME_UNIT.MINUTES);
+          });
+        }
       });
 }
 
 /**
- *Populate the import-menu-wrapper div with an import menu when the user is 
+ *Populate the import-menu-wrapper div with an import menu when the user is
  *logged in.
  */
 function drawImportMenu() {
@@ -115,11 +126,13 @@ function drawImportMenu() {
   // Add all Tasklists of user to the select.
   gapi.client.tasks.tasklists.list({'maxResults': 30}).then(function(response) {
     var tasklists = response.result.items;
-    tasklists.forEach(tasklist => {
-      option = tasklistSelect.appendChild(document.createElement('option'));
-      option.setAttribute('value', tasklist.id);
-      option.innerText = tasklist.title;
-    });
+    if (typeof tasklists != 'undefined') {
+      tasklists.forEach(tasklist => {
+        option = tasklistSelect.appendChild(document.createElement('option'));
+        option.setAttribute('value', tasklist.id);
+        option.innerText = tasklist.title;
+      });
+    }
   });
 
   // Append the select to the div holding our input group.
@@ -166,4 +179,25 @@ function handleImportButtonPress() {
 function clearTasks() {
   const toClear = document.getElementById('new-task-list');
   toClear.innerHTML = '';
+}
+
+function handleTaskAuthError(e) {
+  if (e.error == 'popup_closed_by_user') {
+    $('#task-link-error')
+        .text(
+            'Please complete the entire sign in process if you wish to import Tasks.');
+  } else if (e.error == 'access-denied') {
+    $('#task-link-error').text('Access denied. Please try again later.');
+  } else {
+    $('#task-link-error')
+        .text(
+            'Unknown error encountered when granting permissions. Please try again.');
+  }
+
+  $('#task-link-error').addClass('d-block');
+}
+
+function clearAuthErrorPrompt() {
+  $('#task-link-error').text('');
+  $('#task-link-error').removeClass('d-block');
 }

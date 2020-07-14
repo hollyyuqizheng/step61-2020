@@ -91,18 +91,18 @@ function updateTaskList(newTask, lengthUnit) {
   // Create row for all modifiable content
   const inputRow = document.createElement('div');
   inputRow.classList.add('form-row');
-  
+
   // Create a column for duration
   const durationColumn = document.createElement('div');
   durationColumn.classList.add('col');
 
   const durationLabel = document.createElement('label');
-  durationLabel.setAttribute('for','duration-input-' + ID_COUNTER);
+  durationLabel.setAttribute('for', 'duration-input-' + ID_COUNTER);
   durationLabel.innerText = 'Duration:';
 
   const durationInput = document.createElement('input');
   durationInput.classList.add('form-control');
-  durationInput.setAttribute('id', 'duration-input-'+ ID_COUNTER);
+  durationInput.setAttribute('id', 'duration-input-' + ID_COUNTER);
   durationInput.setAttribute('value', newTask.duration);
 
   durationColumn.appendChild(durationLabel);
@@ -136,8 +136,6 @@ function updateTaskList(newTask, lengthUnit) {
     optionTwo.setAttribute('selected', '');
   }
 
-  
-
   unitColumn.appendChild(unitLabel);
   unitColumn.appendChild(unitSelect);
   inputRow.appendChild(unitColumn);
@@ -157,7 +155,9 @@ function updateTaskList(newTask, lengthUnit) {
   for (var i = 1; i <= 5; i++) {
     option = prioritySelect.appendChild(document.createElement('option'));
     option.innerText = i;
-    if (i == newTask.taskPriority) { option.setAttribute('selected', ''); }
+    if (i == newTask.taskPriority) {
+      option.setAttribute('selected', '');
+    }
   }
 
   priorityColumn.appendChild(priorityLabel);
@@ -210,10 +210,14 @@ function collectAllTasks() {
     const taskName = taskBody.childNodes[0].innerText;
     const taskDescription = taskBody.childNodes[1].innerText;
     const taskLength = taskBody.childNodes[2].childNodes[0].childNodes[1].value;
-    const taskLengthUnit = taskBody.childNodes[2].childNodes[1].childNodes[1].value;
-    const taskPriority = parseInt(taskBody.childNodes[2].childNodes[2].childNodes[1].value);
+    const taskLengthUnit =
+        taskBody.childNodes[2].childNodes[1].childNodes[1].value;
+    const taskPriority =
+        parseInt(taskBody.childNodes[2].childNodes[2].childNodes[1].value);
 
-    const task = new Task(taskName, taskDescription, getDurationMinutes(taskLength, taskLengthUnit), taskPriority);
+    const task = new Task(
+        taskName, taskDescription,
+        getDurationMinutes(taskLength, taskLengthUnit), taskPriority);
     const taskJson = JSON.stringify(task);
     allTaskJson.push(taskJson);
   });
@@ -233,7 +237,6 @@ function validateTaskName(name) {
     return {isValid: true, errorMessage: null};
   }
 }
-
 
 /**
  * This method checks that the duration input by the user is a positive integer.
