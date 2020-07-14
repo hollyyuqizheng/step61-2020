@@ -219,8 +219,10 @@ function collectAllTasks() {
         parseInt(taskBody.childNodes[2].childNodes[2].childNodes[1].value);
 
     const task = new Task(
-        taskName, taskDescription,
-        getDurationMinutes(taskLength, taskLengthUnit), taskPriority);
+        taskName,
+        taskDescription,
+        getDurationMinutes(taskLength, taskLengthUnit),
+        taskPriority);
     const taskJson = JSON.stringify(task);
     allTaskJson.push(taskJson);
   });
