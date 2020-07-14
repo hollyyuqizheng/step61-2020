@@ -1,21 +1,21 @@
 var GoogleAuth;
 
 // Scope for read access to Tasks API
-const SCOPE_READ_TASKS = 'https://www.googleapis.com/auth/tasks.readonly';
+const SCOPE_TASKS_READ = 'https://www.googleapis.com/auth/tasks.readonly';
 
-const CLIENT_ID_TASKS =
+const TASKS_CLIENT_ID =
     '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
 
-const DISCOVERY_DOCS_TASKS =
+const TASKS_DISCOVERY_DOCS =
     'https://www.googleapis.com/discovery/v1/apis/tasks/v1/rest';
 
-var API_KEY_TASKS = '';
+var TASKS_API_KEY = '';
 
 function fetchApiKey() {
   fetch('./appConfigServlet')
       .then(response => response.json())
       .then((responseJson) => {
-        API_KEY_TASKS = responseJson['API_KEY'];
+        TASKS_API_KEY = responseJson['API_KEY'];
       });
 }
 
@@ -33,10 +33,10 @@ function initClientTasks() {
   // 'scope' field specifies space-delimited list of access scopes.
   gapi.client
       .init({
-        'apiKey': API_KEY_TASKS,
-        'clientId': CLIENT_ID_TASKS,
-        'discoveryDocs': [DISCOVERY_DOCS_TASKS],
-        'scope': SCOPE_READ_TASKS
+        'apiKey': TASKS_API_KEY,
+        'clientId': TASKS_CLIENT_ID,
+        'discoveryDocs': [TASKS_DISCOVERY_DOCS],
+        'scope': SCOPE_TASKS_READ
       })
       .then(function() {
         GoogleAuth = gapi.auth2.getAuthInstance();
