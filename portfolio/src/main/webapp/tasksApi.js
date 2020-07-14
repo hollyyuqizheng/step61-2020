@@ -186,7 +186,7 @@ function handleTaskAuthError(e) {
     $('#task-link-error')
         .text(
             'Please complete the entire sign in process if you wish to import Tasks.');
-  } else if (e.error == 'access-denied') {
+  } else if (e.error == 'access_denied') {
     $('#task-link-error').text('Access denied. Please try again later.');
   } else {
     $('#task-link-error')
