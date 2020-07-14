@@ -179,7 +179,7 @@ function updateTaskList(newTask, lengthUnit) {
   taskList.innterHTML = '';
   taskList.appendChild(newTaskCard);
 
-  ID_COUNTER++;
+  TASK_ID_COUNTER++;
 
   // The delete button removes the task's card from the UI.
   deleteButton.onclick = function(newTaskCard) {
