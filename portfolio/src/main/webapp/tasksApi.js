@@ -9,12 +9,8 @@ const TASKS_CLIENT_ID =
 const TASKS_DISCOVERY_DOCS =
     'https://www.googleapis.com/discovery/v1/apis/tasks/v1/rest';
 
-var TASKS_API_KEY = null;
-
 function fetchApiKey() {
-  fetch('./appConfigServlet').then(response => {
-    TASKS_API_KEY = response.json()['API_KEY'];
-  });
+  return fetch('./appConfigServlet').then(response => response.json());
 }
 
 function handleClientLoadTasks() {
@@ -24,14 +20,9 @@ function handleClientLoadTasks() {
 }
 
 function initClientTasks() {
-  fetchApiKey();
-
-  // Initialize the gapi.client object, which app uses to make API requests.
-  // Get API key and client ID from API Console.
-  // 'scope' field specifies space-delimited list of access scopes.
-  gapi.client
-      .init({
-        apiKey: TASKS_API_KEY,
+  fetchApiKey().then(responseJson =>
+      gapi.client.init({
+        apiKey: responseJson['API_KEY'],
         clientId: TASKS_CLIENT_ID,
         discoveryDocs: [TASKS_DISCOVERY_DOCS],
         scope: SCOPE_TASKS_READ
@@ -42,10 +33,10 @@ function initClientTasks() {
         // Listen for sign-in state changes.
         GoogleAuth.isSignedIn.listen(updateSigninStatus);
 
-        // Handle initial sign-in state. (Determine if user is already signed
-        // in.)
+        // Handle initial sign-in state. (Determine if user
+        // is already signed in.)
         updateSigninStatus(GoogleAuth.isSignedIn.get());
-      });
+      }));
 }
 
 function handleAuthClick() {
@@ -78,7 +69,7 @@ function importAllTasks() {
   if (!GoogleAuth.isSignedIn.get()) {
     return;
   }
-  
+
   gapi.client.tasks.tasklists.list({maxResults: 100}).then(function(response) {
     var taskLists = response.result.items;
 
@@ -182,12 +173,14 @@ function clearTasks() {
 function handleTaskAuthError(e) {
   var text;
   if (e.error == 'popup_closed_by_user') {
-    text = 'Please complete the entire sign in process if you wish to import Tasks.';
+    text =
+        'Please complete the entire sign in process if you wish to import Tasks.';
   } else if (e.error == 'access_denied') {
     text = 'You have denied this app from accessing your tasks,' +
-           'please allow access if you wish to import tasks.';
+        'please allow access if you wish to import tasks.';
   } else {
-    text = 'Unknown error encountered when granting permissions. Please try again.';
+    text =
+        'Unknown error encountered when granting permissions. Please try again.';
   }
   $('#task-link-error').text(text);
   $('#task-link-error').addClass('d-block');
