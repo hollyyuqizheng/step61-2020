@@ -37,8 +37,7 @@
       async
       defer
       src="https://apis.google.com/js/api.js"
-      onload="this.onload=function(){};handleClientLoadTasks()"
-      onreadystatechange="if (this.readyState === 'complete') this.onload()"
+      onload="handleClientLoadTasks()"
     ></script>
   </head>
   <body>
@@ -114,6 +113,9 @@
                   <option value="minutes">minute(s)</option>
                   <option value="hours">hour(s)</option>
                 </select>
+                <div class="invalid-feedback" id="task-length-unit-message">
+                  Unknown time unit! Please try again or refresh the page.
+                </div>
               </div>
 
               <div class="col">
