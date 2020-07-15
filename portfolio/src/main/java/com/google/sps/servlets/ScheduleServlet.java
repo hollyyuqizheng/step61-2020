@@ -16,13 +16,10 @@ package com.google.sps.servlets;
 
 import com.google.gson.Gson;
 import com.google.sps.data.*;
-import com.google.sps.data.CalendarEvent;
-import com.google.sps.data.ScheduleRequest;
-import com.google.sps.data.Task;
 import java.io.IOException;
-import java.time.Duration;
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -40,55 +37,43 @@ public class ScheduleServlet extends HttpServlet {
 
     JSONArray eventsArray = jsonFromRequest.getJSONArray("events");
     JSONArray tasksArray = jsonFromRequest.getJSONArray("tasks");
-    String workHoursStartTimeString = (String) jsonFromRequest.get("startTime");
-    String workHoursEndTimeString = (String) jsonFromRequest.get("endTime");
+    String workHoursStartTimeString = jsonFromRequest.getString("startTime");
+    String workHoursEndTimeString = jsonFromRequest.getString("endTime");
     Instant workHoursStartTime = Instant.parse(workHoursStartTimeString);
     Instant workHoursEndTime = Instant.parse(workHoursEndTimeString);
+    String algorithmTypeString = jsonFromRequest.getString("algorithmType");
+    Collection<CalendarEvent> events = ServletHelper.collectEventsFromJsonArray(eventsArray);
+    Collection<Task> tasks = ServletHelper.collectTasksFromJsonArray(tasksArray);
 
-    Collection<CalendarEvent> events = collectEventsFromJsonArray(eventsArray);
-    Collection<Task> tasks = collectTasksFromJsonArray(tasksArray);
+    Optional<SchedulingAlgorithmType> schedulingAlgorithmTypeOptional =
+        SchedulingAlgorithmReference.getSchedulingAlgorithmTypeOptional(algorithmTypeString);
+    if (!schedulingAlgorithmTypeOptional.isPresent()) {
+      response.sendError(
+          HttpServletResponse.SC_BAD_REQUEST,
+          "The request by the client was syntactically incorrect. The algorithm could not be determined.");
+      // Here I am returning the empty schedule instead of null to not mess up
+      // any front end code expecting some array.
+      ServletHelper.returnEmptyArrayResponse(response);
+      return;
+    }
+
+    Optional<TaskScheduler> taskSchedulerOptional =
+        SchedulingAlgorithmReference.getTaskSchedulerOptional(schedulingAlgorithmTypeOptional);
+    if (!taskSchedulerOptional.isPresent()) {
+      response.sendError(
+          HttpServletResponse.SC_BAD_REQUEST,
+          "The request by the client was syntactically incorrect. The algorithm could not be determined.");
+      ServletHelper.returnEmptyArrayResponse(response);
+      return;
+    }
+
     Collection<ScheduledTask> scheduledTasks =
-        algorithm.schedule(events, tasks, workHoursStartTime, workHoursEndTime);
+        taskSchedulerOptional.get().schedule(events, tasks, workHoursStartTime, workHoursEndTime);
 
     Gson gson = new Gson();
     String resultJson = gson.toJson(scheduledTasks);
 
     response.setContentType("application/json");
     response.getWriter().println(resultJson);
-  }
-  
-  // TODO(tomasalvarez): Add tests for this method.
-  private static Collection<CalendarEvent> collectEventsFromJsonArray(JSONArray eventsArray) {
-    Collection<CalendarEvent> events = new ArrayList<CalendarEvent>();
-    for (Object object: eventsArray) {
-      if (object instanceof JSONObject) {
-        JSONObject eventJsonObject = (JSONObject) object;
-        String name = eventJsonObject.getString("name");
-        Instant startTime = Instant.parse(eventJsonObject.getString("startTime"));
-        Instant endTime = Instant.parse(eventJsonObject.getString("endTime"));
-        CalendarEvent newEvent = new CalendarEvent(name, startTime, endTime);
-        events.add(newEvent);
-      }
-    }
-    return events;
-  }
-  
-  // TODO(tomasalvarez): Add tests for this method.
-  private static Collection<Task> collectTasksFromJsonArray(JSONArray tasksArray) {
-    Collection<Task> tasks = new ArrayList<Task>();
-    for (Object object: tasksArray) {
-      if (object instanceof JSONObject) {
-        JSONObject taskJsonObject = (JSONObject) object;
-        String name = taskJsonObject.getString("name");
-        String description = taskJsonObject.getString("description");
-        long durationMinutes = taskJsonObject.getLong("duration");
-        Duration duration = Duration.ofMinutes(durationMinutes);
-        int priorityInt = taskJsonObject.getInt("taskPriority");
-        TaskPriority priority = new TaskPriority(priorityInt);
-        Task newTask = new Task(name, description, duration, priority);
-        tasks.add(newTask);
-      }
-    }
-    return tasks;
   }
 }

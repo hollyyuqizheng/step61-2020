@@ -21,13 +21,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-// TODO(tomasalvarez): Refactor this class into an abstract class where each of
-// the scheduling algorithms can be their own class that extends this one.
-// TODO: Add test coverage for scheduling algorithms
-
-public class FindSchedule {
+class ShortestTaskFirstScheduler implements TaskScheduler {
   private static final Comparator<CalendarEvent> sortByEventStartTimeAscending =
-      Comparator.comparing(CalendarEvent::getStartTimeInstant);
+      Comparator.comparing(CalendarEvent::getStartTime);
 
   private static final Comparator<Task> sortByTaskDurationThenName =
       Comparator.comparing(Task::getDuration).thenComparing(Task::getName);
@@ -36,17 +32,17 @@ public class FindSchedule {
    * This method schedules tasks from shortest to longest and returns a ScheduledTask Collection
    * based on the tasks that were able to be scheduled.
    */
-  public static Collection<ScheduledTask> shortestTaskFirst(
+  public Collection<ScheduledTask> schedule(
       Collection<CalendarEvent> events,
       Collection<Task> tasks,
       Instant workHoursStartTime,
       Instant workHoursEndTime) {
     List<CalendarEvent> eventsList = new ArrayList<CalendarEvent>(events);
     List<Task> tasksList = new ArrayList<Task>(tasks);
-    Collections.sort(eventsList, sortByEventStartTimeAscending);
     Collections.sort(tasksList, sortByTaskDurationThenName);
-    List<TimeRange> availableTimes =
-        getEmptyTimeRanges(eventsList, workHoursStartTime, workHoursEndTime);
+    CalendarGroup calendarGroup =
+        new CalendarGroup(eventsList, workHoursStartTime, workHoursEndTime);
+    List<TimeRange> availableTimes = calendarGroup.calculateFreeTimeRanges();
     List<ScheduledTask> scheduledTasks = new ArrayList<ScheduledTask>();
     int rangeIndex = 0;
     int taskIndex = 0;
@@ -79,40 +75,10 @@ public class FindSchedule {
         rangeIndex++;
       }
     }
+    return scheduledTasks;
+  }
 
-  /**
-   * This method returns a List of TimeRange's, in chronological order, that are empty of events and
-   * lie completely inside the period in between startTime and endTime. All fields are required for
-   * this method and object construction in the servlet enforces that none are null.
-   *
-   * @param events: A Collection of CalendarEvent objects,
-   * @param startTime: An Instant representing the start of the time period,
-   * @param endTime: An Instant representing the end of the time period.
-   */
-    public static List<TimeRange> getEmptyTimeRanges(
-      List<CalendarEvent> events, Instant startTime, Instant endTime) {
-    List<TimeRange> possibleTimes = new ArrayList<TimeRange>();
-    // This represents the earliest time that we can schedule a window for the
-    // meeting. As events are processed, this changes to their end times.
-    Instant earliestNonScheduledInstant = startTime;
-    for (CalendarEvent event : events) {
-      // Make sure that there is some time between the events and it is not
-      // later than the person's working hours ending time.
-      if (event.getStartTime().isAfter(earliestNonScheduledInstant)
-          && !event.getStartTime().isAfter(endTime)) {
-        possibleTimes.add(
-            TimeRange.fromStartEnd(
-                earliestNonScheduledInstant, event.getStartTime(), /* inclusive= */ true));
-      }
-      if (earliestNonScheduledInstant.isBefore(event.getEndTime())) {
-        earliestNonScheduledInstant = event.getEndTime();
-      }
-    }
-    // The end of the work hours is potentially never included so we check.
-    if (endTime.isAfter(earliestNonScheduledInstant)) {
-      possibleTimes.add(
-          TimeRange.fromStartEnd(earliestNonScheduledInstant, endTime, /* inclusive= */ true));
-    }
-    return possibleTimes;
+  public SchedulingAlgorithmType getSchedulingAlgorithmType() {
+    return SchedulingAlgorithmType.SHORTEST_TASK_FIRST;
   }
 }
