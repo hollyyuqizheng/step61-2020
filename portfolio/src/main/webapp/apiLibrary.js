@@ -45,6 +45,8 @@ function handleApiButtons() {
   const $logOutCalendarButton = $('#calendar-logout-button');
   const $exportSheetsButton = $('#sheets-export-button'); 
   const $connectTasksButton = $('#connect-tasks-btn'); 
+  const $importCalendarButton = $('#import-calendar-button'); 
+  const $exportCalendarButton = $('#export-calendar-button'); 
 
   var currentAuth = gapi.auth2.getAuthInstance(); 
 
@@ -54,13 +56,13 @@ function handleApiButtons() {
         currentUser.hasGrantedScopes(SCOPE_CALENDAR_READ_WRITE)){
       $logInCalendarButton.addClass('d-none');
       $logOutCalendarButton.removeClass('d-none');
-      $('#import-calendar-button').removeClass('d-none');
-      $('#export-calendar-button').removeClass('d-none');
+      $importCalendarButton .removeClass('d-none');
+      $exportCalendarButton.removeClass('d-none');
     } else {
       $logInCalendarButton.removeClass('d-none');
       $logOutCalendarButton.addClass('d-none'); 
-      $('#import-calendar-button').addClass('d-none');
-      $('#export-calendar-button').addClass('d-none');
+      $importCalendarButton .addClass('d-none');
+      $exportCalendarButton.addClass('d-none');
     }
       
     if (currentUser.hasGrantedScopes(SCOPE_SHEETS_READ_WRITE)) {
@@ -78,6 +80,10 @@ function handleApiButtons() {
   } 
 }
 
+/**
+ * Handles signing out of the user's Google account.
+ * Hides all API buttons accordinly, except the main "Log into your Google account" button.
+ */
 function logOutAllApis() {
   const $calendarView = $('#calendar-view');
   const $logInCalendarButton = $('#calendar-auth-button');
@@ -85,15 +91,17 @@ function logOutAllApis() {
   const $exportSheetsButton = $('#sheets-export-button'); 
   const $connectTasksButton = $('#connect-tasks-btn'); 
   const $importCalendarButton = $('#import-calendar-button');
+  const $exportCalendarButton = $('#export-calendar-button'); 
+  const $importTaskMenuWrapper = $('#import-menu-wrapper'); 
 
   $calendarView.addClass('d-none');
   $logInCalendarButton.removeClass('d-none');
   $logOutCalendarButton.addClass('d-none');
-  $('#export-calendar-button').addClass('d-none'); 
+  $exportCalendarButton.addClass('d-none'); 
   $exportSheetsButton.addClass('d-none');
   $connectTasksButton.addClass('d-none'); 
   $importCalendarButton.addClass('d-none'); 
-  $('#import-menu-wrapper').addClass('d-none');
+  $importTaskMenuWrapper.addClass('d-none');
 
   gapi.auth2.getAuthInstance().signOut();
 }

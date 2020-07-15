@@ -33,6 +33,7 @@ function initCalendarClient() {
   //         updateCalendarView(); 
   //       } );
   // }
+  fetchApiKey(); 
 
   gapi.client
       .init({
