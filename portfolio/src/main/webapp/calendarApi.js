@@ -136,7 +136,7 @@ function listUpcomingEvents() {
   const timeRangeStart = getUserPickedDate();
   timeRangeStart.setHours(0,0,0);   
   const timeRangeEnd = getUserPickedDate();
-  timeRangeEnd.setHours(23, 59, 59); 
+  timeRangeEnd.setHours(24, 0, 0); 
 
   // Retrieves events on the user's calendar for the day
   // that the user has picked in the nav bar.
