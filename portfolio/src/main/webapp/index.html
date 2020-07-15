@@ -30,9 +30,15 @@
     <script src="task.js"></script>
     <script src="calendar.js"></script>
     <script src="request.js"></script>
-    <script src="https://apis.google.com/js/api.js"></script>
     <script src="calendarApi.js"></script>
     <script src="sheetsApi.js"></script>
+    <script src="tasksApi.js"></script>
+    <script
+      async
+      defer
+      src="https://apis.google.com/js/api.js"
+      onload="handleClientLoadTasks()"
+    ></script>
   </head>
  
   <body onload="setDatePickerToToday(); setNewEventStartAndEndTimes()">
@@ -121,6 +127,9 @@
                   <option value="minutes">minute(s)</option>
                   <option value="hours">hour(s)</option>
                 </select>
+                <div class="invalid-feedback" id="task-length-unit-message">
+                  Unknown time unit! Please try again or refresh the page.
+                </div>
               </div>
 
               <div class="col">
@@ -136,6 +145,9 @@
             </div>
             <br />
             <button type="button" class="btn btn-primary" onclick="createNewTask()">Add this task</button>
+            <button type="button" class="btn btn-primary" id="connect-tasks-btn" onclick="handleAuthClick()"></button>
+            <div class="invalid-feedback" id="task-link-error"></div>
+            <div class="input-group" id="import-menu-wrapper"></div>
           </form>
           <br />
           <h2>Tasks added:</h2>
