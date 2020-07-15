@@ -78,7 +78,7 @@ function importAllTasks() {
   if (!GoogleAuth.isSignedIn.get()) {
     return;
   }
-
+  
   gapi.client.tasks.tasklists.list({maxResults: 100}).then(function(response) {
     var taskLists = response.result.items;
 
@@ -199,5 +199,5 @@ function handleTaskAuthError(e) {
 }
 
 function clearAuthErrorPrompt() {
-  $('#task-link-error').text('').removeClass('d-block');
+  $('#task-link-error').empty().removeClass('d-block');
 }
