@@ -269,10 +269,7 @@
           </button>
           <h2>3. Your tasks are scheduled here!</h2>
           <div id="scheduled-task-list"></div>
-          <h4 id="empty-scheduled-task-message" class="d-none">
-            Sorry, but it looks like none of your tasks can be scheduled for the date
-            you have picked. You have such a busy schedule! 
-          </h4>
+          <div class="alert alert-secondary d-none" role="alert" id="empty-scheduled-task-message"></div>
           <button type="button" class="btn btn-primary d-none" id="export-calendar-button" onclick="addCalendarWriteScope()">
             Looks good to me! Add them to my Google Calendar
           </button>

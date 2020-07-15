@@ -57,11 +57,20 @@ function createRequestFromUiInformation() {
  */
 function startScheduling() {
   const scheduleRequest = createRequestFromUiInformation();
-  // Create the request to send to the server using the data we collected from
-  // the web form.
-  fetchScheduledTasksFromServlet(scheduleRequest).then((scheduledTaskArray) => {
-    updateResultsOnPage(scheduledTaskArray);
-  });
+
+  // If the user hasn't added any tasks, display a message accordingly. 
+  if (!scheduleRequest.tasks.length) {
+    $emptyScheduledTaskMessage = $('#empty-scheduled-task-message');
+    $emptyScheduledTaskMessage.removeClass('d-none'); 
+    $emptyScheduledTaskMessage.text('It seems like you haven\'t added any tasks to schedule.'); 
+  } else {
+    $emptyScheduledTaskMessage.empty().addClass('d-none');
+    // Create the request to send to the server using the data we collected from
+    // the web form.
+    fetchScheduledTasksFromServlet(scheduleRequest).then((scheduledTaskArray) => {
+      updateResultsOnPage(scheduledTaskArray);
+    });
+  }
 }
 
 /**
@@ -74,8 +83,9 @@ function updateResultsOnPage(scheduledTaskArray) {
 
   if (!scheduledTaskArray.length) {
     $emptyScheduledTaskMessage.removeClass('d-none'); 
+    $emptyScheduledTaskMessage.text('Sorry, but it looks like none of your tasks can be scheduled for the date you have picked. You have such a busy schedule!'); 
   } else {
-    $emptyScheduledTaskMessage.addClass('d-none');
+    $emptyScheduledTaskMessage.empty().addClass('d-none');
     scheduledTaskArray.forEach(addScheduledTaskToPage, resultElement);
   }
   
