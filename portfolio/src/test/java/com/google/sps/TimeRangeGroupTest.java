@@ -13,11 +13,12 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public final class TimeRangeGroupTest {
 
-  /** Tests deleting and modifying a free time range. */
+  /** Tests for deleting an entire time range. */
   @Test
-  public void deleteAndModifyTimeRange() {
-    // Possible: |---------------------------|
-    // Free:     |---|       |---|       |---|
+  public void deleteEntireTimeRange() {
+    // Time Ranges:     |---|       |---|       |---|
+    // To delete:       |---|
+    // Result:                      |---|       |---|
     Instant timeRangeOneStart = Instant.now();
     Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(100);
     Instant timeRangeTwoStart = timeRangeOneEnd.plusSeconds(200);
@@ -35,27 +36,16 @@ public final class TimeRangeGroupTest {
     timeRangeGroup.addTimeRange(timeRangeThree);
 
     List<TimeRange> expectedTimeRangesAfterDelete = Arrays.asList(timeRangeOne, timeRangeThree);
-    List<TimeRange> actualTimeRangesAfterDelete = timeRangeGroup.deleteTimeRange(timeRangeTwo);
-    Assert.assertEquals(expectedTimeRangesAfterDelete, actualTimeRangesAfterDelete);
 
-    // Creates a new time range that is 10 seconds shorter than the original time range.
-    Instant timeRangeOneEndNew = timeRangeOneEnd.minusSeconds(10);
-    TimeRange timeRangeOneNew = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEndNew);
-
-    List<TimeRange> timeRangesAfterModify =
-        timeRangeGroup.modifyTimeRange(
-            /* originalFreeTimeRange= */ timeRangeOne, /* newFreeTimeRange= */ timeRangeOneNew);
-    Assert.assertEquals(timeRangesAfterModify.get(0).end(), timeRangeOneNew.end());
+    List<TimeRange> actualTimeRangesAfterDelete =
+        timeRangeGroup.deleteEntireTimeRange(timeRangeTwo);
+    Assert.assertTrue(expectedTimeRangesAfterDelete.equals(actualTimeRangesAfterDelete));
   }
 
-  /**
-   * Tests updating an existing free time into a time range that is not part of the original time
-   * range.
-   */
   @Test(expected = IllegalArgumentException.class)
-  public void modifyTimeRangeWrongBoundary() {
-    // Possible: |---------------------------|
-    // Free:     |---|       |---|       |---|
+  public void deleteEntireTimeRangeDoesNotExist() {
+    // Time Ranges:  |--------|       |------|       |------|
+    // To Delete:               |----|
     Instant timeRangeOneStart = Instant.now();
     Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(100);
     Instant timeRangeTwoStart = timeRangeOneEnd.plusSeconds(200);
@@ -67,18 +57,168 @@ public final class TimeRangeGroupTest {
     TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
     TimeRange timeRangeThree = TimeRange.fromStartEnd(timeRangeThreeStart, timeRangeThreeEnd);
 
-    TimeRangeGroup timeRangeGroup = new TimeRangeGroup();
-    timeRangeGroup.addTimeRange(timeRangeOne);
-    timeRangeGroup.addTimeRange(timeRangeTwo);
-    timeRangeGroup.addTimeRange(timeRangeThree);
+    TimeRangeGroup timeRangeGroupOriginal = new TimeRangeGroup();
+    timeRangeGroupOriginal.addTimeRange(timeRangeOne);
+    timeRangeGroupOriginal.addTimeRange(timeRangeTwo);
+    timeRangeGroupOriginal.addTimeRange(timeRangeThree);
 
-    // Creates a new time range that is 10 seconds longer than the original time range,
-    // which makes this modification not valid.
-    Instant timeRangeOneEndNew = timeRangeOneEnd.plusSeconds(10);
-    TimeRange timeRangeOneNew = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEndNew);
+    // This time range does not exist in the original time range group.
+    Instant toDeleteStart = timeRangeOneEnd;
+    Instant toDeleteEnd = timeRangeTwoStart.minusSeconds(20);
+    TimeRange timeRangeToDelete = TimeRange.fromStartEnd(toDeleteStart, toDeleteEnd);
+    timeRangeGroupOriginal.deleteEntireTimeRange(timeRangeToDelete);
+  }
 
-    List<TimeRange> timeRangesAfterModify =
-        timeRangeGroup.modifyTimeRange(
-            /* originalFreeTimeRange= */ timeRangeOne, /* newFreeTimeRange= */ timeRangeOneNew);
+  /** Tests for deleting the middle part of a time range. */
+  @Test
+  public void deletePartofTimeRange() {
+    // Time Ranges:  |--------|       |------|       |------|
+    // To Delete:      |---|
+    // Result:       |-|   |--|       |------|       |------|
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(100);
+    Instant timeRangeTwoStart = timeRangeOneEnd.plusSeconds(200);
+    Instant timeRangeTwoEnd = timeRangeTwoStart.plusSeconds(100);
+    Instant timeRangeThreeStart = timeRangeTwoEnd.plusSeconds(200);
+    Instant timeRangeThreeEnd = timeRangeThreeStart.plusSeconds(100);
+
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+    TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
+    TimeRange timeRangeThree = TimeRange.fromStartEnd(timeRangeThreeStart, timeRangeThreeEnd);
+
+    TimeRangeGroup timeRangeGroupOriginal = new TimeRangeGroup();
+    timeRangeGroupOriginal.addTimeRange(timeRangeOne);
+    timeRangeGroupOriginal.addTimeRange(timeRangeTwo);
+    timeRangeGroupOriginal.addTimeRange(timeRangeThree);
+
+    // Deletes part of the time range one.
+    Instant toDeleteStart = timeRangeOneStart.plusSeconds(20);
+    Instant toDeleteEnd = timeRangeOneStart.plusSeconds(60);
+    TimeRange timeRangeToDelete = TimeRange.fromStartEnd(toDeleteStart, toDeleteEnd);
+
+    // These are the expected newly created time ranges after the deletion.
+    TimeRange timeRangeNewOne =
+        TimeRange.fromStartEnd(timeRangeOneStart, timeRangeToDelete.start());
+    TimeRange timeRangeNewTwo = TimeRange.fromStartEnd(timeRangeToDelete.end(), timeRangeOne.end());
+
+    List<TimeRange> expectedTimeRangesAfterDelete =
+        Arrays.asList(timeRangeNewOne, timeRangeNewTwo, timeRangeTwo, timeRangeThree);
+
+    List<TimeRange> actualTimeRangesAfterDelete =
+        timeRangeGroupOriginal.deletePartOfTimeRange(timeRangeOne, timeRangeToDelete);
+
+    Assert.assertEquals(expectedTimeRangesAfterDelete, actualTimeRangesAfterDelete);
+  }
+
+  /**
+   * Tests for deleting the second half of a time range. This should not throw the invalid input
+   * exception.
+   */
+  @Test
+  public void deletePartOfTimeRangeOverlappingBoundary() {
+    // Time Ranges:  |--------|       |------|       |------|
+    // To Delete:      |------|
+    // Result:       |-|              |------|       |------|
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(100);
+    Instant timeRangeTwoStart = timeRangeOneEnd.plusSeconds(200);
+    Instant timeRangeTwoEnd = timeRangeTwoStart.plusSeconds(100);
+    Instant timeRangeThreeStart = timeRangeTwoEnd.plusSeconds(200);
+    Instant timeRangeThreeEnd = timeRangeThreeStart.plusSeconds(100);
+
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+    TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
+    TimeRange timeRangeThree = TimeRange.fromStartEnd(timeRangeThreeStart, timeRangeThreeEnd);
+
+    TimeRangeGroup timeRangeGroupOriginal = new TimeRangeGroup();
+    timeRangeGroupOriginal.addTimeRange(timeRangeOne);
+    timeRangeGroupOriginal.addTimeRange(timeRangeTwo);
+    timeRangeGroupOriginal.addTimeRange(timeRangeThree);
+
+    // Deletes part of the time range one.
+    Instant toDeleteStart = timeRangeOneStart.plusSeconds(20);
+    Instant toDeleteEnd = timeRangeOneEnd;
+    TimeRange timeRangeToDelete = TimeRange.fromStartEnd(toDeleteStart, toDeleteEnd);
+
+    // This the expected newly created time range after the deletion.
+    TimeRange timeRangeNewOne =
+        TimeRange.fromStartEnd(timeRangeOneStart, timeRangeToDelete.start());
+
+    List<TimeRange> expectedTimeRangesAfterDelete =
+        Arrays.asList(timeRangeNewOne, timeRangeTwo, timeRangeThree);
+
+    List<TimeRange> actualTimeRangesAfterDelete =
+        timeRangeGroupOriginal.deletePartOfTimeRange(timeRangeOne, timeRangeToDelete);
+
+    Assert.assertEquals(expectedTimeRangesAfterDelete, actualTimeRangesAfterDelete);
+  }
+
+  /**
+   * This scenario calls the method to delete only part of a time range, but the range to delete is
+   * actually the entire original time range. This should not throw exceptions, and the result
+   * should be same if deleteEntireTimeRange was called.
+   */
+  @Test
+  public void deletePartOfTimeRangeButIsEntireRange() {
+    // Time Ranges:  |--------|       |------|       |------|
+    // To Delete:    |--------|
+    // Result:                        |------|       |------|
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(100);
+    Instant timeRangeTwoStart = timeRangeOneEnd.plusSeconds(200);
+    Instant timeRangeTwoEnd = timeRangeTwoStart.plusSeconds(100);
+    Instant timeRangeThreeStart = timeRangeTwoEnd.plusSeconds(200);
+    Instant timeRangeThreeEnd = timeRangeThreeStart.plusSeconds(100);
+
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+    TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
+    TimeRange timeRangeThree = TimeRange.fromStartEnd(timeRangeThreeStart, timeRangeThreeEnd);
+
+    TimeRangeGroup timeRangeGroupOriginal = new TimeRangeGroup();
+    timeRangeGroupOriginal.addTimeRange(timeRangeOne);
+    timeRangeGroupOriginal.addTimeRange(timeRangeTwo);
+    timeRangeGroupOriginal.addTimeRange(timeRangeThree);
+
+    // Deletes the entire time range one, but using deletePartOfTimeRange method.
+    Instant toDeleteStart = timeRangeOneStart;
+    Instant toDeleteEnd = timeRangeOneEnd;
+    TimeRange timeRangeToDelete = TimeRange.fromStartEnd(toDeleteStart, toDeleteEnd);
+
+    List<TimeRange> expectedTimeRangesAfterDelete = Arrays.asList(timeRangeTwo, timeRangeThree);
+    List<TimeRange> actualTimeRangesAfterDelete =
+        timeRangeGroupOriginal.deletePartOfTimeRange(timeRangeOne, timeRangeToDelete);
+
+    Assert.assertEquals(expectedTimeRangesAfterDelete, actualTimeRangesAfterDelete);
+  }
+
+  /**
+   * Tests deleting from a time range but withou the wrong boundary. The target time range to delete
+   * does not lie completely within the original range.
+   */
+  @Test(expected = IllegalArgumentException.class)
+  public void deletePartOfTimeRangeWrongBoundary() {
+    // Time Ranges:  |--------|       |------|       |------|
+    // To Delete:       |-------|
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(100);
+    Instant timeRangeTwoStart = timeRangeOneEnd.plusSeconds(200);
+    Instant timeRangeTwoEnd = timeRangeTwoStart.plusSeconds(100);
+    Instant timeRangeThreeStart = timeRangeTwoEnd.plusSeconds(200);
+    Instant timeRangeThreeEnd = timeRangeThreeStart.plusSeconds(100);
+
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+    TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
+    TimeRange timeRangeThree = TimeRange.fromStartEnd(timeRangeThreeStart, timeRangeThreeEnd);
+
+    TimeRangeGroup timeRangeGroupOriginal = new TimeRangeGroup();
+    timeRangeGroupOriginal.addTimeRange(timeRangeOne);
+    timeRangeGroupOriginal.addTimeRange(timeRangeTwo);
+    timeRangeGroupOriginal.addTimeRange(timeRangeThree);
+
+    // Deletes part of the time range one but with wrong boundary.
+    Instant toDeleteStart = timeRangeOneStart.plusSeconds(20);
+    Instant toDeleteEnd = timeRangeOneStart.plusSeconds(120);
+    TimeRange timeRangeToDelete = TimeRange.fromStartEnd(toDeleteStart, toDeleteEnd);
+    timeRangeGroupOriginal.deletePartOfTimeRange(timeRangeOne, timeRangeToDelete);
   }
 }
