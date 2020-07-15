@@ -180,21 +180,16 @@ function clearTasks() {
 }
 
 function handleTaskAuthError(e) {
+  var text;
   if (e.error == 'popup_closed_by_user') {
-    $('#task-link-error')
-        .text(
-            'Please complete the entire sign in process if you wish to import Tasks.');
+    text = 'Please complete the entire sign in process if you wish to import Tasks.';
   } else if (e.error == 'access_denied') {
-    $('#task-link-error')
-        .text(
-            'You have denied this app from accessing your tasks,' +
-            'please allow access if you wish to import tasks.');
+    text = 'You have denied this app from accessing your tasks,' +
+           'please allow access if you wish to import tasks.';
   } else {
-    $('#task-link-error')
-        .text(
-            'Unknown error encountered when granting permissions. Please try again.');
+    text = 'Unknown error encountered when granting permissions. Please try again.';
   }
-
+  $('#task-link-error').text(text);
   $('#task-link-error').addClass('d-block');
 }
 
