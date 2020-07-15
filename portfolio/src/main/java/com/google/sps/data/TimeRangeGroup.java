@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/** Models a collection of Time Ranges, with methods for add and delete. */
+/** Models a collection of Time Ranges with methods for add and delete. */
 public class TimeRangeGroup {
 
   public List<TimeRange> allTimeRanges;
