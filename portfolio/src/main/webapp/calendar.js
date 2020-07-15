@@ -85,9 +85,11 @@ function createNewCalendarEventUserInput() {
  * Creates a Date object based on a string that represents a time in HH:MM
  * format. This function assumes that the date is the current date when the
  * function is called.
+ * @param timeString: a String representation of a time, in format HH:MM. 
+ * @return a Date object with the current date and the time of the timeString. 
  */
 function getTimeObject(timeString) {
-  const userPickedDate = getUserPickedDate();
+  const userPickedDate = getUserPickedDateFromDom();
   const currentYear = userPickedDate.getFullYear();
   const currentMonth = userPickedDate.getMonth();
   const currentDate = userPickedDate.getDate();
@@ -165,8 +167,8 @@ function eventsEqual(eventA, eventB) {
       (eventA.endTime.getTime() === eventB.endTime.getTime());
 }
 
-/** Retrives the date that the user has picked for the scheduling. */
-function getUserPickedDate() {
+/** Retrieves the date that the user has picked for the scheduling. */
+function getUserPickedDateFromDom() {
   const userPickedDate = $('#date-picker').val().split('-');
   const year = userPickedDate[0];
   const month = userPickedDate[1];
@@ -192,8 +194,11 @@ function setDatePickerToToday() {
 }
 
 /** 
- * Parses the current day's date into a dash separated string. 
+ * Constructs the current day's date into a dash separated string. 
  * The parameters are of type String. 
+ * @param year: of format YYYY
+ * @param month: of format MM, starts with 1
+ * @param date: of format DD
  */
 function constructTodayString(year, month, date) {
   // Adds leading 0 as padding for month and date strings.
@@ -217,7 +222,7 @@ function setNewEventStartAndEndTimes() {
   const workHourStartString = $('#working-hour-start').val();
   const workHourEndString = $('#working-hour-end').val();
 
-  const userPickedDate = getUserPickedDate();
+  const userPickedDate = getUserPickedDateFromDom();
   var defaultEventStartHour; 
 
   if (isToday(userPickedDate)) {
@@ -294,7 +299,7 @@ function checkWorkingHourRange() {
         workHourStartHour, workHourEndHour, workHourStartMinute, workHourEndMinute)) {
     $workHourWarning.removeClass('d-none').text('Working hours are not valid.');
   } else {
-    $workHourWarning.addClass('d-none');
+    $workHourWarning.empty().addClass('d-none');
     // Only sets the default times for calendar events if
     // the inputted working hours are valid.
     setNewEventStartAndEndTimes();
@@ -314,7 +319,7 @@ function isWorkingHourValid(
  
 /** Checks if the date the user has picked is before the current date. */
 function checkDatePicker() {
-  const pickedDate = getUserPickedDate();
+  const pickedDate = getUserPickedDateFromDom();
   const now = new Date();
  
   if (pickedDate.getTime() < now.getTime()) {

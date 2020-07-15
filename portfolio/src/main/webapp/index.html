@@ -35,7 +35,7 @@
     <script src="sheetsApi.js"></script>
   </head>
  
-  <body onload="useTodayAsDefault(); setClosestEventTime()">
+  <body onload="setDatePickerToToday(); setNewEventStartAndEndTimes()">
     <div class="container-fluid">
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">Task Scheduler</a>
@@ -44,7 +44,7 @@
             <li class="nav-item nav-link">
               Date to schedule for:
               <!-- The default date will be set to current date by one of the onload functions -->
-              <input type="date" id="date-picker" value="2020-07-01" onchange="checkDatePicker(); setClosestEventTime()" />
+              <input type="date" id="date-picker" value="2020-07-01" onchange="checkDatePicker(); setNewEventStartAndEndTimes()" />
               <small class="d-none" id="date-picker-warning">
                 The date you have picked is earlier than today. Please choose a different date to schedule tasks for.
               </small>
@@ -56,7 +56,7 @@
                 id="working-hour-start"
                 name="working-hour-start"
                 value="09:00"
-                onchange="checkWorkHourRange()"
+                onchange="checkWorkingHourRange()"
               />
               to
               <input
@@ -64,7 +64,7 @@
                 id="working-hour-end"
                 name="working-hour-end"
                 value="17:00"
-                onchange="checkWorkHourRange()"
+                onchange="checkWorkingHourRange()"
               />
               <small class="d-none" id="working-hour-warning"></small>
             </li>
@@ -199,7 +199,7 @@
             <button
               type="button"
               class="btn btn-primary"
-              onclick="createNewCalendarEventUserInput(); setClosestEventTime()"
+              onclick="createNewCalendarEventUserInput(); setNewEventStartAndEndTimes()"
             >
               Add this event
             </button>
