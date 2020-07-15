@@ -53,9 +53,7 @@ public class TimeRangeGroup {
   /**
    * Deletes only part of a time range from the middle.
    *
-   * @param originalTimeRange: |----------------------|, of type TimeRange
-   * @param timeRangeToDelete: |-----| , of type TimeRange new time ranges: |------| |---------|
-   * @return the sorted all time ranges with the new ranges included
+   * @return the sorted all time ranges with the new ranges included.
    */
   public List<TimeRange> deletePartOfTimeRange(
       TimeRange originalTimeRange, TimeRange timeRangeToDelete) {
