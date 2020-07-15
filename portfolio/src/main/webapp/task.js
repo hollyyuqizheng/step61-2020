@@ -62,7 +62,9 @@ function createNewTask() {
   }
 
   const newTask = new Task(
-      name, description, getDurationMinutes(length, lengthUnit),
+      name,
+      description,
+      getDurationMinutes(length, lengthUnit),
       priority);
   
   updateTaskList(newTask, lengthUnit);
