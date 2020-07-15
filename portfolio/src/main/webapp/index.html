@@ -227,6 +227,14 @@
             >
               Add this event
             </button>
+            <button
+              type="button"
+              class="btn btn-primary d-none"
+              id="import-calendar-button"
+              onclick="listUpcomingEvents()"
+            >
+              Import from Google Calendar
+            </button>
  
             <div class="alert alert-secondary d-none" role="alert" id="event-warning"></div>
           </form>
@@ -251,14 +259,7 @@
               Log out of your Google account
             </button>
           </div>
-          <button
-            type="button"
-            class="btn btn-primary d-none"
-            id="import-calendar-button"
-            onclick="listUpcomingEvents()"
-          >
-            Import from Google Calendar
-          </button>
+          
           <div class="d-none" id="import-calendar-message"></div>
         </div>
  

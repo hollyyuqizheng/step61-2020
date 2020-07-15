@@ -159,11 +159,12 @@ function getUserPickedDate() {
  * If no events are found a message is displayed on the UI.
  */
 function listUpcomingEvents() {
+  // The start and end time limits for imported events are
+  // start and end of day of the user's picked date.
   const timeRangeStart = getUserPickedDate();
-  const timeRangeEnd = new Date();
-  timeRangeEnd.setFullYear(timeRangeStart.getFullYear());
-  timeRangeEnd.setMonth(timeRangeStart.getMonth());
-  timeRangeEnd.setDate(timeRangeStart.getDate() + 1);
+  timeRangeStart.setHours(0,0,0);   
+  const timeRangeEnd = getUserPickedDate();
+  timeRangeEnd.setHours(23, 59, 59); 
  
   // Retrieves events on the user's calendar for the day
   // that the user has picked in the nav bar.
