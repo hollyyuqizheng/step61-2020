@@ -192,7 +192,7 @@ public final class TimeRangeGroupTest {
   }
 
   /**
-   * Tests deleting from a time range but withou the wrong boundary. The target time range to delete
+   * Tests deleting from a time range but with the wrong boundary. The target time range to delete
    * does not lie completely within the original range.
    */
   @Test(expected = IllegalArgumentException.class)
