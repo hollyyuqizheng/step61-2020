@@ -9,7 +9,7 @@ const TASKS_CLIENT_ID =
 const TASKS_DISCOVERY_DOCS =
     'https://www.googleapis.com/discovery/v1/apis/tasks/v1/rest';
 
-var TASKS_API_KEY = '';
+var TASKS_API_KEY = null;
 
 function fetchApiKey() {
   fetch('./appConfigServlet').then(response => {
