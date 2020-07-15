@@ -105,8 +105,6 @@ function fetchScheduledTasksFromServlet() {
       })
       // Turns result from a Promise into its Array value.
       .then((array) => {
-        // console.log("back in javascript");
-        // console.log(array); 
         scheduledTasks = array;
         return scheduledTasks;
       });
