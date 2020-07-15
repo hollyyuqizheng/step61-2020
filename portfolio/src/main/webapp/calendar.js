@@ -85,9 +85,11 @@ function createNewCalendarEventUserInput() {
  * Creates a Date object based on a string that represents a time in HH:MM
  * format. This function assumes that the date is the current date when the
  * function is called.
+ * @param timeString: a String representation of a time, in format HH:MM. 
+ * @return a Date object with the current date and the time of the timeString. 
  */
 function getTimeObject(timeString) {
-  const userPickedDate = getUserPickedDate();
+  const userPickedDate = getUserPickedDateFromDom();
   const currentYear = userPickedDate.getFullYear();
   const currentMonth = userPickedDate.getMonth();
   const currentDate = userPickedDate.getDate();
@@ -165,37 +167,40 @@ function eventsEqual(eventA, eventB) {
       (eventA.endTime.getTime() === eventB.endTime.getTime());
 }
 
-/** Retrives the date that the user has picked for the scheduling. */
-function getUserPickedDate() {
+/** Retrieves the date that the user has picked for the scheduling. */
+function getUserPickedDateFromDom() {
   const userPickedDate = $('#date-picker').val().split('-');
   const year = userPickedDate[0];
   const month = userPickedDate[1];
   const date = userPickedDate[2];
- 
+
   const pickedDate = new Date();
   pickedDate.setFullYear(year);
   pickedDate.setMonth(month - 1);  // month is zero-indexed.
   pickedDate.setDate(date);
- 
+
   return pickedDate;
 }
- 
+
 /** Sets the date picker to the current date as the default. */
-function useTodayAsDefault() {
+function setDatePickerToToday() {
   const today = new Date();
   const year = today.getFullYear();
   const month = today.getMonth() + 1;  // month is zero-indexed
   const date = today.getDate();
-  
-  const todayString = parseTodayString(year, month, date);
+
+  const todayString = constructTodayString(year, month, date);
   $('#date-picker').val(todayString);
 }
 
 /** 
- * Parses the current day's date into a dash separated string. 
+ * Constructs the current day's date into a dash separated string. 
  * The parameters are of type String. 
+ * @param year: of format YYYY
+ * @param month: of format MM, starts with 1
+ * @param date: of format DD
  */
-function parseTodayString(year, month, date) {
+function constructTodayString(year, month, date) {
   // Adds leading 0 as padding for month and date strings.
   if (parseInt(month) < 10) {
     month = '0' + month;
@@ -213,11 +218,11 @@ function parseTodayString(year, month, date) {
  * The default start time is set to the closet hour.
  * The default end time is set to the end of working hour.
  */
-function setClosestEventTime() {
+function setNewEventStartAndEndTimes() {
   const workHourStartString = $('#working-hour-start').val();
   const workHourEndString = $('#working-hour-end').val();
 
-  const userPickedDate = getUserPickedDate();
+  const userPickedDate = getUserPickedDateFromDom();
   var defaultEventStartHour; 
 
   if (isToday(userPickedDate)) {
@@ -254,6 +259,10 @@ function isToday(date) {
  * @return closest next hour in HH:00 format. 
  */
 function getClosestNextHour(nextHour, workHourStartString, workHourEndString) {
+  if (nextHour == 24) {
+    nextHour = 0; 
+  }
+
   const workHourStart = parseInt(workHourStartString.split(':')[0]);
   const workHourEnd = parseInt(workHourEndString.split(':')[0]);
 
@@ -273,7 +282,7 @@ function getClosestNextHour(nextHour, workHourStartString, workHourEndString) {
 }
  
 /** Checks the validity of the user's working hours input. */
-function checkWorkHourRange() {
+function checkWorkingHourRange() {
   const workHourStartParts = $('#working-hour-start').val().split(':'); 
   const workHourStartHour =
       parseInt(workHourStartParts[0]);
@@ -293,7 +302,7 @@ function checkWorkHourRange() {
     $workHourWarning.addClass('d-none');
     // Only sets the default times for calendar events if
     // the inputted working hours are valid.
-    setClosestEventTime();
+    setNewEventStartAndEndTimes();
   }
 }
 
@@ -310,7 +319,7 @@ function isWorkHourValid(
  
 /** Checks if the date the user has picked is before the current date. */
 function checkDatePicker() {
-  const pickedDate = getUserPickedDate();
+  const pickedDate = getUserPickedDateFromDom();
   const now = new Date();
  
   if (pickedDate.getTime() < now.getTime()) {
@@ -321,7 +330,7 @@ function checkDatePicker() {
 }
 
 module.exports._test = {
-  parseTodayString : parseTodayString,
+  constructTodayString : constructTodayString,
   getClosestNextHour : getClosestNextHour,
   isWorkHourValid : isWorkHourValid
 }
