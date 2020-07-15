@@ -132,11 +132,11 @@ function updateTaskList(newTask, lengthUnit) {
   unitSelect.setAttribute('id', 'unit-select-' + TASK_ID_COUNTER);
   unitSelect.setAttribute('selected', lengthUnit);
 
-  var optionMinutes = unitSelect.appendChild(document.createElement('option'));
+  const optionMinutes = unitSelect.appendChild(document.createElement('option'));
   optionMinutes.setAttribute('value', TIME_UNIT.MINUTES);
   optionMinutes.innerText = 'minute(s)';
 
-  var optionHours = unitSelect.appendChild(document.createElement('option'));
+  const optionHours = unitSelect.appendChild(document.createElement('option'));
   optionHours.setAttribute('value', TIME_UNIT.HOURS);
   optionHours.innerText = 'hour(s)';
 
