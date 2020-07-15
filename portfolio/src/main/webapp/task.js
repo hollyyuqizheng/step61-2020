@@ -125,18 +125,18 @@ function updateTaskList(newTask, lengthUnit) {
   unitSelect.setAttribute('id', 'unit-select-' + TASK_ID_COUNTER);
   unitSelect.setAttribute('selected', lengthUnit);
 
-  var option = unitSelect.appendChild(document.createElement('option'));
-  option.setAttribute('value', TIME_UNIT.MINUTES);
-  option.innerText = 'minute(s)';
+  var optionMinutes = unitSelect.appendChild(document.createElement('option'));
+  optionMinutes.setAttribute('value', TIME_UNIT.MINUTES);
+  optionMinutes.innerText = 'minute(s)';
 
-  var optionTwo = unitSelect.appendChild(document.createElement('option'));
-  optionTwo.setAttribute('value', TIME_UNIT.HOURS);
-  optionTwo.innerText = 'hour(s)';
+  var optionHours = unitSelect.appendChild(document.createElement('option'));
+  optionHours.setAttribute('value', TIME_UNIT.HOURS);
+  optionHours.innerText = 'hour(s)';
 
   if (lengthUnit == TIME_UNIT.MINUTES) {
-    option.setAttribute('selected', '');
+    optionMinutes.setAttribute('selected', '');
   } else {
-    optionTwo.setAttribute('selected', '');
+    optionHours.setAttribute('selected', '');
   }
 
   unitColumn.appendChild(unitLabel);
