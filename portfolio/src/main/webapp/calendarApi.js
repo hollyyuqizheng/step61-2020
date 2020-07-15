@@ -134,7 +134,7 @@ function listUpcomingEvents() {
   // The start and end time limits for imported events are
   // start and end of day of the user's picked date.
   const timeRangeStart = getUserPickedDate();
-  timeRangeStart.setHours(0,0,0);   
+  timeRangeStart.setHours(0, 0, 0);   
   const timeRangeEnd = getUserPickedDate();
   timeRangeEnd.setHours(24, 0, 0); 
 
