@@ -104,8 +104,13 @@ function updateTaskList(newTask, lengthUnit) {
   durationInput.setAttribute('id', 'duration-input-' + TASK_ID_COUNTER);
   if (lengthUnit == TIME_UNIT.HOURS) {
     durationInput.setAttribute('value', newTask.duration / 60);
-  } else {
+    $('#task-length-unit-message').removeClass('d-block');
+  } else if (lengthUnit == TIME_UNIT.MINUTES) {
     durationInput.setAttribute('value', newTask.duration);
+    $('#task-length-unit-message').removeClass('d-block');
+  } else {
+    $('#task-length-unit-message').addClass('d-block');
+    return;
   }
 
   durationColumn.appendChild(durationLabel);
