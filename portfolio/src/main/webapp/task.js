@@ -106,6 +106,10 @@ function updateTaskList(newTask, lengthUnit) {
   eventList.innterHTML = '';
   eventList.appendChild(newEventCard);
 
+  // Clear the create task inputs once the data is transferred
+  // onto the UI.
+  clearNewTaskInputs();
+
   // The delete button removes the event's card from the UI.
   deleteButton.onclick = function(newEventCard) {
     newEventCard.target.closest('div.card').remove();
@@ -151,6 +155,17 @@ function collectAllTasks() {
 function clearTasks() {
   const taskList = document.getElementById('new-task-list');
   taskList.innerHTML = '';
+}
+
+/**
+ * This method clears inputs from the create new task UI
+ * once a user has added a Task by setting the input values
+ * to empty strings.
+ */
+function clearNewTaskInputs() {
+  $('#new-task-estimated-length').val('');
+  $('#new-task-name').val('');
+  $('#new-task-description').val('');
 }
 
 /**
