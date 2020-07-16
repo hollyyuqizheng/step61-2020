@@ -57,10 +57,10 @@ function createRequestFromUiInformation() {
  */
 function startScheduling() {
   const scheduleRequest = createRequestFromUiInformation();
+  const $emptyScheduledTaskMessage = $('#empty-scheduled-task-message');
 
   // If the user hasn't added any tasks, display a message accordingly. 
   if (!scheduleRequest.tasks.length) {
-    $emptyScheduledTaskMessage = $('#empty-scheduled-task-message');
     $emptyScheduledTaskMessage.removeClass('d-none'); 
     $emptyScheduledTaskMessage.text('It seems like you haven\'t added any tasks to schedule.'); 
   } else {
