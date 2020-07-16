@@ -30,7 +30,7 @@ public final class TimeRange {
   public static final Comparator<TimeRange> sortByTimeRangeStartTimeAscending =
       Comparator.comparing(TimeRange::start);
 
-  private TimeRange(Instant start, Duration duration) {
+  public TimeRange(Instant start, Duration duration) {
     this.start = start;
     this.duration = duration;
   }
@@ -84,21 +84,25 @@ public final class TimeRange {
     // If the other range has no duration, then it is treated like a point that is
     // anchored in its start time.
     if (otherRange.duration.getSeconds() <= 0) {
-      return containsTimeRangeAndPoint(this, otherRange.start);
+      return timeRangeContainsPoint(this, otherRange.start);
     }
 
     // Checks if the time range contains the other range's start and end points.
     // We need the inclusive end for this check in order for this case to equal true:
     // |------|
     //     |--|
-    int otherInclusiveEnd =
-        otherRange.start.getEpochSecond() + otherRange.duration.getSeconds() - 1;
-    return containsTimeRangeAndPoint(this, otherRange.start)
-        && containsTimeRangeAndPoint(this, otherInclusiveEnd);
+    Instant otherInclusiveEnd =
+        Instant.ofEpochSecond(otherRange.start.getEpochSecond() + otherRange.duration.getSeconds())
+            .minusSeconds(1);
+    return timeRangeContainsPoint(this, otherRange.start)
+        && timeRangeContainsPoint(this, otherInclusiveEnd);
   }
 
-  /** Checks if a time range contains a time point. Helper method for contains. */
-  private static boolean containsTimeRangeAndPoint(TimeRange range, Instant point) {
+  /**
+   * Checks if a time range contains a time point. Helper method for contains and overlaps. This
+   * method is public so that it can be tested.
+   */
+  public static boolean timeRangeContainsPoint(TimeRange range, Instant point) {
     // If a range has no duration, it cannot contain anything.
     if (range.duration.getSeconds() <= 0) {
       return false;
@@ -121,14 +125,22 @@ public final class TimeRange {
    */
   public boolean overlaps(TimeRange otherRange) {
     // For two ranges to overlap, one range must contain the start of another range.
-    //
     // Case 1: |---| |---|
     //
     // Case 2: |---|
     //            |---|
-    //
     // Case 3: |---------|
     //            |---|
-    return this.contains(otherRange.start) || otherRange.contains(this.start);
+    // Case 4:    |--------|
+    //         |-----|
+    return (timeRangeContainsPoint(this, otherRange.start())
+        || timeRangeContainsPoint(otherRange, start));
   }
+
+  /** @return the overlapping time range between two ranges. */
+  // public TimeRange getOverlap(TimeRange otherRange) {
+  //   if (! this.overlaps(otherRange)) {
+  //     throw new IllegalArgumentException("These two time ranges do not overlap");
+  //   }
+  // }
 }
