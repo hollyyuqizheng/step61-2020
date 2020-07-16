@@ -10,7 +10,7 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public final class TimeRangeTest {
 
-  private static Duration DURATION_30_MINUTES = Duration.ofSeconds(30 * 60).plusSeconds(1);
+  private static Duration DURATION_30_MINUTES = Duration.ofSeconds(30 * 60);
 
   private static Instant TIME_0900 = Instant.parse("2020-06-25T09:00:00Z");
   private static Instant TIME_0930 = TIME_0900.plus(DURATION_30_MINUTES);
@@ -56,13 +56,13 @@ public final class TimeRangeTest {
   }
 
   /** Makes sure that toString() works properly. */
-  // @Test
-  // public void toStringMethod() {
-  //   TimeRange timeRange = TimeRange.fromStartEnd(TIME_0900, TIME_0930);
-  //   String actualString = timeRange.toString();
-  //   String expectedString = "Range: [2020-06-25T09:00:00Z, 2020-06-25T09:30:00Z]";
-  //   Assert.assertEquals(expectedString, actualString);
-  // }
+  @Test
+  public void toStringMethod() {
+    TimeRange timeRange = TimeRange.fromStartEnd(TIME_0900, TIME_0930);
+    String actualString = timeRange.toString();
+    String expectedString = "Range: [2020-06-25T09:00:00Z, 2020-06-25T09:30:00Z]";
+    Assert.assertEquals(expectedString, actualString);
+  }
 
   /** Tests the helper method for contains. This tests for a time range containing points. */
   @Test

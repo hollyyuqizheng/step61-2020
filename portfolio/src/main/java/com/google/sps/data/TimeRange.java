@@ -90,9 +90,8 @@ public final class TimeRange {
     // We need the inclusive end for this check in order for this case to equal true:
     // |------|
     //     |--|
-    Instant otherInclusiveEnd =
-        Instant.ofEpochSecond(otherRange.start.getEpochSecond() + otherRange.duration.getSeconds())
-            .minusSeconds(1);
+    Instant otherInclusiveEnd = otherRange.end();
+
     return timeRangeContainsPoint(this, otherRange.start)
         && timeRangeContainsPoint(this, otherInclusiveEnd);
   }
@@ -112,6 +111,7 @@ public final class TimeRange {
       return false;
     }
 
+    // This is to make sure [8 - 8:30] contains 8:30.
     return point.getEpochSecond() <= range.start.getEpochSecond() + range.duration.getSeconds();
   }
 
@@ -132,11 +132,4 @@ public final class TimeRange {
     return (timeRangeContainsPoint(this, otherRange.start())
         || timeRangeContainsPoint(otherRange, start));
   }
-
-  /** @return the overlapping time range between two ranges. */
-  // public TimeRange getOverlap(TimeRange otherRange) {
-  //   if (! this.overlaps(otherRange)) {
-  //     throw new IllegalArgumentException("These two time ranges do not overlap");
-  //   }
-  // }
 }
