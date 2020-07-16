@@ -231,8 +231,7 @@ function collectAllTasks() {
         taskDescription,
         getDurationMinutes(taskLength, taskLengthUnit),
         taskPriority);
-    const taskJson = JSON.stringify(task);
-    allTaskJson.push(taskJson);
+    allTaskJson.push(task);
   });
   return allTaskJson;
 }
