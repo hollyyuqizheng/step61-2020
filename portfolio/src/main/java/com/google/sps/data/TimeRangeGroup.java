@@ -1,97 +1,28 @@
 package com.google.sps.data;
 
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Collection;
 
-/** Models a collection of Time Ranges with methods for add and delete. */
-public class TimeRangeGroup {
-
-  public List<TimeRange> allTimeRanges;
-
-  public TimeRangeGroup() {
-    allTimeRanges = new ArrayList();
-  }
-
-  /** Adds a new time range to the list of all time ranges. */
-  public void addTimeRange(TimeRange newTimeRange) {
-    if (!allTimeRanges.contains(newTimeRange)) {
-      allTimeRanges.add(newTimeRange);
-    }
-  }
-
-  @Override
-  public boolean equals(Object other) {
-    return other instanceof TimeRangeGroup && this.equals((TimeRangeGroup) other);
-  }
-
-  /** Returns the list of all time ranges. */
-  public List<TimeRange> getAllTimeRanges() {
-    return allTimeRanges;
-  }
+public interface TimeRangeGroup {
 
   /**
-   * Deletes an entire time range from the list of all time ranges.
-   *
-   * @return the modifed list of time ranges.
+   * Merges the collection of time ranges that is passed into the constructor so that all time
+   * ranges are disjoint.
    */
-  public List<TimeRange> deleteEntireTimeRange(TimeRange timeRange) {
-    if (timeRange == null) {
-      throw new IllegalArgumentException("Time range to delete cannot be null");
-    }
+  public Collection<TimeRange> mergeInputTimeRanges(Collection<TimeRange> timeRanges);
 
-    if (allTimeRanges.contains(timeRange)) {
-      allTimeRanges.remove(timeRange);
-    } else {
-      throw new IllegalArgumentException(
-          "The time range to delete does not exist in the collection of all time ranges.");
-    }
-    return allTimeRanges;
-  }
+  /** Adds a new time range into the collection of time ranges. */
+  public void addTimeRange(TimeRange timeRange);
+
+  /** Returns the collection of all time ranges. */
+  public Collection<TimeRange> getAllTimeRanges();
+
+  /** Checks if a time range exists in the collection. */
+  public boolean hasTimeRange(TimeRange timeRange);
 
   /**
-   * Deletes only part of a time range from the middle.
+   * Deletes a given time range.
    *
-   * @return the sorted all time ranges with the new ranges included.
+   * @return the newly modified collection of time ranges.
    */
-  public List<TimeRange> deletePartOfTimeRange(
-      TimeRange timeRangeOriginal, TimeRange timeRangeToDelete) {
-    if (timeRangeOriginal == null || timeRangeToDelete == null) {
-      throw new IllegalArgumentException(
-          "Original time range or time range to delete cannot be null");
-    }
-    if (!allTimeRanges.contains(timeRangeOriginal)) {
-      throw new IllegalArgumentException(
-          "The original time range does not exist in the collection of all time ranges.");
-    }
-
-    if (timeRangeOriginal.start().isAfter(timeRangeToDelete.start())
-        || timeRangeOriginal.end().isBefore(timeRangeToDelete.end())) {
-      throw new IllegalArgumentException(
-          "The busy time range does not lie entirely inside the original time range.");
-    }
-
-    Instant originalStart = timeRangeOriginal.start();
-    Instant originalEnd = timeRangeOriginal.end();
-    Instant toDeleteTimeRangeStart = timeRangeToDelete.start();
-    Instant toDeleteTimeRangeEnd = timeRangeToDelete.end();
-
-    if (originalStart.isBefore(toDeleteTimeRangeStart)) {
-      TimeRange newTimeRangeOne = TimeRange.fromStartEnd(originalStart, toDeleteTimeRangeStart);
-      allTimeRanges.add(newTimeRangeOne);
-    }
-
-    if (originalEnd.isAfter(toDeleteTimeRangeEnd)) {
-      TimeRange newTimeRangeTwo = TimeRange.fromStartEnd(toDeleteTimeRangeEnd, originalEnd);
-      allTimeRanges.add(newTimeRangeTwo);
-    }
-
-    allTimeRanges.remove(timeRangeOriginal);
-
-    // Sorts all free time ranges before returning.
-    Collections.sort(allTimeRanges, TimeRange.sortByTimeRangeStartTimeAscending);
-
-    return allTimeRanges;
-  }
+  public Collection<TimeRange> deleteTimeRange(TimeRange timeRangeToDelete);
 }
