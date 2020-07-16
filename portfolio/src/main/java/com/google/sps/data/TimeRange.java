@@ -47,7 +47,7 @@ public final class TimeRange {
 
   /** Returns the end of the range. This ending value is the closing exclusive bound. */
   public Instant end() {
-    return Instant.ofEpochSecond(start.getEpochSecond() + duration.getSeconds());
+    return start.plus(duration);
   }
 
   @Override
@@ -57,7 +57,7 @@ public final class TimeRange {
 
   @Override
   public String toString() {
-    return String.format("Range: [%d, %d)", start, this.end());
+    return String.format("Range: [%s, %s]", start.toString(), this.end().toString());
   }
 
   public static boolean equals(TimeRange a, TimeRange b) {
@@ -67,6 +67,6 @@ public final class TimeRange {
   /** Creates a {@code TimeRange} from {@code start} to {@code end}. */
   public static TimeRange fromStartEnd(Instant start, Instant end) {
     return new TimeRange(
-        start, Duration.ofSeconds(end.getEpochSecond() - start.getEpochSecond() + 1));
+        start, Duration.ofSeconds(end.getEpochSecond() - start.getEpochSecond()));
   }
 }
