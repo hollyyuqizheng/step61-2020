@@ -14,7 +14,20 @@ public class TimeRangeGroupArrayList {
     Collections.sort(allTimeRanges, TimeRange.sortByTimeRangeStartTimeAscending);
   }
 
-  public void addTimeRange(TimeRange timeRange) {}
+  /**
+   * Adds a new time range to the list. This new range must be disjoint from all existing ranges.
+   */
+  public void addTimeRange(TimeRange timeRange) {
+    for (TimeRange currentRange : allTimeRanges) {
+      if (currentRange.overlaps(timeRange)) {
+        throw new IllegalArgumentException(
+            "New time range to add cannot overlap with any existing time ranges");
+      }
+    }
+
+    allTimeRanges.add(timeRange);
+    Collections.sort(allTimeRanges, TimeRange.sortByTimeRangeStartTimeAscending);
+  }
 
   /** Returns the array list of all time ranges. */
   public List<TimeRange> getAllTimeRanges() {
@@ -36,8 +49,15 @@ public class TimeRangeGroupArrayList {
   }
 
   /** @return the newly modified collection of time ranges. */
-  // public List<TimeRange> deleteTimeRange(TimeRange timeRangeToDelete) {
+  public List<TimeRange> deleteTimeRange(TimeRange timeRangeToDelete) {
+    for (TimeRange currentRange : allTimeRanges) {
+      if (currentRange.contains(timeRangeToDelete)) {}
+    }
 
-  // }
-
+    // If at this point the method hasn't returned yet, it means none of the existing
+    // time ranges actually contains the range to delete.
+    // Throw an invalid input exception here.
+    throw new IllegalArgumentException(
+        "The time range to delete must be contained by an existing time range");
+  }
 }
