@@ -143,12 +143,11 @@ function listUpcomingEvents() {
   gapi.client.calendar.events
       .list({
         calendarId: 'primary',
-        orderBy: 'startTime',
-        showDeleted: false,
-        singleEvents: true,
-        status: 'confirmed', 
         timeMin: timeRangeStart.toISOString(),
         timeMax: timeRangeEnd.toISOString(),
+        showDeleted: false,
+        singleEvents: true,
+        orderBy: 'startTime'
       })
       .then(function(response) {
         var events = response.result.items;
@@ -252,7 +251,7 @@ function addNewEventsToGoogleCalendar() {
 /** Adds an individual event to the authorized user's Google Calendar. */
 function addOneEventToGoogleCalendar(event) {
   const request = gapi.client.calendar.events.insert(
-      {calendarId: 'primary', resource: event, visibility: 'private'});
+      {calendarId: 'primary', resource: event});
 
   request.execute(function() {
     // Refreshes the calendar view so that the new event shows up on it.
