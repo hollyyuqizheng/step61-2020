@@ -40,9 +40,9 @@ class ShortestTaskFirstScheduler implements TaskScheduler {
     List<CalendarEvent> eventsList = new ArrayList<CalendarEvent>(events);
     List<Task> tasksList = new ArrayList<Task>(tasks);
     Collections.sort(tasksList, sortByTaskDurationThenName);
-    CalendarGroup calendarGroup =
-        new CalendarGroup(eventsList, workHoursStartTime, workHoursEndTime);
-    List<TimeRange> availableTimes = calendarGroup.calculateFreeTimeRanges();
+    CalendarEventsGroup CalendarEventsGroup =
+        new CalendarEventsGroup(eventsList, workHoursStartTime, workHoursEndTime);
+    List<TimeRange> availableTimes = CalendarEventsGroup.getFreeTimeRanges();
     List<ScheduledTask> scheduledTasks = new ArrayList<ScheduledTask>();
     int rangeIndex = 0;
     int taskIndex = 0;
