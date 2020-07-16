@@ -74,17 +74,11 @@
               />
               <small class="d-none" id="working-hour-warning"></small>
             </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                role="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                Scheduling algorithm preferences
-              </a>
-              <div class="dropdown-menu" aria-labelledby="navbar-dropdown"></div>
+            <li class="nav-item nav-link">
+              Scheduling Type:
+              <select id="algorithm-type" name="algorithm-type">
+                <option value="SHORTEST_TASK_FIRST">Shortest tasks first</option>
+              </select>
             </li>
           </ul>
         </div>
