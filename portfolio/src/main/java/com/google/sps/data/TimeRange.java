@@ -111,7 +111,9 @@ public final class TimeRange {
       return false;
     }
 
-    // This is to make sure [8 - 8:30] contains 8:30.
+    // This is to make sure [8 - 8:30] contains 8:30, for example.
+    // The end of a time range is considered part of this time range,
+    // so that [8 - 8:30] and [8:30 - 9] can be considered as overlapping.
     return point.getEpochSecond() <= range.start.getEpochSecond() + range.duration.getSeconds();
   }
 
