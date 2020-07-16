@@ -158,14 +158,13 @@ function clearTasks() {
 }
 
 /**
- * This method clears inputs from the create new task UI
- * once a user has added a Task by setting the input values
- * to empty strings.
+ * This method clears empties the three text input boxes
+ * on the create new task UI.
  */
 function clearNewTaskInputs() {
-  $('#new-task-estimated-length').val('');
-  $('#new-task-name').val('');
-  $('#new-task-description').val('');
+  $('#new-task-estimated-length').empty();
+  $('#new-task-name').empty();
+  $('#new-task-description').empty();
 }
 
 /**
