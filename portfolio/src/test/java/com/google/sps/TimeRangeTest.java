@@ -77,7 +77,7 @@ public final class TimeRangeTest {
     Assert.assertTrue(TimeRange.timeRangeContainsPoint(timeRange, pointInside));
 
     Instant pointOutside = timeRangeStart.minusSeconds(100);
-    Assert.assertTrue(!TimeRange.timeRangeContainsPoint(timeRange, pointOutside));
+    Assert.assertFalse(TimeRange.timeRangeContainsPoint(timeRange, pointOutside));
 
     Instant pointOnEnd = timeRangeEnd;
     Assert.assertTrue(TimeRange.timeRangeContainsPoint(timeRange, pointOnEnd));
@@ -100,7 +100,7 @@ public final class TimeRangeTest {
     TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
 
     Assert.assertTrue(timeRangeOne.contains(timeRangeTwo));
-    Assert.assertTrue(!timeRangeTwo.contains(timeRangeOne));
+    Assert.assertFalse(timeRangeTwo.contains(timeRangeOne));
   }
 
   /** Tests for a time range partially overlapping another one, therefore not containing. */
@@ -117,7 +117,7 @@ public final class TimeRangeTest {
     Instant timeRangeTwoEnd = timeRangeTwoStart.plusSeconds(500);
     TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
 
-    Assert.assertTrue(!timeRangeOne.contains(timeRangeTwo));
+    Assert.assertFalse(timeRangeOne.contains(timeRangeTwo));
   }
 
   /** Tests for a time range lying on the boundary of another one. */
@@ -185,8 +185,8 @@ public final class TimeRangeTest {
     Instant timeRangeTwoEnd = timeRangeTwoStart.plusSeconds(200);
     TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
 
-    Assert.assertTrue(!timeRangeOne.overlaps(timeRangeTwo));
-    Assert.assertTrue(!timeRangeTwo.overlaps(timeRangeOne));
+    Assert.assertFalse(timeRangeOne.overlaps(timeRangeTwo));
+    Assert.assertFalse(timeRangeTwo.overlaps(timeRangeOne));
   }
 
   /** Tests for time ranges overlapping on their boundary. */
