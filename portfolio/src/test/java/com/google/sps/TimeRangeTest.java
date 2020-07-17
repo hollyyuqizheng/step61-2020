@@ -17,21 +17,21 @@ public final class TimeRangeTest {
 
   /** Makes sure that the start() method works properly. */
   @Test
-  public void startMethod() {
+  public void testStart() {
     TimeRange timeRange = TimeRange.fromStartEnd(TIME_0900, TIME_0930);
     Assert.assertEquals(TIME_0900, timeRange.start());
   }
 
   /** Makes sure that the duration() method works properly. */
   @Test
-  public void durationMethod() {
+  public void testDuration() {
     TimeRange timeRange = TimeRange.fromStartEnd(TIME_0900, TIME_0930);
     Assert.assertEquals(DURATION_30_MINUTES, timeRange.duration());
   }
 
   /** Makes sure that the end() method works properly. */
   @Test
-  public void endMethod() {
+  public void testEnd() {
     TimeRange timeRange = TimeRange.fromStartEnd(TIME_0900, TIME_0930);
     Assert.assertEquals(TIME_0930, timeRange.end());
   }
@@ -41,7 +41,7 @@ public final class TimeRangeTest {
    * TimeRange.equals(a,b) because that method is called from a.equals(b).
    */
   @Test
-  public void equalsMethodCorrectClass() {
+  public void testEqualsCorrectClass() {
     TimeRange timeRangeOne = TimeRange.fromStartEnd(TIME_0900, TIME_0930);
     TimeRange timeRangeTwo = TimeRange.fromStartEnd(TIME_0900, TIME_0930);
     Assert.assertTrue(timeRangeOne.equals(timeRangeTwo));
@@ -49,7 +49,7 @@ public final class TimeRangeTest {
 
   /** Makes sure that a.equals(b) works properly when one Object is not a TimeRange */
   @Test
-  public void equalsMethodIncorrectClass() {
+  public void testEqualsIncorrectClass() {
     TimeRange timeRange = TimeRange.fromStartEnd(TIME_0900, TIME_0930);
     CalendarEvent calendarEvent = new CalendarEvent("Event 1", TIME_0900, TIME_0930);
     Assert.assertFalse(timeRange.equals(calendarEvent));
@@ -57,7 +57,7 @@ public final class TimeRangeTest {
 
   /** Makes sure that toString() works properly. */
   @Test
-  public void toStringMethod() {
+  public void testToString() {
     TimeRange timeRange = TimeRange.fromStartEnd(TIME_0900, TIME_0930);
     String actualString = timeRange.toString();
     String expectedString = "Range: [2020-06-25T09:00:00Z, 2020-06-25T09:30:00Z]";

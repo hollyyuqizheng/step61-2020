@@ -70,7 +70,7 @@ public final class TimeRange {
   }
 
   /**
-   * Checks if this range completely contains another range. This means that {@code other} is a
+   * Checks if this range completely contains another range. This means that {@code otherRange} is a
    * subset of this range. This is an inclusive bounds, meaning that if two ranges are the same,
    * they contain each other.
    */
@@ -95,7 +95,7 @@ public final class TimeRange {
    * Checks if a time range contains a time point. Helper method for contains and overlaps. This
    * method is public so that it can be tested.
    */
-  public static boolean timeRangeContainsPoint(TimeRange range, Instant point) {
+  static boolean timeRangeContainsPoint(TimeRange range, Instant point) {
     // If a range has no duration, it cannot contain anything.
     if (range.duration.getSeconds() <= 0) {
       return false;
