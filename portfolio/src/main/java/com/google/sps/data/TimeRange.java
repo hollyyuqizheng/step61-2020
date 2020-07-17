@@ -1,3 +1,17 @@
+// Copyright 2019 Google LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package com.google.sps.data;
 
 import java.time.Duration;
@@ -56,7 +70,7 @@ public final class TimeRange {
   }
 
   /**
-   * Checks if this range completely contains another range. This means that {@code other} is a
+   * Checks if this range completely contains another range. This means that {@code otherRange} is a
    * subset of this range. This is an inclusive bounds, meaning that if two ranges are the same,
    * they contain each other.
    */
@@ -73,20 +87,15 @@ public final class TimeRange {
     }
 
     // Checks if the time range contains the other range's start and end points.
-    // We need the inclusive end for this check in order for this case to equal true:
-    // |------|
-    //     |--|
-    Instant otherInclusiveEnd = otherRange.end();
-
     return timeRangeContainsPoint(this, otherRange.start)
-        && timeRangeContainsPoint(this, otherInclusiveEnd);
+        && timeRangeContainsPoint(this, otherRange.end());
   }
 
   /**
    * Checks if a time range contains a time point. Helper method for contains and overlaps. This
    * method is public so that it can be tested.
    */
-  public static boolean timeRangeContainsPoint(TimeRange range, Instant point) {
+  static boolean timeRangeContainsPoint(TimeRange range, Instant point) {
     // If a range has no duration, it cannot contain anything.
     if (range.duration.getSeconds() <= 0) {
       return false;
