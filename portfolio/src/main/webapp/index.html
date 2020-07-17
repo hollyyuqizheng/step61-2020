@@ -103,7 +103,8 @@
       <div class="row">
         <div id="new-task-wrapper" class="col-md-12 col-lg-6 col-xl-3">
           <h2>1. Add the tasks you would like to schedule for today</h2>
-          <h5>Fields with asterisk (*) are required.</h5>
+          <div><small>Fields with asterisk (*) are required.</small></div>
+          <br /> 
           <form id="new-task-form">
             <div class="form-group">
               <label for="new-task-name">Task name*:</label>
@@ -159,16 +160,15 @@
 
           <br />
           <h2>Tasks added:</h2>
-          <div class="scrollable" id="new-task-list-wrapper">
-            <div id="new-task-list"></div>
-          </div>
+          <div id="new-task-list"></div>
           <button type="button" class="btn btn-warning" onclick="clearTasks()">Clear Tasks</button>
         </div>
  
         <div id="new-event-wrapper" class="col-md-12 col-lg-6 col-xl-3">
           <h2>2. Add any pre-scheduled events here</h2>
-          <h5>We will not schedule any tasks during these time slots.</h5>
-          <h5>Fields with asterisk (*) are required.</h5>
+          <div><small>We will not schedule any tasks during these time slots.</small></div>
+          <div><small>Fields with asterisk (*) are required.</small></div>
+          <br /> 
           <form id="new-event-form">
             <div class="form-group">
               <label for="new-event-name">Event name*:</label>
@@ -238,22 +238,19 @@
  
             <div class="alert alert-secondary d-none" role="alert" id="event-warning"></div>
           </form>
- 
+          <br /> 
           <div id="new-event-list-wrapper">
-            <h2>Events added:</h2>
+            <h2 id="event-added-header">Events added:</h2>
             <div class="alert alert-secondary d-none" role="alert" id="empty-calendar-import-message"></div>
-            <div class="scrollable">
-              <div id="new-event-list"></div>
-            </div>
+            <div id="new-event-list"></div>
           </div>
         </div>
  
         <div id="calendar-wrapper" class="col-md-12 col-lg-6 col-xl-3">
           <div id="calendar-view-wrapper">
-            <h2>Your Google Calendar</h2> 
             <iframe title="Your Google Calendar" id="calendar-view" class="d-none" scrolling="yes"></iframe>
             <button type="button" class="btn btn-primary" id="calendar-auth-button" onclick="initiateCalendarAuth()">
-              Log in to your Google account
+              Log in to see your Google Calendar
             </button>
             <button type="button" class="btn btn-primary d-none" id="calendar-logout-button" onclick="logOutAllApis()"> 
               Log out of your Google account
@@ -264,7 +261,7 @@
         </div>
  
         <div id="schedule-result-wrapper" class="col-md-12 col-lg-6 col-xl-3">
-          <button type="button" class="btn btn-primary" onclick="startScheduling()">
+          <button type="button" class="btn-lg btn-success" onclick="startScheduling()">
             Start scheduling!
           </button>
           <h2>3. Your tasks are scheduled here!</h2>
