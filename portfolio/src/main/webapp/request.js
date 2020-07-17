@@ -42,7 +42,10 @@ function createScheduleRequestFromDom() {
   const tasks = collectAllTasks();
   const algorithmType = document.getElementById('algorithm-type').value;
   const scheduleRequest = new ScheduleRequest(
-      events, tasks, getTimeObject(startTime), getTimeObject(endTime),
+      events, 
+      tasks, 
+      getTimeObject(startTime), 
+      getTimeObject(endTime),
       algorithmType);
   return scheduleRequest;
 }
