@@ -1,5 +1,7 @@
 package com.google.sps.data;
 
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -10,7 +12,11 @@ public class TimeRangeGroupArrayList {
   public List<TimeRange> allTimeRanges;
 
   public TimeRangeGroupArrayList(Collection<TimeRange> timeRanges) {
-    allTimeRanges = (List<TimeRange>) timeRanges;
+    allTimeRanges = new ArrayList<TimeRange>();
+    timeRanges.forEach(
+        (range) -> {
+          addTimeRange(range);
+        });
     Collections.sort(allTimeRanges, TimeRange.sortByTimeRangeStartTimeAscending);
   }
 
@@ -24,13 +30,12 @@ public class TimeRangeGroupArrayList {
             "New time range to add cannot overlap with any existing time ranges");
       }
     }
-
     allTimeRanges.add(timeRange);
-    Collections.sort(allTimeRanges, TimeRange.sortByTimeRangeStartTimeAscending);
   }
 
   /** Returns the array list of all time ranges. */
   public List<TimeRange> getAllTimeRanges() {
+    Collections.sort(allTimeRanges, TimeRange.sortByTimeRangeStartTimeAscending);
     return allTimeRanges;
   }
 
@@ -44,18 +49,32 @@ public class TimeRangeGroupArrayList {
         return true;
       }
     }
-
     return false;
   }
 
-  /** @return the newly modified collection of time ranges. */
+  /**
+   * Delete a time range from the list. Because the list of all time ranges are always kept to be
+   * pairwise disjoint, the potentially two new time ranges resulted from a deletion will not
+   * overlap with any other existing time ranges.
+   *
+   * <p>For example, if the list contains [3:00 - 4:00] and [5:00 - 6:00], deleting [3:15 - 3:30]
+   * will result in [3 - 3:15] and [3:30 - 4] as new time ranges. Trying to delete [4 - 4:15] will
+   * result in an invalid input exception.
+   *
+   * @return the newly modified collection of time ranges.
+   */
   public List<TimeRange> deleteTimeRange(TimeRange timeRangeToDelete) {
     for (TimeRange currentRange : allTimeRanges) {
       if (currentRange.contains(timeRangeToDelete)) {
+        System.out.println(currentRange);
+        System.out.println(timeRangeToDelete);
+
         Instant currentRangeStart = currentRange.start();
         Instant currentRangeEnd = currentRange.end();
         Instant toDeleteRangeStart = timeRangeToDelete.start();
         Instant toDeleteRangeEnd = timeRangeToDelete.end();
+
+        allTimeRanges.remove(currentRange);
 
         // Construct one or two new time ranges after the deletion.
         if (currentRangeStart.isBefore(toDeleteRangeStart)) {
