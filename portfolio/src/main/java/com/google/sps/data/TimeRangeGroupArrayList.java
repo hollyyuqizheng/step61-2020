@@ -11,6 +11,10 @@ public class TimeRangeGroupArrayList {
 
   public List<TimeRange> allTimeRanges;
 
+  /**
+   * Adds all the input time ranges to the list of all time ranges. Also sorts the list of all
+   * ranges in the constructor.
+   */
   public TimeRangeGroupArrayList(Collection<TimeRange> timeRanges) {
     allTimeRanges = new ArrayList<TimeRange>();
     timeRanges.forEach(
@@ -22,6 +26,9 @@ public class TimeRangeGroupArrayList {
 
   /**
    * Adds a new time range to the list. This new range must be disjoint from all existing ranges.
+   * TODO(hollyyuqizheng): Depending on how the algorithms are implemented, we might need to add the
+   * merging logic in this method. For example, if a time range is deleted but then later added back
+   * to the list for some reason, this list will potentially need to be merged.
    */
   public void addTimeRange(TimeRange timeRange) {
     for (TimeRange currentRange : allTimeRanges) {
