@@ -40,7 +40,7 @@ function createScheduleRequestFromDom() {
   const endTime = document.getElementById('working-hour-end').value;
   const events = collectAllEvents();
   const tasks = collectAllTasks();
-  const algorithmType = 'SHORTEST_TASK_FIRST';
+  const algorithmType = document.getElementById('algorithm-type').value;
   const scheduleRequest = new ScheduleRequest(
       events, tasks, getTimeObject(startTime), getTimeObject(endTime),
       algorithmType);
