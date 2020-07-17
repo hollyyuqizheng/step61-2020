@@ -87,13 +87,8 @@ public final class TimeRange {
     }
 
     // Checks if the time range contains the other range's start and end points.
-    // We need the inclusive end for this check in order for this case to equal true:
-    // |------|
-    //     |--|
-    Instant otherInclusiveEnd = otherRange.end();
-
     return timeRangeContainsPoint(this, otherRange.start)
-        && timeRangeContainsPoint(this, otherInclusiveEnd);
+        && timeRangeContainsPoint(this, otherRange.end());
   }
 
   /**
