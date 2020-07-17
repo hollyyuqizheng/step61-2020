@@ -51,7 +51,23 @@ public class TimeRangeGroupArrayList {
   /** @return the newly modified collection of time ranges. */
   public List<TimeRange> deleteTimeRange(TimeRange timeRangeToDelete) {
     for (TimeRange currentRange : allTimeRanges) {
-      if (currentRange.contains(timeRangeToDelete)) {}
+      if (currentRange.contains(timeRangeToDelete)) {
+        Instant currentRangeStart = currentRange.start();
+        Instant currentRangeEnd = currentRange.end();
+        Instant toDeleteRangeStart = timeRangeToDelete.start();
+        Instant toDeleteRangeEnd = timeRangeToDelete.end();
+
+        // Construct one or two new time ranges after the deletion.
+        if (currentRangeStart.isBefore(toDeleteRangeStart)) {
+          allTimeRanges.add(TimeRange.fromStartEnd(currentRangeStart, toDeleteRangeStart));
+        }
+
+        if (currentRangeEnd.isAfter(toDeleteRangeEnd)) {
+          allTimeRanges.add(TimeRange.fromStartEnd(toDeleteRangeEnd, currentRangeEnd));
+        }
+        Collections.sort(allTimeRanges, TimeRange.sortByTimeRangeStartTimeAscending);
+        return allTimeRanges;
+      }
     }
 
     // If at this point the method hasn't returned yet, it means none of the existing
