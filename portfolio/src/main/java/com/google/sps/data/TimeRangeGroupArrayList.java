@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 
 /** Models an implementation of the TimeRangeGroup model using ArrayList. */
-public class TimeRangeGroupArrayList {
+public class TimeRangeGroupArrayList implements TimeRangeGroup {
 
   public List<TimeRange> allTimeRanges;
   private Comparator<TimeRange> comparator;
