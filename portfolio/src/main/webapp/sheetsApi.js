@@ -147,16 +147,13 @@ function singleScheduledTaskToSheetsArray(scheduledTask) {
   const task = scheduledTask.task;
   const taskName = task.name;
   // Changes seconds into minutes.
-  const taskDurationMinutes = task.duration.seconds / 60;
-  const taskDescription = task.description.value;
-  const taskPriority = task.priority.priority;
-  const taskTimeSeconds = scheduledTask.startTime.seconds;
-  const taskDate = new Date();
-  // This is x1000 because the functions takes milliseconds
-  taskDate.setTime(taskTimeSeconds * 1000);
+  const taskDurationMinutes = task.duration;
+  const taskDescription = task.description;
+  const taskPriority = task.taskPriority;
+  const taskDate = scheduledTask.date;
 
   scheduledTaskAsSheetsArray.push(taskName);
-  scheduledTaskAsSheetsArray.push(taskDate.toString());
+  scheduledTaskAsSheetsArray.push(taskDate);
   scheduledTaskAsSheetsArray.push(taskDurationMinutes);
   scheduledTaskAsSheetsArray.push(taskDescription);
   scheduledTaskAsSheetsArray.push(taskPriority);
