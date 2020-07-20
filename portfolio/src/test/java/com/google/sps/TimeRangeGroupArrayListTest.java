@@ -28,7 +28,9 @@ public final class TimeRangeGroupArrayListTest {
     TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
 
     List<TimeRange> timeRanges = Arrays.asList(timeRangeOne, timeRangeTwo);
-    TimeRangeGroupArrayList timeRangeGroup = new TimeRangeGroupArrayList(timeRanges);
+    TimeRangeGroupArrayList timeRangeGroup =
+        new TimeRangeGroupArrayList(
+            timeRanges, TimeRange.sortByTimeRangeStartTimeAscending, /* ascending= */ true);
 
     Instant timeRangeThreeStart = timeRangeOneStart.plusSeconds(200);
     Instant timeRangeThreeEnd = timeRangeThreeStart.plusSeconds(200);
@@ -61,7 +63,9 @@ public final class TimeRangeGroupArrayListTest {
     TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
 
     List<TimeRange> timeRanges = Arrays.asList(timeRangeOne, timeRangeTwo);
-    TimeRangeGroupArrayList timeRangeGroup = new TimeRangeGroupArrayList(timeRanges);
+    TimeRangeGroupArrayList timeRangeGroup =
+        new TimeRangeGroupArrayList(
+            timeRanges, TimeRange.sortByTimeRangeStartTimeAscending, /* ascending= */ true);
 
     TimeRange timeRangeThree =
         TimeRange.fromStartEnd(
@@ -85,7 +89,9 @@ public final class TimeRangeGroupArrayListTest {
     TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
 
     List<TimeRange> timeRanges = Arrays.asList(timeRangeOne, timeRangeTwo);
-    TimeRangeGroupArrayList timeRangeGroup = new TimeRangeGroupArrayList(timeRanges);
+    TimeRangeGroupArrayList timeRangeGroup =
+        new TimeRangeGroupArrayList(
+            timeRanges, TimeRange.sortByTimeRangeStartTimeAscending, /* ascending= */ true);
 
     TimeRange timeRangeToDelete =
         TimeRange.fromStartEnd(
@@ -117,7 +123,9 @@ public final class TimeRangeGroupArrayListTest {
     TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
 
     List<TimeRange> timeRanges = Arrays.asList(timeRangeOne, timeRangeTwo);
-    TimeRangeGroupArrayList timeRangeGroup = new TimeRangeGroupArrayList(timeRanges);
+    TimeRangeGroupArrayList timeRangeGroup =
+        new TimeRangeGroupArrayList(
+            timeRanges, TimeRange.sortByTimeRangeStartTimeAscending, /* ascending= */ true);
 
     TimeRange timeRangeToDelete =
         TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneStart.plusSeconds(1000));
@@ -145,7 +153,9 @@ public final class TimeRangeGroupArrayListTest {
     TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
 
     List<TimeRange> timeRanges = Arrays.asList(timeRangeOne, timeRangeTwo);
-    TimeRangeGroupArrayList timeRangeGroup = new TimeRangeGroupArrayList(timeRanges);
+    TimeRangeGroupArrayList timeRangeGroup =
+        new TimeRangeGroupArrayList(
+            timeRanges, TimeRange.sortByTimeRangeStartTimeAscending, /* ascending= */ true);
 
     TimeRange timeRangeToDelete =
         TimeRange.fromStartEnd(

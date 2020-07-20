@@ -4,24 +4,33 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /** Models an implementation of the TimeRangeGroup model using ArrayList. */
 public class TimeRangeGroupArrayList {
 
   public List<TimeRange> allTimeRanges;
+  private Comparator<TimeRange> comparator;
+  private boolean ascending;
+
+  public static final Comparator<TimeRange> sortByTimeRangeDurationAscending =
+      Comparator.comparing(TimeRange::duration);
 
   /**
    * Adds all the input time ranges to the list of all time ranges. Also sorts the list of all
    * ranges in the constructor.
    */
-  public TimeRangeGroupArrayList(Collection<TimeRange> timeRanges) {
+  public TimeRangeGroupArrayList(
+      Collection<TimeRange> timeRanges, Comparator<TimeRange> comparator, boolean ascending) {
     allTimeRanges = new ArrayList<TimeRange>();
     timeRanges.forEach(
         (range) -> {
           addTimeRange(range);
         });
-    Collections.sort(allTimeRanges, TimeRange.sortByTimeRangeStartTimeAscending);
+    this.comparator = comparator;
+    this.ascending = ascending;
+    sortTimeRanges(comparator, ascending);
   }
 
   /**
@@ -42,7 +51,7 @@ public class TimeRangeGroupArrayList {
 
   /** Returns the array list of all time ranges. */
   public List<TimeRange> getAllTimeRanges() {
-    Collections.sort(allTimeRanges, TimeRange.sortByTimeRangeStartTimeAscending);
+    sortTimeRanges(comparator, ascending);
     return allTimeRanges;
   }
 
@@ -73,9 +82,6 @@ public class TimeRangeGroupArrayList {
   public List<TimeRange> deleteTimeRange(TimeRange timeRangeToDelete) {
     for (TimeRange currentRange : allTimeRanges) {
       if (currentRange.contains(timeRangeToDelete)) {
-        System.out.println(currentRange);
-        System.out.println(timeRangeToDelete);
-
         Instant currentRangeStart = currentRange.start();
         Instant currentRangeEnd = currentRange.end();
         Instant toDeleteRangeStart = timeRangeToDelete.start();
@@ -91,7 +97,8 @@ public class TimeRangeGroupArrayList {
         if (currentRangeEnd.isAfter(toDeleteRangeEnd)) {
           allTimeRanges.add(TimeRange.fromStartEnd(toDeleteRangeEnd, currentRangeEnd));
         }
-        Collections.sort(allTimeRanges, TimeRange.sortByTimeRangeStartTimeAscending);
+        // Collections.sort(allTimeRanges, TimeRange.sortByTimeRangeStartTimeAscending);
+        sortTimeRanges(comparator, ascending);
         return allTimeRanges;
       }
     }
@@ -101,5 +108,17 @@ public class TimeRangeGroupArrayList {
     // Throw an invalid input exception here.
     throw new IllegalArgumentException(
         "The time range to delete must be contained by an existing time range");
+  }
+
+  /**
+   * Sorts the list of time ranges based on given comparator and whether to sort ascending or
+   * descending.
+   */
+  public void sortTimeRanges(Comparator<TimeRange> comparator, boolean ascending) {
+    if (ascending) {
+      Collections.sort(allTimeRanges, comparator);
+    } else {
+      Collections.sort(allTimeRanges, Collections.reverseOrder(comparator));
+    }
   }
 }
