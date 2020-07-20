@@ -4,7 +4,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public final class MaximizeScheduledTimeSchedulerTest {
+public final class LongestTaskFirstSchedulerTest {
+
+  @Test
+  public void dummyTest() {
+    Assert.assertEquals(1 == 1);
+  }
 
   // /** Tests that the reverse order comparator sorts tasks by duration in descending order. */
   // @Test

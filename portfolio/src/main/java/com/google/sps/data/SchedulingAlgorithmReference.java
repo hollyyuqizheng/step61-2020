@@ -11,7 +11,7 @@ public class SchedulingAlgorithmReference {
     switch (algorithmTypeString) {
       case "SHORTEST_TASK_FIRST":
         return Optional.of(SchedulingAlgorithmType.SHORTEST_TASK_FIRST);
-      case "MAXIMIZE_SCHEDULED_TIME":
+      case "LONGEST_TASK_FIRST":
         return Optional.of(SchedulingAlgorithmType.LONGEST_TASK_FIRST);
     }
     return Optional.empty();
@@ -27,8 +27,8 @@ public class SchedulingAlgorithmReference {
     switch (schedulingAlgorithmType) {
       case SHORTEST_TASK_FIRST:
         return Optional.of(new ShortestTaskFirstScheduler());
-      case MAXIMIZE_SCHEDULED_TIME:
-        return Optional.of(new MaximizeScheduledTimeScheduler());
+      case LONGEST_TASK_FIRST:
+        return Optional.of(new LongestTaskFirstScheduler());
     }
     return Optional.empty();
   }
