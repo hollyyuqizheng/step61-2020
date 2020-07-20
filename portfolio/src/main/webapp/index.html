@@ -42,7 +42,7 @@
     ></script>
   </head>
  
-  <body onload="setDatePickerToToday(); setNewEventStartAndEndTimes()">
+  <body onload="setDatePickerToToday(); setNewEventStartAndEndTimes(); setWorkingHour()">
     <div class="container-fluid">
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">Task Scheduler</a>
@@ -51,7 +51,7 @@
             <li class="nav-item nav-link">
               Date to schedule for:
               <!-- The default date will be set to current date by one of the onload functions -->
-              <input type="date" id="date-picker" value="2020-07-01" onchange="checkDatePicker(); setNewEventStartAndEndTimes()" />
+              <input type="date" id="date-picker" value="2020-07-01" onchange="checkDatePicker(); setNewEventStartAndEndTimes(); setWorkingHour()" />
               <small class="d-none" id="date-picker-warning">
                 The date you have picked is earlier than today. Please choose a different date to schedule tasks for.
               </small>
