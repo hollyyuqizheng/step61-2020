@@ -95,8 +95,7 @@ function collectAllScheduledTasks() {
         scheduledTaskName,
         scheduledTaskDescription,
         scheduledTaskDurationMinutes,
-        scheduledTaskPriority
-        );
+        scheduledTaskPriority);
 
     scheduledTask.task = task;
     scheduledTask.date = scheduledTaskScheduledTime;
