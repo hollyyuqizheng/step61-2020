@@ -30,6 +30,9 @@ public final class TimeRange {
   public static final Comparator<TimeRange> sortByTimeRangeStartTimeAscending =
       Comparator.comparing(TimeRange::start);
 
+  public static final Comparator<TimeRange> sortByTimeRangeDurationAscending =
+      Comparator.comparing(TimeRange::duration);
+
   private TimeRange(Instant start, Duration duration) {
     this.start = start;
     this.duration = duration;
@@ -93,7 +96,7 @@ public final class TimeRange {
 
   /**
    * Checks if a time range contains a time point. Helper method for contains and overlaps. This
-   * method is public so that it can be tested.
+   * method is package-private so that it can be tested.
    */
   static boolean timeRangeContainsPoint(TimeRange range, Instant point) {
     // If a range has no duration, it cannot contain anything.

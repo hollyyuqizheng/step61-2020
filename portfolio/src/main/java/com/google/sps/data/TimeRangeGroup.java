@@ -27,4 +27,11 @@ public interface TimeRangeGroup {
    * @return the newly modified collection of time ranges.
    */
   public Collection<TimeRange> deleteTimeRange(TimeRange timeRangeToDelete);
+
+  /**
+   * Sorts the collection of time ranges based on given comparator and a boolean value that denotes
+   * if the sorting is in ascending order. The comparator and the boolean value are passed to the
+   * constructor of the class.
+   */
+  public void sortTimeRanges(Comparator<TimeRange> comparator, boolean ascending);
 }
