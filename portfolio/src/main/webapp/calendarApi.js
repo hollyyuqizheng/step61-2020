@@ -1,78 +1,4 @@
 /**
- * Loads the API's client and auth2 modules.
- * Calls the initCalendarClient function after the modules load.
- */
-function initiateCalendarAuth() {
-  gapi.load('client:auth2', initCalendarClient);
-}
- 
-/** Starts authentication flow based on current user's login status. */
-function initCalendarClient() {
-  // If the user has not logged into their Google account yet, 
-  // initializes the gapi.client object, which app uses to make API requests.
-  // Initially, the scope is read-only to view user's Google Calendar.
-
-  // if (!gapi.auth2.getAuthInstance()) {
-  //   fetchApiKey();
-  //   gapi.client
-  //     .init({
-  //       apiKey: API_KEY,
-  //       clientId: CLIENT_ID,
-  //       discoveryDocs: [DISCOVERY_DOCS_CALENDAR, DISCOVERY_DOCS_SHEETS, DISCOVERY_DOCS_TASKS],
-  //       scope: SCOPE_CALENDAR_READ_ONLY + ' ' 
-  //           + SCOPE_SHEETS_READ_WRITE + ' ' 
-  //           + SCOPE_TASKS_READ_ONLY
-  //     })
-  //     .then(handleCalendarSignIn());
-  // } else {
-  //   // This is the case that the user has logged into their Google account. 
-  //   // Grants the read-only scope of Calendar to the current user. 
-  //   var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
-  //   googleUser.grant({scope: SCOPE_CALENDAR_READ_ONLY})
-  //       .then((response) => {
-  //         updateCalendarView(); 
-  //       } );
-  // }
-  fetchApiKey(); 
-
-  gapi.client
-      .init({
-        apiKey: API_KEY,
-        clientId: CLIENT_ID,
-        discoveryDocs: [DISCOVERY_DOCS_CALENDAR, DISCOVERY_DOCS_SHEETS, DISCOVERY_DOCS_TASKS],
-        scope: SCOPE_CALENDAR_READ_ONLY + ' ' 
-            + SCOPE_SHEETS_READ_WRITE + ' ' 
-            + SCOPE_TASKS_READ_ONLY
-      })
-      .then(handleCalendarSignIn());
-}
-
-/** 
- * Runs after the promise is returned from gapi.client.init.
- * Attaches a listener to the signed-in status of the user 
- * that handle all API buttons' display accordingly. 
- */
-// function finishCalendarInit() {
-//   console.log('finish calendar init'); 
-//   gapi.auth2.getAuthInstance().isSignedIn.listen(handleApiButtons);
-//   handleCalendarSignIn(); 
-// }
- 
-/** Signs user in. */
-function handleCalendarSignIn() {
-  gapi.auth2.getAuthInstance().signIn()
-      .then((response) => {
-        var $importCalendarMessage = $('#import-calendar-message');
-        $importCalendarMessage.addClass('d-none');
-        handleApiButtons(); 
-        updateCalendarView(); 
-      })
-      .catch(function(error) {
-        handleImportAuthError(error);
-      });
-}
- 
-/**
  * Updates import message box based on the error during authentication process
  * for importing.
  */
@@ -163,9 +89,9 @@ function listUpcomingEvents() {
   // The start and end time limits for imported events are
   // start and end of day of the user's picked date.
   const timeRangeStart = getUserPickedDate();
-  timeRangeStart.setHours(0,0,0);   
+  timeRangeStart.setHours(0, 0, 0);   
   const timeRangeEnd = getUserPickedDate();
-  timeRangeEnd.setHours(24, 0, 0);
+  timeRangeEnd.setHours(24, 0, 0); 
 
   // Retrieves events on the user's calendar for the day
   // that the user has picked in the nav bar.
@@ -234,7 +160,7 @@ function listUpcomingEvents() {
  * Asks the user for Write access to the API scope.
  */
 function addCalendarWriteScope() {
-  var googleUser = gapi.auth2.getAuthInstance().currentUser.get();
+  var googleUser = GoogleAuth.currentUser.get();
   googleUser.grant({scope: SCOPE_CALENDAR_READ_WRITE})
       .then((response) => {
         $('#export-calendar-message').addClass('d-none');
@@ -250,16 +176,18 @@ function addCalendarWriteScope() {
  * Adds the scheduled task items back to the user's Google Calendar.
  */
 function addNewEventsToGoogleCalendar() {
+  const scheduledTasks = collectAllScheduledTasks();
+  console.log(scheduledTasks);
   scheduledTasks.forEach((scheduledTask) => {
     const task = scheduledTask.task;
 
-    const taskStartTimeSeconds = scheduledTask.startTime.seconds;
+    const taskStartTimeMilliseconds = Date.parse(scheduledTask.date);
     const taskStartTime = new Date();
     // This is x1000 because the functions takes milliseconds
-    taskStartTime.setTime(taskStartTimeSeconds * 1000);
+    taskStartTime.setTime(taskStartTimeMilliseconds);
 
     const taskEndTime = new Date();
-    taskEndTime.setTime((taskStartTimeSeconds + task.duration.seconds) * 1000); 
+    taskEndTime.setTime(taskStartTimeMilliseconds + (task.duration * 60 * 1000)); 
 
     const currentScheduledTask = {
         summary: task.name,

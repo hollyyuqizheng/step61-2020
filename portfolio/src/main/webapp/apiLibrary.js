@@ -1,7 +1,7 @@
 const CLIENT_ID =
     '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
 
-var API_KEY; 
+var GoogleAuth; 
 
 // Constants for discovery documents' URLs. 
 const DISCOVERY_DOCS_CALENDAR =
@@ -23,15 +23,77 @@ const SCOPE_TASKS_READ_ONLY = 'https://www.googleapis.com/auth/tasks.readonly';
 const ERROR_CODES = {
   popup_closed_by_user: 'popup_closed_by_user',
   access_denied: 'access_denied'
-}; 
+};
 
-/** Calls the API key servlet to retrieve the key. */
 function fetchApiKey() {
-  fetch('./appConfigServlet')
-      .then(response => response.json()) 
-      .then((responseJson) => {
-        API_KEY = responseJson['API_KEY'];  
-      }); 
+  return fetch('./appConfigServlet').then(response => response.json());
+}
+
+/**
+ * Loads the API's client and auth2 modules.
+ * Calls the initCalendarClient function after the modules load.
+ */
+function handleClientLoad() {
+  gapi.load('client:auth2', initAuthentication);
+}
+
+function initAuthentication() {
+  fetchApiKey().then(responseJson =>
+      gapi.client
+          .init({
+            apiKey: responseJson['API_KEY'],
+            clientId: CLIENT_ID,
+            discoveryDocs: [DISCOVERY_DOCS_CALENDAR, DISCOVERY_DOCS_SHEETS, DISCOVERY_DOCS_TASKS],
+            scope: SCOPE_CALENDAR_READ_ONLY + ' ' 
+                + SCOPE_SHEETS_READ_WRITE + ' ' 
+                + SCOPE_TASKS_READ_ONLY
+          })
+          .then( function() {
+            GoogleAuth = gapi.auth2.getAuthInstance();
+
+            // Listen for sign-in state changes.
+            GoogleAuth.isSignedIn.listen(updateSigninStatus);
+
+            // Handle initial sign-in state. (Determine if user
+            // is already signed in.)
+            updateSigninStatus(GoogleAuth.isSignedIn.get());
+          }));
+}
+
+/** Signs user in. */
+function handleAuthClick() {
+  if (GoogleAuth.isSignedIn.get()) {
+    // User is authorized and has clicked "Sign out" button.
+    GoogleAuth.signOut();
+  } else {
+    // User is not signed in. Start Google auth flow.
+    GoogleAuth.signIn().catch(error => {
+      handleImportAuthError(error);
+    });
+  }
+/*
+  GoogleAuth.signIn()
+      .then((response) => {
+        var $importCalendarMessage = $('#import-calendar-message');
+        $importCalendarMessage.addClass('d-none');
+        handleApiButtons(); 
+        updateCalendarView(); 
+      })
+      .catch(function(error) {
+        handleImportAuthError(error);
+      });*/
+}
+
+function updateSigninStatus(isSignedIn) {
+  if (isSignedIn) {
+    var $importCalendarMessage = $('#import-calendar-message');
+    $importCalendarMessage.addClass('d-none');
+    handleApiButtons();
+    handleUiSheets();
+    updateCalendarView();
+  } else {
+    logOutAllApis();
+  }
 }
 
 /**
@@ -48,10 +110,8 @@ function handleApiButtons() {
   const $importCalendarButton = $('#import-calendar-button'); 
   const $exportCalendarButton = $('#export-calendar-button'); 
 
-  var currentAuth = gapi.auth2.getAuthInstance(); 
-
-  if (currentAuth && currentAuth.isSignedIn.get()) {
-    currentUser = currentAuth.currentUser.get(); 
+  if (GoogleAuth && GoogleAuth.isSignedIn.get()) {
+    currentUser = GoogleAuth.currentUser.get(); 
     if (currentUser.hasGrantedScopes(SCOPE_CALENDAR_READ_ONLY) ||
         currentUser.hasGrantedScopes(SCOPE_CALENDAR_READ_WRITE)){
       $logInCalendarButton.addClass('d-none');
@@ -92,7 +152,6 @@ function logOutAllApis() {
   const $connectTasksButton = $('#connect-tasks-btn'); 
   const $importCalendarButton = $('#import-calendar-button');
   const $exportCalendarButton = $('#export-calendar-button'); 
-  const $importTaskMenuWrapper = $('#import-menu-wrapper'); 
 
   $calendarView.addClass('d-none');
   $logInCalendarButton.removeClass('d-none');
@@ -101,7 +160,8 @@ function logOutAllApis() {
   $exportSheetsButton.addClass('d-none');
   $connectTasksButton.addClass('d-none'); 
   $importCalendarButton.addClass('d-none'); 
-  $importTaskMenuWrapper.addClass('d-none');
 
-  gapi.auth2.getAuthInstance().signOut();
+  clearImportMenu();
+
+  GoogleAuth.signOut();
 }

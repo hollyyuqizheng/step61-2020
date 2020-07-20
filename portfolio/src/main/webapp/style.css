@@ -7,7 +7,7 @@
 }
  
 .scrollable {
-  height: 300px;
+  height: 600px;
   overflow: scroll;
 }
  
@@ -32,6 +32,15 @@
   width: 100%;
 }
 
+.navbar-item {
+  margin: 3%;
+}
+ 
+#calendar-view {
+  min-height: 800px;
+  width: 100%;
+}
+ 
 .navbar-item {
   margin: 3%;
 }
