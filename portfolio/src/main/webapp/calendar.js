@@ -289,8 +289,6 @@ function getClosestNextHour(nextHour, workHourStartString, workHourEndString) {
  * or the defualt working hour end time (5pm) if next hour is past end time. 
  */
 function setWorkingHour() {
-  console.log('set working hour');
-
   const userPickedDate = getUserPickedDateFromDom();
   const $workingHourEndString = $('#working-hour-end').val(); 
   const workingHourEnd = parseInt($workingHourEndString.split(':')[0]); 
