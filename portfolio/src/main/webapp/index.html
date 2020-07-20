@@ -74,18 +74,6 @@
               />
               <small class="d-none" id="working-hour-warning"></small>
             </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                role="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                Scheduling algorithm preferences
-              </a>
-              <div class="dropdown-menu" aria-labelledby="navbar-dropdown"></div>
-            </li>
           </ul>
         </div>
       </nav>
@@ -251,9 +239,19 @@
         </div>
  
         <div id="schedule-result-wrapper" class="col-md-12 col-lg-6 col-xl-3">
-          <button type="button" class="btn btn-primary" onclick="startScheduling()">
-            Start scheduling!
-          </button>
+          <div id="scheduling-button-dropdown-row" class="row">
+            <div class="col">
+              Scheduling Type:
+              <select id="algorithm-type" class="form-control">
+                <option value="SHORTEST_TASK_FIRST">Shortest tasks first</option>
+              </select>
+            </div>
+            <div class="col">
+              <button type="button" class="btn btn-success" onclick="onClickStartScheduling()">
+                Start scheduling!
+              </button>
+            </div>
+          </div>
           <h2>3. Your tasks are scheduled here!</h2>
           <div id="schedule-result-list"></div>
           <button type="button" class="btn btn-primary d-none" id="export-calendar-button" onclick="addCalendarWriteScope()">
