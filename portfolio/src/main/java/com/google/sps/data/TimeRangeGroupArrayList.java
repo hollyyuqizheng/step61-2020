@@ -14,9 +14,6 @@ public class TimeRangeGroupArrayList {
   private Comparator<TimeRange> comparator;
   private boolean ascending;
 
-  public static final Comparator<TimeRange> sortByTimeRangeDurationAscending =
-      Comparator.comparing(TimeRange::duration);
-
   /**
    * Adds all the input time ranges to the list of all time ranges. Also sorts the list of all
    * ranges in the constructor.
