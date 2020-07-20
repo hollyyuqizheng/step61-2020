@@ -97,8 +97,11 @@ function collectAllScheduledTasks() {
 
     var scheduledTask = {};
     const task = new Task(
-        scheduledTaskName, scheduledTaskDescription,
-        scheduledTaskDurationMinutes, scheduledTaskPriority);
+        scheduledTaskName,
+        scheduledTaskDescription,
+        scheduledTaskDurationMinutes,
+        scheduledTaskPriority
+        );
 
     scheduledTask.task = task;
     scheduledTask.date = scheduledTaskScheduledTime;
