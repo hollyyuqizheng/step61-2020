@@ -94,7 +94,7 @@ public class TimeRangeGroupArrayList implements TimeRangeGroup {
         if (currentRangeEnd.isAfter(toDeleteRangeEnd)) {
           allTimeRanges.add(TimeRange.fromStartEnd(toDeleteRangeEnd, currentRangeEnd));
         }
-        // Collections.sort(allTimeRanges, TimeRange.sortByTimeRangeStartTimeAscending);
+
         sortTimeRanges(comparator, ascending);
         return allTimeRanges;
       }

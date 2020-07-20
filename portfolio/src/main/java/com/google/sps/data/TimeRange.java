@@ -33,6 +33,9 @@ public final class TimeRange {
   public static final Comparator<TimeRange> sortByTimeRangeDurationAscending =
       Comparator.comparing(TimeRange::duration);
 
+  public static final Comparator<TimeRange> sortByTimeRangeDurationAscendingThenStartTime =
+      Comparator.comparing(TimeRange::duration).thenComparing(TimeRange::start);
+
   private TimeRange(Instant start, Duration duration) {
     this.start = start;
     this.duration = duration;
