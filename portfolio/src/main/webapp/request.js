@@ -79,21 +79,18 @@ function collectAllScheduledTasks() {
   const scheduledTaskList = document.getElementById('schedule-result-list');
 
   scheduledTaskList.childNodes.forEach((scheduledTaskCard) => {
-    // The cardBody of the scheduledTaskCard
     const cardBody = scheduledTaskCard.childNodes[0];
 
-    const scheduledTaskName = cardBody.childNodes[0].innerText;
+    const scheduledTaskName =
+        cardBody.childNodes[0].getAttribute('data-task-name');
     const scheduledTaskScheduledTime =
-        cardBody.childNodes[1].innerText.substring(
-            SCHEDULED_TIME_INITIAL_TEXT.length);
+        cardBody.childNodes[1].getAttribute('data-task-time');
     const scheduledTaskDurationMinutes =
-        parseInt(cardBody.childNodes[2].innerText.substring(
-            DURATION_INITIAL_TEXT.length));
-    const scheduledTaskDescription = cardBody.childNodes[3].innerText.substring(
-        DESCRIPTION_INITIAL_TEXT.length);
+        parseInt(cardBody.childNodes[2].getAttribute('data-task-duration'));
+    const scheduledTaskDescription =
+        cardBody.childNodes[3].getAttribute('data-task-description');
     const scheduledTaskPriority =
-        parseInt(cardBody.childNodes[4].innerText.substring(
-            PRIORITY_INITIAL_TEXT.length));
+        parseInt(cardBody.childNodes[4].getAttribute('data-task-priority'));
 
     var scheduledTask = {};
     const task = new Task(
@@ -148,27 +145,32 @@ function addScheduledTaskToDom(scheduledTask) {
   const cardTitle = document.createElement('h4');
   cardTitle.classList.add('card-title');
   cardTitle.innerText = taskName;
+  cardTitle.setAttribute('data-task-name', taskName);
   cardBody.appendChild(cardTitle);
 
   const timeText = document.createElement('p');
   timeText.classList.add('card-text');
   timeText.innerText = SCHEDULED_TIME_INITIAL_TEXT + taskDate;
+  timeText.setAttribute('data-task-time', taskDate);
   cardBody.appendChild(timeText);
 
 
   const durationText = document.createElement('p');
   durationText.classList.add('card-text');
   durationText.innerText = DURATION_INITIAL_TEXT + taskDurationMinutes;
+  durationText.setAttribute('data-task-duration', taskDurationMinutes);
   cardBody.appendChild(durationText);
 
   const descriptionText = document.createElement('p');
   descriptionText.classList.add('card-text');
   descriptionText.innerText = DESCRIPTION_INITIAL_TEXT + taskDescription;
+  descriptionText.setAttribute('data-task-description', taskDescription);
   cardBody.appendChild(descriptionText);
 
   const priorityText = document.createElement('p');
   priorityText.classList.add('card-text');
   priorityText.innerText = PRIORITY_INITIAL_TEXT + taskPriority;
+  priorityText.setAttribute('data-task-priority', taskPriority);
   cardBody.appendChild(priorityText);
 
   const scheduledTaskList = document.getElementById('schedule-result-list');
