@@ -80,6 +80,14 @@ function createNewCalendarEventUserInput() {
     document.getElementById('new-event-name').value = EVENT_DEFAULT_NAME;
   }
 }
+
+/** Shows the "Event added" header. */
+function showEventAddedHeader() { 
+  const $eventListHeader = $('#event-added-header');
+  if ($eventListHeader.hasClass('d-none')) {
+    $eventListHeader.removeClass('d-none');
+  }
+}
  
 /**
  * Creates a Date object based on a string that represents a time in HH:MM
@@ -100,6 +108,8 @@ function getTimeObject(timeString) {
  
 /** Creates a card element for a new calendar event. */
 function updateCalendarEventList(newCalendarEvent) {
+  showEventAddedHeader();
+
   const newEventCard = document.createElement('div');
   newEventCard.classList.add('card');
  
@@ -322,6 +332,8 @@ function setWorkingHour() {
  
 /** Checks the validity of the user's working hours input. */
 function checkWorkingHourRange() {
+  const $startSchedulingButton = $('#start-scheduling-button');
+
   const workHourStartParts = $('#working-hour-start').val().split(':'); 
   const workHourStartHour =
       parseInt(workHourStartParts[0]);
@@ -337,8 +349,10 @@ function checkWorkingHourRange() {
   if (!isWorkingHourValid(
         workHourStartHour, workHourEndHour, workHourStartMinute, workHourEndMinute)) {
     $workHourWarning.removeClass('d-none').text('Working hours are not valid.');
+    $startSchedulingButton.attr('disabled', 'disabled'); 
   } else {
     $workHourWarning.empty().addClass('d-none');
+    $startSchedulingButton.removeAttr('disabled', 'disabled');
     // Only sets the default times for calendar events if
     // the inputted working hours are valid.
     setNewEventStartAndEndTimes();
@@ -358,13 +372,17 @@ function isWorkingHourValid(
  
 /** Checks if the date the user has picked is before the current date. */
 function checkDatePicker() {
+  const $startSchedulingButton = $('#start-scheduling-button');
+
   const pickedDate = getUserPickedDateFromDom();
   const now = new Date();
  
   if (pickedDate.getTime() < now.getTime()) {
     $('#date-picker-warning').removeClass('d-none');
+    $startSchedulingButton.attr('disabled', 'disabled');
   } else {
     $('#date-picker-warning').addClass('d-none');
+    $startSchedulingButton.removeAttr('disabled', 'disabled');
   }
 }
 

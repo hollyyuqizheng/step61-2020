@@ -1,11 +1,8 @@
 .container-fluid {
   background-color: #fffaf5;
-}
-
-.container-fluid {
   font-family: Calibri, Candara, Segoe, 'Segoe UI', Optima, Arial, sans-serif;
 }
- 
+
 .scrollable {
   height: 600px;
   overflow: scroll;

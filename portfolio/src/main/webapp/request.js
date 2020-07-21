@@ -54,15 +54,29 @@ function createScheduleRequestFromDom() {
  * Gets called when the user hits 'Start Scheduling'.
  */
 function onClickStartScheduling() {
-  // Create the request to send to the server using the data we collected from
-  // the web form.
-  fetchScheduledTasksFromServlet().then(handleScheduledTaskArray);
+  const inputTasks = collectAllTasks(); 
+  const $emptyTaskMessage = $('#empty-scheduled-task-message');
+
+  if (inputTasks.length == 0){
+    $emptyTaskMessage.removeClass('d-none');
+  } else {
+    $emptyTaskMessage.addClass('d-none'); 
+    // Create the request to send to the server using the data we collected from
+    // the web form.
+    fetchScheduledTasksFromServlet().then(handleScheduledTaskArray);
+  } 
 }
 
 /**
  * Updates the UI to show the results of a query.
  */
 function handleScheduledTaskArray(scheduledTaskArray) {
+  // Show the 2 export buttons only after scheduling finishes normally. 
+  const $exportCalendarButton = $('#export-calendar-button');
+  const $exportSheetsButton = $('#sheets-export-button');
+  $exportCalendarButton.removeClass('d-none');
+  $exportSheetsButton.removeClass('d-none');
+
   const resultElement = document.getElementById('schedule-result-list');
   resultElement.innerHTML = '';
   scheduledTaskArray.forEach(addScheduledTaskToDom);
@@ -109,11 +123,11 @@ function collectAllScheduledTasks() {
  * scheduled tasks.
  */
 function fetchScheduledTasksFromServlet() {
-  const scheduleRequest = createScheduleRequestFromDom();
+  const scheduleRequest = createScheduleRequestFromDom(); 
   const json = JSON.stringify(scheduleRequest);
   return fetch('/schedule', {method: 'POST', body: json}).then((response) => {
     return response.json();
-  });
+  }); 
 }
 
 /**

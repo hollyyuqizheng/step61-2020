@@ -5,10 +5,8 @@ function updateCalendarView() {
   if (isAuthorized) {
     showCalendarView(googleUser);
     $('#import-calendar-button').removeClass('d-none');
-    $('#export-calendar-button').removeClass('d-none');
   } else {
     $('#import-calendar-button').addClass('d-none');
-    $('#export-calendar-button').addClass('d-none');
   }
 }
 
@@ -120,7 +118,7 @@ function listUpcomingEvents() {
                     eventsEqual(newCalendarEvent, existingEvent),
                 /* initialValue= */ false);
  
-            if (!doesEventExist) {
+            if (!doesEventExist) { 
               updateCalendarEventList(newCalendarEvent);
             }
           });

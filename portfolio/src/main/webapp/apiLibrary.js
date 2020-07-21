@@ -78,7 +78,6 @@ function updateSigninStatus(isSignedIn) {
     var $importCalendarMessage = $('#import-auth-message');
     $importCalendarMessage.addClass('d-none');
     handleApiButtons();
-    handleUiSheets();
     updateCalendarView();
   } else {
     logOutAllApis();
@@ -119,7 +118,6 @@ function handleApiButtons() {
   const $exportSheetsButton = $('#sheets-export-button'); 
   const $connectTasksButton = $('#connect-tasks-btn'); 
   const $importCalendarButton = $('#import-calendar-button'); 
-  const $exportCalendarButton = $('#export-calendar-button'); 
 
   if (GoogleAuth && GoogleAuth.isSignedIn.get()) {
     currentUser = GoogleAuth.currentUser.get(); 
@@ -128,18 +126,10 @@ function handleApiButtons() {
       $logInButton.addClass('d-none');
       $logOutButton.removeClass('d-none');
       $importCalendarButton .removeClass('d-none');
-      $exportCalendarButton.removeClass('d-none');
     } else {
       $logInButton.removeClass('d-none');
       $logOutButton.addClass('d-none'); 
       $importCalendarButton .addClass('d-none');
-      $exportCalendarButton.addClass('d-none');
-    }
-      
-    if (currentUser.hasGrantedScopes(SCOPE_SHEETS_READ_WRITE)) {
-      $exportSheetsButton.removeClass('d-none'); 
-    } else {
-      $exportSheetsButton.addClass('d-none');
     }
 
     if (currentUser.hasGrantedScopes(SCOPE_TASKS_READ_ONLY)) {

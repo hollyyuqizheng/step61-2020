@@ -45,16 +45,13 @@
   <body onload="setDatePickerToToday(); setNewEventStartAndEndTimes(); setWorkingHour()">
     <div class="container-fluid">
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Task Scheduler</a>
-        <div class="collapse navbar-collapse">
+        <a class="navbar-brand">Task Scheduler</a>
           <ul class="navbar-nav">
             <li class="nav-item nav-link">
               Date to schedule for:
               <!-- The default date will be set to current date by one of the onload functions -->
               <input type="date" id="date-picker" value="2020-07-01" onchange="checkDatePicker(); setNewEventStartAndEndTimes(); setWorkingHour()" />
-              <small class="d-none" id="date-picker-warning">
-                The date you have picked is earlier than today. Please choose a different date to schedule tasks for.
-              </small>
+              
             </li>
             <li class="nav-item nav-link">
               Working hours:
@@ -75,8 +72,14 @@
               />
               <small class="d-none" id="working-hour-warning"></small>
           </ul>
-        </div>
       </nav>
+
+      <div class="row">
+        <div class="d-none alert alert-secondary" role="alert" id="date-picker-warning">
+          The date you have picked is earlier than today. Please choose a different date to schedule tasks for.
+        </div>
+        <div class="d-none alert alert-secondary" role="alert" id="working-hour-warning"></div>
+      </div>
 
       <div class="row">
         <div id="new-task-wrapper" class="col-md-12 col-lg-6 col-xl-3">
@@ -139,7 +142,7 @@
          </form>
 
           <br />
-          <h2>Tasks added:</h2>
+          <h2 id="task-added-header" class="d-none">Tasks added:</h2>
           <div id="new-task-list"></div>
           <button type="button" class="btn btn-warning" onclick="clearTasks()">Clear Tasks</button>
         </div>
@@ -203,7 +206,7 @@
             <button
               type="button"
               class="btn btn-primary"
-              onclick="createNewCalendarEventUserInput(); setClosestEventTime()"
+              onclick="createNewCalendarEventUserInput(); setNewEventStartAndEndTimes()"
             >
               Add this event
             </button>
@@ -220,7 +223,7 @@
           </form>
           <br /> 
           <div id="new-event-list-wrapper">
-            <h2 id="event-added-header">Events added:</h2>
+            <h2 class="d-none" id="event-added-header">Events added:</h2>
             <div class="alert alert-secondary d-none" role="alert" id="empty-calendar-import-message"></div>
             <div id="new-event-list"></div>
           </div>
@@ -249,7 +252,6 @@
             </div>
           </div>
           <br />
-          <h2>3. Your tasks are scheduled here!</h2>
           <div id="schedule-result-list"></div>
           <div class="alert alert-secondary d-none" role="alert" id="empty-scheduled-task-message">It seems like you haven't added any tasks to schedule.</div>
           <button type="button" class="btn btn-primary d-none" id="export-calendar-button" onclick="addCalendarWriteScope()">
