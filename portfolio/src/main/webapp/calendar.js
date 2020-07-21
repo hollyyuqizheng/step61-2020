@@ -322,6 +322,8 @@ function setWorkingHour() {
  
 /** Checks the validity of the user's working hours input. */
 function checkWorkingHourRange() {
+  const $startSchedulingButton = $('#start-scheduling-button');
+
   const workHourStartParts = $('#working-hour-start').val().split(':'); 
   const workHourStartHour =
       parseInt(workHourStartParts[0]);
@@ -337,8 +339,10 @@ function checkWorkingHourRange() {
   if (!isWorkingHourValid(
         workHourStartHour, workHourEndHour, workHourStartMinute, workHourEndMinute)) {
     $workHourWarning.removeClass('d-none').text('Working hours are not valid.');
+    $startSchedulingButton.attr('disabled', 'disabled'); 
   } else {
     $workHourWarning.empty().addClass('d-none');
+    $startSchedulingButton.removeAttr('disabled', 'disabled');
     // Only sets the default times for calendar events if
     // the inputted working hours are valid.
     setNewEventStartAndEndTimes();

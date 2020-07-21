@@ -51,9 +51,7 @@
               Date to schedule for:
               <!-- The default date will be set to current date by one of the onload functions -->
               <input type="date" id="date-picker" value="2020-07-01" onchange="checkDatePicker(); setNewEventStartAndEndTimes(); setWorkingHour()" />
-              <small class="d-none" id="date-picker-warning">
-                The date you have picked is earlier than today. Please choose a different date to schedule tasks for.
-              </small>
+              
             </li>
             <li class="nav-item nav-link">
               Working hours:
@@ -72,7 +70,7 @@
                 value="17:00"
                 onchange="checkWorkingHourRange()"
               />
-              <small class="d-none" id="working-hour-warning"></small>
+              
             <li class="nav-item nav-link">
               Scheduling Type:
               <select id="algorithm-type" name="algorithm-type">
@@ -81,6 +79,13 @@
             </li> 
           </ul>
       </nav>
+
+      <div class="row">
+        <div class="d-none alert alert-secondary" role="alert" id="date-picker-warning">
+          The date you have picked is earlier than today. Please choose a different date to schedule tasks for.
+        </div>
+        <div class="d-none alert alert-secondary" role="alert" id="working-hour-warning"></div>
+      </div>
 
       <div class="row">
         <div id="new-task-wrapper" class="col-md-12 col-lg-6 col-xl-3">
@@ -245,7 +250,7 @@
         </div>
  
         <div id="schedule-result-wrapper" class="col-md-12 col-lg-6 col-xl-3">
-          <button type="button" class="btn-lg btn-success" onclick="onClickStartScheduling()">
+          <button type="button" class="btn-lg btn-success" id="start-scheduling-button" onclick="onClickStartScheduling()">
             Start scheduling!
           </button>
           <h2>3. Your tasks are scheduled here!</h2>

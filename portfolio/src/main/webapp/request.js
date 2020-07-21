@@ -54,9 +54,17 @@ function createScheduleRequestFromDom() {
  * Gets called when the user hits 'Start Scheduling'.
  */
 function onClickStartScheduling() {
-  // Create the request to send to the server using the data we collected from
-  // the web form.
-  fetchScheduledTasksFromServlet().then(handleScheduledTaskArray);
+  const inputTasks = collectAllTasks(); 
+  const $emptyTaskMessage = $('#empty-scheduled-task-message');
+
+  if (inputTasks.length == 0){
+    $emptyTaskMessage.removeClass('d-none');
+  } else {
+    $emptyTaskMessage.addClass('d-none'); 
+    // Create the request to send to the server using the data we collected from
+    // the web form.
+    fetchScheduledTasksFromServlet().then(handleScheduledTaskArray);
+  } 
 }
 
 /**
@@ -109,11 +117,11 @@ function collectAllScheduledTasks() {
  * scheduled tasks.
  */
 function fetchScheduledTasksFromServlet() {
-  const scheduleRequest = createScheduleRequestFromDom();
+  const scheduleRequest = createScheduleRequestFromDom(); 
   const json = JSON.stringify(scheduleRequest);
   return fetch('/schedule', {method: 'POST', body: json}).then((response) => {
     return response.json();
-  });
+  }); 
 }
 
 /**
