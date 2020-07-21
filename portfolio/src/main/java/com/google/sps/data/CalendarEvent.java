@@ -48,4 +48,14 @@ public class CalendarEvent {
   public Instant getEndTime() {
     return endTime;
   }
+  @Override
+  public boolean equals(Object other) {
+    return other instanceof CalendarEvent && equals(this, (CalendarEvent) other);
+  }
+
+  public static boolean equals(CalendarEvent a, CalendarEvent b) {
+    return a.name.equals(b.name)
+        && a.startTime.equals(b.startTime)
+        && a.endTime.equals(b.endTime);
+  }
 }
