@@ -148,7 +148,7 @@
          </form>
 
           <br />
-          <h2>Tasks added:</h2>
+          <h2 id="task-added-header" class="d-none">Tasks added:</h2>
           <div id="new-task-list"></div>
           <button type="button" class="btn btn-warning" onclick="clearTasks()">Clear Tasks</button>
         </div>
@@ -212,7 +212,7 @@
             <button
               type="button"
               class="btn btn-primary"
-              onclick="createNewCalendarEventUserInput(); setClosestEventTime()"
+              onclick="createNewCalendarEventUserInput(); setNewEventStartAndEndTimes()"
             >
               Add this event
             </button>
@@ -229,7 +229,7 @@
           </form>
           <br /> 
           <div id="new-event-list-wrapper">
-            <h2 id="event-added-header">Events added:</h2>
+            <h2 class="d-none" id="event-added-header">Events added:</h2>
             <div class="alert alert-secondary d-none" role="alert" id="empty-calendar-import-message"></div>
             <div id="new-event-list"></div>
           </div>

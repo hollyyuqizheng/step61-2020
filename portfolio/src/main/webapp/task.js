@@ -71,8 +71,18 @@ function createNewTask() {
   updateTaskList(newTask, lengthUnit);
 }
 
+/** Shows the "Task Added" header. */
+function showTaskAddedHeader() {
+  const $taskListHeader = $('#task-added-header');
+  if ($taskListHeader.hasClass('d-none')) {
+    $taskListHeader.removeClass('d-none');
+  }
+}
+
 /** Display Task information from user input. */
 function updateTaskList(newTask, lengthUnit) {
+  showTaskAddedHeader();
+  
   const newTaskCard = document.createElement('div');
   newTaskCard.classList.add('card');
 

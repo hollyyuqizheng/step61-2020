@@ -147,7 +147,7 @@ function listUpcomingEvents() {
                     eventsEqual(newCalendarEvent, existingEvent),
                 /* initialValue= */ false);
  
-            if (!doesEventExist) {
+            if (!doesEventExist) { 
               updateCalendarEventList(newCalendarEvent);
             }
           });

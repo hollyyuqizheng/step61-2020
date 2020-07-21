@@ -80,6 +80,14 @@ function createNewCalendarEventUserInput() {
     document.getElementById('new-event-name').value = EVENT_DEFAULT_NAME;
   }
 }
+
+/** Shows the "Event added" header. */
+function showEventAddedHeader() { 
+  const $eventListHeader = $('#event-added-header');
+  if ($eventListHeader.hasClass('d-none')) {
+    $eventListHeader.removeClass('d-none');
+  }
+}
  
 /**
  * Creates a Date object based on a string that represents a time in HH:MM
@@ -100,6 +108,8 @@ function getTimeObject(timeString) {
  
 /** Creates a card element for a new calendar event. */
 function updateCalendarEventList(newCalendarEvent) {
+  showEventAddedHeader();
+
   const newEventCard = document.createElement('div');
   newEventCard.classList.add('card');
  
