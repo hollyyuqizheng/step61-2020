@@ -362,13 +362,17 @@ function isWorkingHourValid(
  
 /** Checks if the date the user has picked is before the current date. */
 function checkDatePicker() {
+  const $startSchedulingButton = $('#start-scheduling-button');
+
   const pickedDate = getUserPickedDateFromDom();
   const now = new Date();
  
   if (pickedDate.getTime() < now.getTime()) {
     $('#date-picker-warning').removeClass('d-none');
+    $startSchedulingButton.attr('disabled', 'disabled');
   } else {
     $('#date-picker-warning').addClass('d-none');
+    $startSchedulingButton.removeAttr('disabled', 'disabled');
   }
 }
 
