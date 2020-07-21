@@ -3,9 +3,8 @@ package com.google.sps.data;
 import java.time.Instant;
 
 /**
- * <<<<<<< HEAD This is a wrapper class for scheduled tasks. Includes a Task and the Instant when it
- * is scheduled. ======= This is a wrapper class for scheduled tasks. Includes a Task and the
- * Instant when it is scheduled. >>>>>>> origin/master
+ * This is a wrapper class for scheduled tasks. Includes a Task and the Instant when it is
+ * scheduled.
  */
 public class ScheduledTask {
   private final Task task;
