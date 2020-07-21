@@ -23,6 +23,9 @@
   width: 100%;
 }
 
+.btn-primary {
+  margin-top: 2px;
+}
 .card {
   margin-bottom: 15px; 
 }

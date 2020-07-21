@@ -74,12 +74,6 @@
                 onchange="checkWorkingHourRange()"
               />
               <small class="d-none" id="working-hour-warning"></small>
-            <li class="nav-item nav-link">
-              Scheduling Type:
-              <select id="algorithm-type" name="algorithm-type">
-                <option value="SHORTEST_TASK_FIRST">Shortest tasks first</option>
-              </select>
-            </li> 
           </ul>
         </div>
       </nav>
@@ -235,21 +229,26 @@
         <div id="calendar-wrapper" class="col-md-12 col-lg-6 col-xl-3">
           <div id="calendar-view-wrapper">
             <iframe title="Your Google Calendar" id="calendar-view" class="d-none" scrolling="yes"></iframe>
-            <button type="button" class="btn btn-primary" id="calendar-auth-button" onclick="handleAuthClick()">
+            <button type="button" class="btn btn-primary" id="google-auth-button" onclick="handleAuthClick()">
               Log in to see your Google Calendar
             </button>
-            <button type="button" class="btn btn-primary d-none" id="calendar-logout-button" onclick="logOutAllApis()"> 
+            <button type="button" class="btn btn-primary d-none" id="google-logout-button" onclick="logOutAllApis()"> 
               Log out of your Google account
             </button>
           </div>
           
-          <div class="d-none" id="import-calendar-message"></div>
+          <div class="d-none" id="import-auth-message"></div>
         </div>
  
         <div id="schedule-result-wrapper" class="col-md-12 col-lg-6 col-xl-3">
-          <button type="button" class="btn-lg btn-success" onclick="onClickStartScheduling()">
-            Start scheduling!
-          </button>
+          <div class="input-group input-group-lg" id="algorithm-menu-wrapper">
+            <select class="custom-select" id="algorithm-type">
+              <option value="SHORTEST_TASK_FIRST">Shortest Tasks First</option>
+            </select><div class="input-group-append">
+            <button class="btn btn-success" type="button" onclick="onClickStartScheduling()">Start Scheduling!</button>
+            </div>
+          </div>
+          <br />
           <h2>3. Your tasks are scheduled here!</h2>
           <div id="schedule-result-list"></div>
           <div class="alert alert-secondary d-none" role="alert" id="empty-scheduled-task-message">It seems like you haven't added any tasks to schedule.</div>

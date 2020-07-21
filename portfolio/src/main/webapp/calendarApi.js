@@ -1,30 +1,3 @@
-/**
- * Updates import message box based on the error during authentication process
- * for importing.
- */
-function handleImportAuthError(e) {
-  var $importCalendarMessage = $('#import-calendar-message');
- 
-  var errorMessage;
-  if (e.error === ERROR_CODES.popup_closed_by_user) {
-    errorMessage =
-        'It seems like you didn\'t complete the authorization process. ' +
-        'Please click the Login button again.'
-  } else if (e.error === ERROR_CODES.access_denied) {
-    errorMessage =
-        'You didn\'t give permission to view your Google Calendar, ' +
-        'so your calendar events cannot be viewed or imported.'
-  } else {
-    errorMessage = 'An error occurred.';
-  }
-  $importCalendarMessage.text(errorMessage).removeClass('d-none');
-}
- 
-/** Disconnects current user authentication. */
-function revokeCalendarAccess() {
-  gapi.auth2.getAuthInstance().disconnect();
-}
-
 /** Updates the calendar view and button visibility based on login status. */
 function updateCalendarView() {
   const googleUser = gapi.auth2.getAuthInstance().currentUser.get();
