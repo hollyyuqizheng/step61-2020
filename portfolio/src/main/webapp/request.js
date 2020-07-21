@@ -71,6 +71,12 @@ function onClickStartScheduling() {
  * Updates the UI to show the results of a query.
  */
 function handleScheduledTaskArray(scheduledTaskArray) {
+  // Show the 2 export buttons only after scheduling finishes normally. 
+  const $exportCalendarButton = $('#export-calendar-button');
+  const $exportSheetsButton = $('#sheets-export-button');
+  $exportCalendarButton.removeClass('d-none');
+  $exportSheetsButton.removeClass('d-none');
+
   const resultElement = document.getElementById('schedule-result-list');
   resultElement.innerHTML = '';
   scheduledTaskArray.forEach(addScheduledTaskToDom);
