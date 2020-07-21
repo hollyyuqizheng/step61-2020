@@ -39,7 +39,7 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
     List<TimeRange> availableTimes = calendarEventsGroup.getFreeTimeRanges();
 
     // Create a TimeRangeGroup class for the free time ranges.
-    // The comparator is by time range duration ascending.
+    // The comparator is by time range duration and then start time ascending.
     TimeRangeGroup availableTimesGroup =
         new TimeRangeGroupArrayList(
             availableTimes,
@@ -52,10 +52,10 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
       Task task = tasksList.get(taskIndex);
       Duration taskDuration = task.getDuration();
 
-      // Find the first free time range that is longer than
+      // Find the first free time range that is longer than the current task's duration.
       for (int freeRangeIndex = 0; freeRangeIndex < availableTimes.size(); freeRangeIndex++) {
         TimeRange currentFreeTimeRange = availableTimes.get(freeRangeIndex);
-        // Check if current free time range's duration is equal or larger than tasks' duration.
+
         if (currentFreeTimeRange.duration().compareTo(taskDuration) >= 0) {
           Instant scheduledTime = currentFreeTimeRange.start();
           ScheduledTask scheduledTask = new ScheduledTask(task, scheduledTime);
