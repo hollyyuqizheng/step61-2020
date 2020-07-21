@@ -292,6 +292,25 @@ function validateTaskDuration(duration) {
   }
 }
 
+/** 
+ * Sets the task list title according to the date that the user has picked.
+ * For example, if the user picks today to schedule for, the title will read
+ * "Add any tasks you want to schedule for today."
+ * If the user picked July 1, 2020, the title then reads "Add any tasks you
+ * want to schedule for 2020-07-01." 
+ */
+function setTaskInstructionTitle() {
+  const userPickedDate = getUserPickedDateFromDom();
+  const $taskTitle = $('#task-instruction-title');
+
+  const baseString = '1. Add any tasks you want to schedule for ';
+  if (isToday(userPickedDate)) {
+    $taskTitle.text(baseString + 'today'); 
+  } else {
+    $taskTitle.text(baseString + $('#date-picker').val()); 
+  }
+}
+
 module.exports.getDurationMinutes = getDurationMinutes;
 module.exports.validateTaskDuration = validateTaskDuration;
 module.exports.validateTaskName = validateTaskName;

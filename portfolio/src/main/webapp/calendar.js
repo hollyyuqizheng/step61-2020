@@ -229,25 +229,36 @@ function constructTodayString(year, month, date) {
  * The default end time is set to the end of working hour.
  */
 function setNewEventStartAndEndTimes() {
-  const workHourStartString = $('#working-hour-start').val();
-  const workHourEndString = $('#working-hour-end').val();
+  const workingHourStartString = $('#working-hour-start').val();
+  const workingHourEndString = $('#working-hour-end').val();
 
   const userPickedDate = getUserPickedDateFromDom();
   var defaultEventStartHour; 
+  var defaultEventEndHour; 
+
+  const now = new Date();
+  var nextHour = now.getHours() + 1;
 
   if (isToday(userPickedDate)) {
     // If user picked today to schedule for, 
     // the default event starts on the next hour if it is before
     // working hour ends. 
-    const now = new Date();
-    var nextHour = now.getHours() + 1;
-    defaultEventStartHour = getClosestNextHour(nextHour, workHourStartString, workHourEndString);
+    defaultEventStartHour = getClosestNextHour(nextHour, workingHourStartString, workingHourEndString);
+    defaultEventEndHour = getClosestNextHour(nextHour + 1, workingHourStartString, workingHourEndString);
   } else {
-    defaultEventStartHour = workHourStartString; 
-  }
+    defaultEventStartHour = workingHourStartString; 
+
+    // Construct the default event end time for a picked date later than today.
+    // The default event end time in this case is an hour after working hour start time. 
+    var oneHourAfterWorkingHourStart = parseInt(workingHourStartString.split(':')[0]) + 1; 
+    if (oneHourAfterWorkingHourStart < 10) {
+      oneHourAfterWorkingHourStart = '0' + oneHourAfterWorkingHourStart; 
+    }
+    defaultEventEndHour = oneHourAfterWorkingHourStart + ':00'; 
+  }  
    
   $('#new-event-start-time').val(defaultEventStartHour);
-  $('#new-event-end-time').val(workHourEndString);
+  $('#new-event-end-time').val(defaultEventEndHour);
 }
 
 /** Checks if a date is today. */
@@ -383,6 +394,7 @@ function checkDatePicker() {
   } else {
     $('#date-picker-warning').addClass('d-none');
     $startSchedulingButton.removeAttr('disabled', 'disabled');
+    setTaskInstructionTitle(); 
   }
 }
 

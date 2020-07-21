@@ -70,7 +70,6 @@
                 value="17:00"
                 onchange="checkWorkingHourRange()"
               />
-              <small class="d-none" id="working-hour-warning"></small>
           </ul>
       </nav>
 
@@ -248,7 +247,7 @@
             <select class="custom-select" id="algorithm-type">
               <option value="SHORTEST_TASK_FIRST">Shortest Tasks First</option>
             </select><div class="input-group-append">
-            <button class="btn btn-success" type="button" onclick="onClickStartScheduling()">Start Scheduling!</button>
+            <button class="btn btn-success" id="start-scheduling-button" type="button" onclick="onClickStartScheduling()">Start Scheduling!</button>
             </div>
           </div>
           <br />
