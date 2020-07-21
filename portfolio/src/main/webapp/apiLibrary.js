@@ -71,22 +71,11 @@ function handleAuthClick() {
       handleImportAuthError(error);
     });
   }
-/*
-  GoogleAuth.signIn()
-      .then((response) => {
-        var $importCalendarMessage = $('#import-calendar-message');
-        $importCalendarMessage.addClass('d-none');
-        handleApiButtons(); 
-        updateCalendarView(); 
-      })
-      .catch(function(error) {
-        handleImportAuthError(error);
-      });*/
 }
 
 function updateSigninStatus(isSignedIn) {
   if (isSignedIn) {
-    var $importCalendarMessage = $('#import-calendar-message');
+    var $importCalendarMessage = $('#import-auth-message');
     $importCalendarMessage.addClass('d-none');
     handleApiButtons();
     updateCalendarView();
@@ -96,14 +85,37 @@ function updateSigninStatus(isSignedIn) {
 }
 
 /**
+ * Updates import message box based on the error during authentication process
+ * for importing.
+ */
+function handleImportAuthError(e) {
+  var $importAuthMessage = $('#import-auth-message');
+ 
+  var errorMessage;
+  if (e.error === ERROR_CODES.popup_closed_by_user) {
+    errorMessage =
+        'It seems like you didn\'t complete the authorization process. ' +
+        'Please click the Login button again.'
+  } else if (e.error === ERROR_CODES.access_denied) {
+    errorMessage =
+        'You didn\'t give permission to view your Google Account, ' +
+        'so your information cannot be viewed or imported.'
+  } else {
+    errorMessage = 'An error occurred.';
+  }
+  $importAuthMessage.text(errorMessage).removeClass('d-none');
+}
+
+/**
  * If current use is signed in and authorized,
  * for read-only access to any of the APIs, 
  * hide the log-in button and show log-out button for that API.
  * Otherwise, the user needs to log in and/or authorize. 
  */
 function handleApiButtons() {
-  const $logInCalendarButton = $('#calendar-auth-button');
-  const $logOutCalendarButton = $('#calendar-logout-button');
+  const $logInButton = $('#google-auth-button');
+  const $logOutButton = $('#google-logout-button');
+  const $exportSheetsButton = $('#sheets-export-button'); 
   const $connectTasksButton = $('#connect-tasks-btn'); 
   const $importCalendarButton = $('#import-calendar-button'); 
 
@@ -111,12 +123,12 @@ function handleApiButtons() {
     currentUser = GoogleAuth.currentUser.get(); 
     if (currentUser.hasGrantedScopes(SCOPE_CALENDAR_READ_ONLY) ||
         currentUser.hasGrantedScopes(SCOPE_CALENDAR_READ_WRITE)){
-      $logInCalendarButton.addClass('d-none');
-      $logOutCalendarButton.removeClass('d-none');
+      $logInButton.addClass('d-none');
+      $logOutButton.removeClass('d-none');
       $importCalendarButton .removeClass('d-none');
     } else {
-      $logInCalendarButton.removeClass('d-none');
-      $logOutCalendarButton.addClass('d-none'); 
+      $logInButton.removeClass('d-none');
+      $logOutButton.addClass('d-none'); 
       $importCalendarButton .addClass('d-none');
     }
 
@@ -135,16 +147,16 @@ function handleApiButtons() {
  */
 function logOutAllApis() {
   const $calendarView = $('#calendar-view');
-  const $logInCalendarButton = $('#calendar-auth-button');
-  const $logOutCalendarButton = $('#calendar-logout-button');
+  const $logInButton = $('#google-auth-button');
+  const $logOutButton = $('#google-logout-button');
   const $exportSheetsButton = $('#sheets-export-button'); 
   const $connectTasksButton = $('#connect-tasks-btn'); 
   const $importCalendarButton = $('#import-calendar-button');
   const $exportCalendarButton = $('#export-calendar-button'); 
 
   $calendarView.addClass('d-none');
-  $logInCalendarButton.removeClass('d-none');
-  $logOutCalendarButton.addClass('d-none');
+  $logInButton.removeClass('d-none');
+  $logOutButton.addClass('d-none');
   $exportCalendarButton.addClass('d-none'); 
   $exportSheetsButton.addClass('d-none');
   $connectTasksButton.addClass('d-none'); 

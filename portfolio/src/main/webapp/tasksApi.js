@@ -1,7 +1,16 @@
 var importMenuVisible;
 
-function initClientTasks() {
-  toggleTasks();
+/** 
+ * This function toggles between displaying and clearing the "import
+ * tasks" menu. The importMenuVisible boolean is toggled inside the
+ * functions that are called.
+ */
+function toggleTasks() {
+  if (importMenuVisible) {
+    clearImportMenu();
+  } else if (!importMenuVisible) {
+    drawImportMenu();
+  }
 }
 
 /**
@@ -47,8 +56,8 @@ function importTasklist(tasklistId) {
 function drawImportMenu() {
   importMenuVisible = true;
 
-  const button = $('#connect-tasks-btn')[0];
-  button.innerText = 'Unlink Tasks';
+  const $button = $('#connect-tasks-btn')[0];
+  $button.innerText = 'Unlink Tasks';
 
   // Create a div element to hold the custom select.
   const customSelect = document.getElementById('import-menu-wrapper');
@@ -93,8 +102,8 @@ function drawImportMenu() {
 function clearImportMenu() {
   importMenuVisible = false;
 
-  const button = $('#connect-tasks-btn')[0];
-  button.innerText = 'Link Tasks';
+  const $button = $('#connect-tasks-btn')[0];
+  $button.innerText = 'Link Tasks';
   
   const menuWrapper = document.getElementById('import-menu-wrapper');
   menuWrapper.innerHTML = '';
@@ -112,32 +121,4 @@ function handleImportButtonPress() {
 function clearTasks() {
   const toClear = document.getElementById('new-task-list');
   toClear.innerHTML = '';
-}
-
-function handleTaskAuthError(e) {
-  var text;
-  if (e.error == 'popup_closed_by_user') {
-    text =
-        'Please complete the entire sign in process if you wish to import Tasks.';
-  } else if (e.error == 'access_denied') {
-    text = 'You have denied this app from accessing your tasks,' +
-        'please allow access if you wish to import tasks.';
-  } else {
-    text =
-        'Unknown error encountered when granting permissions. Please try again.';
-  }
-  $('#task-link-error').text(text);
-  $('#task-link-error').addClass('d-block');
-}
-
-function clearAuthErrorPrompt() {
-  $('#task-link-error').empty().removeClass('d-block');
-}
-
-function toggleTasks() {
-  if (importMenuVisible) {
-    clearImportMenu();
-  } else if (!importMenuVisible) {
-    drawImportMenu();
-  }
 }

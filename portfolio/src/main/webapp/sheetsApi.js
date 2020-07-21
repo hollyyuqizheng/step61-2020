@@ -1,18 +1,5 @@
 const URL_DOCUMENT_BEGINNING = 'https://docs.google.com/spreadsheets/d/';
 
-// Error codes that the process can throw
-const ERROR_CODE_SHEETS = {
-  POPUP_CLOSED: 'popup_closed_by_user',
-  ACCESS_DENIED: 'access_denied'
-};
-
-/**
- * On load, called to load the auth2 library and API client library.
- */
-function handleClientLoadSheets() {
-  gapi.load('client:auth2', initClientSheets);
-}
-
 /**
  * Initializes the API client library and sets up sign-in state
  * listeners.
