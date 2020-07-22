@@ -39,12 +39,7 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
     List<TimeRange> availableTimes = calendarEventsGroup.getFreeTimeRanges();
 
     // Create a TimeRangeGroup class for the free time ranges.
-    // The comparator is by time range duration and then start time ascending.
-    TimeRangeGroup availableTimesGroup =
-        new TimeRangeGroupArrayList(
-            availableTimes,
-            TimeRange.sortByTimeRangeDurationAscendingThenStartTime,
-            /* ascending= */ true);
+    TimeRangeGroup availableTimesGroup = new TimeRangeGroupArrayList(availableTimes);
 
     List<ScheduledTask> scheduledTasks = new ArrayList<ScheduledTask>();
 
@@ -65,8 +60,18 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
           // the original free time range.
           TimeRange scheduledTimeRange =
               TimeRange.fromStartEnd(scheduledTime, scheduledTime.plus(taskDuration));
-          availableTimes =
-              (ArrayList<TimeRange>) availableTimesGroup.deleteTimeRange(scheduledTimeRange);
+
+          availableTimesGroup.deleteTimeRange(scheduledTimeRange);
+          Iterator<TimeRange> updatedAvailableTimesGroupIterator =
+              availableTimesGroup.getAllTimeRanges();
+
+          // Reconstruct availableTimes list based on the updated iterator after delete.
+          availableTimes = new ArrayList();
+          while (updatedAvailableTimesGroupIterator.hasNext()) {
+            availableTimes.add(updatedAvailableTimesGroupIterator.next());
+          }
+          Collections.sort(
+              availableTimes, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
 
           // Break out of the inner for loop, as the current task
           // is scheduled and the outer loops needs to move to the next task.
