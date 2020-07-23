@@ -56,8 +56,8 @@ function importTasklist(tasklistId) {
 function drawImportMenu() {
   importMenuVisible = true;
 
-  const $button = $('#connect-tasks-btn')[0];
-  $button.innerText = 'Unlink Tasks';
+  const $toggleTasksButton = $('#connect-tasks-btn')[0];
+  $toggleTasksButton.innerText = 'Unlink Tasks';
 
   // Create a div element to hold the custom select.
   const customSelect = document.getElementById('import-menu-wrapper');
@@ -102,8 +102,8 @@ function drawImportMenu() {
 function clearImportMenu() {
   importMenuVisible = false;
 
-  const $button = $('#connect-tasks-btn')[0];
-  $button.innerText = 'Link Tasks';
+  const $toggleTasksButton = $('#connect-tasks-btn')[0];
+  $toggleTasksButton.innerText = 'Link Tasks';
 
   const menuWrapper = document.getElementById('import-menu-wrapper');
   menuWrapper.innerHTML = '';
