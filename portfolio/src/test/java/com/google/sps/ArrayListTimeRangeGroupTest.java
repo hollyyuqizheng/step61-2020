@@ -1,7 +1,5 @@
-package com.google.sps;
+package com.google.sps.data;
 
-import com.google.sps.data.ArrayListTimeRangeGroup;
-import com.google.sps.data.TimeRange;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -118,7 +116,7 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expected = Arrays.asList(timeRangeOne, timeRangeNew, timeRangeTwo);
 
     timeRangeGroup.addTimeRange(timeRangeToAdd);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRanges();
+    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
     while (actualIterator.hasNext()) {
@@ -158,7 +156,7 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expected = Arrays.asList(timeRangeTwo, timeRangeNew);
 
     timeRangeGroup.addTimeRange(timeRangeToAdd);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRanges();
+    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
     while (actualIterator.hasNext()) {
@@ -197,7 +195,7 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expected = Arrays.asList(timeRangeOne, timeRangeNew);
 
     timeRangeGroup.addTimeRange(timeRangeToAdd);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRanges();
+    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
     while (actualIterator.hasNext()) {
@@ -239,7 +237,7 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expected = Arrays.asList(timeRangeThree, timeRangeNew);
 
     timeRangeGroup.addTimeRange(timeRangeToAdd);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRanges();
+    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
     while (actualIterator.hasNext()) {
@@ -281,7 +279,7 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expected = Arrays.asList(timeRangeNew);
 
     timeRangeGroup.addTimeRange(timeRangeToAdd);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRanges();
+    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
     while (actualIterator.hasNext()) {
@@ -320,7 +318,7 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expected = Arrays.asList(timeRangeNewOne, timeRangeNewTwo, timeRangeTwo);
 
     timeRangeGroup.deleteTimeRange(timeRangeToDelete);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRanges();
+    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
     while (actualIterator.hasNext()) {
@@ -359,7 +357,7 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expectedTimeRangesAfterDelete = Arrays.asList(timeRangeNewOne, timeRangeNewTwo);
 
     timeRangeGroup.deleteTimeRange(timeRangeToDelete);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRanges();
+    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
     while (actualIterator.hasNext()) {
@@ -401,7 +399,7 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expectedTimeRangesAfterDelete = Arrays.asList(timeRangeNewOne, timeRangeNewTwo);
 
     timeRangeGroup.deleteTimeRange(timeRangeToDelete);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRanges();
+    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
     while (actualIterator.hasNext()) {
@@ -442,7 +440,7 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expected = Arrays.asList(timeRangeNew, timeRangeTwo);
 
     timeRangeGroup.deleteTimeRange(timeRangeToDelete);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRanges();
+    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
     while (actualIterator.hasNext()) {
@@ -475,7 +473,7 @@ public final class ArrayListTimeRangeGroupTest {
             timeRangeOneEnd.plusSeconds(100), timeRangeTwoStart.minusSeconds(100));
 
     timeRangeGroup.deleteTimeRange(timeRangeToDelete);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRanges();
+    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
     while (actualIterator.hasNext()) {
@@ -509,7 +507,42 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expectedTimeRangesAfterDelete = Arrays.asList(timeRangeTwo);
 
     timeRangeGroup.deleteTimeRange(timeRangeToDelete);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRanges();
+    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
+
+    List<TimeRange> actual = new ArrayList();
+    while (actualIterator.hasNext()) {
+      actual.add(actualIterator.next());
+    }
+
+    Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
+    Assert.assertEquals(expectedTimeRangesAfterDelete, actual);
+  }
+
+  /** Tests for time ranges that are covered by the range to delete. */
+  @Test
+  public void testDeleteTimeRangeThatCoversOriginal() {
+    // Time Ranges: |---A---|    |---B---|
+    // To delete:              |------C-----|
+    // Results:     |-------|
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
+    Instant timeRangeTwoStart = timeRangeOneEnd.plusSeconds(1000);
+    Instant timeRangeTwoEnd = timeRangeTwoStart.plusSeconds(1000);
+
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+    TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
+
+    List<TimeRange> timeRanges = Arrays.asList(timeRangeOne, timeRangeTwo);
+    ArrayListTimeRangeGroup timeRangeGroup = new ArrayListTimeRangeGroup(timeRanges);
+
+    TimeRange timeRangeToDelete =
+        TimeRange.fromStartEnd(
+            timeRangeTwoStart.minusSeconds(100), timeRangeTwoEnd.plusSeconds(100));
+
+    List<TimeRange> expectedTimeRangesAfterDelete = Arrays.asList(timeRangeOne);
+
+    timeRangeGroup.deleteTimeRange(timeRangeToDelete);
+    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
     while (actualIterator.hasNext()) {
