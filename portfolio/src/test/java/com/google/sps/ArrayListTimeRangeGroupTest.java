@@ -43,6 +43,8 @@ public final class ArrayListTimeRangeGroupTest {
     Instant timeRangeFiveEnd = timeRangeFiveStart.plusSeconds(200);
     TimeRange timeRangeFive = TimeRange.fromStartEnd(timeRangeFiveStart, timeRangeFiveEnd);
 
+    Assert.assertTrue(timeRangeGroup.hasTimeRange(timeRangeOne));
+    Assert.assertTrue(timeRangeGroup.hasTimeRange(timeRangeTwo));
     Assert.assertTrue(timeRangeGroup.hasTimeRange(timeRangeThree));
     Assert.assertFalse(timeRangeGroup.hasTimeRange(timeRangeFour));
     Assert.assertFalse(timeRangeGroup.hasTimeRange(timeRangeFive));

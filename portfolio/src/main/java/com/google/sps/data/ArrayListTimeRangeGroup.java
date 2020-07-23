@@ -123,15 +123,29 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
 
   /**
    * Checks if a time range exists in the collection. For example, if [3:00 - 4:00] is in the
-   * collection, [3:00 - 3:30] is considered to exist as a time range in the collection.
+   * collection, [3:00 - 3:30] is considered to exist as a time range in the collection. This method
+   * uses binary search to find the time ranges whose start time is before the target range's start
+   * and whose end time is after the target range's end. Then the method calls contains to see if
+   * the target range is contained within this current range.
    */
   public boolean hasTimeRange(TimeRange timeRangeToCheck) {
-    for (TimeRange timeRange : allTimeRanges) {
-      if (timeRange.contains(timeRangeToCheck)) {
-        return true;
+    int end = allTimeRanges.size() - 1;
+    int start = 0;
+    int middle;
+
+    while (start < end) {
+      middle = (start + end) / 2;
+      TimeRange middleRange = allTimeRanges.get(middle);
+      if (middleRange.start().isAfter(timeRangeToCheck.start())) {
+        end = middle;
+      } else if (middleRange.end().isBefore(timeRangeToCheck.end())) {
+        start = middle + 1;
+      } else {
+        break;
       }
     }
-    return false;
+
+    return allTimeRanges.get(start).contains(timeRangeToCheck);
   }
 
   /**
