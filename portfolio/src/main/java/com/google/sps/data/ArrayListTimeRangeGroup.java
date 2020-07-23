@@ -72,7 +72,7 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
           newTimeRanges.add(lastExaminedTimeRange);
           lastExaminedTimeRange = currentRange;
         } else {
-          // If lastExamiendTimeRange is later than the current range,
+          // If lastExaminedTimeRange is later than the current range,
           // add the current range to the new list of all ranges.
           // The lastExaminedTimeRange pointer shouldn't move.
           newTimeRanges.add(currentRange);

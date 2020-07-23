@@ -208,7 +208,7 @@ public final class ArrayListTimeRangeGroupTest {
     Assert.assertEquals(expected, actual);
   }
 
-  /** Tests for adding a time range that overlaps with all other existing ones. */
+  /** Tests for adding a time range that overlaps with several other existing ones. */
   @Test
   public void testAddCompletelyOverlappingRange() {
     // Time Ranges: |-----A-----|     |----B----|    |----C----|
