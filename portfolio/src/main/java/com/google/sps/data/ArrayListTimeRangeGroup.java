@@ -3,7 +3,6 @@ package com.google.sps.data;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -11,7 +10,8 @@ import java.util.List;
 public class ArrayListTimeRangeGroup implements TimeRangeGroup {
 
   // This list of all the time ranges will be sorted by start time ascending
-  // in add and delete methods.
+  // in add and delete methods. The time ranges stored in this list are
+  // pair-wise disjoint at any moment.
   public List<TimeRange> allTimeRanges;
 
   /**
@@ -24,7 +24,6 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
         (range) -> {
           addTimeRange(range);
         });
-    Collections.sort(allTimeRanges, TimeRange.SORT_BY_TIME_RANGE_START_TIME_ASCENDING);
   }
 
   /**
@@ -42,7 +41,7 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
 
     List<TimeRange> newTimeRanges = new ArrayList<TimeRange>();
 
-    // This variable represents the latest time range previously exmained.
+    // This variable represents the latest time range previously exmamined.
     // Initially, this variable points to the time range we want to add.
     // As the for loop iterates through all the current time ranges already existing
     // in allTimeRanges, this lastExaminedTimeRange variable is the time range with which
@@ -52,7 +51,7 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
     for (int i = 0; i < allTimeRanges.size(); i++) {
       TimeRange currentRange = allTimeRanges.get(i);
 
-      // If the current range is complete contained by the lastExaminedTimeRange,
+      // If the current range is completely contained by the lastExaminedTimeRange,
       // no merging or adding needs to happen.
       if (lastExaminedTimeRange.contains(currentRange)) {
         continue;
@@ -63,20 +62,18 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
       // after the merging.
       if (lastExaminedTimeRange.overlaps(currentRange)) {
         lastExaminedTimeRange = mergeTwoTimeRanges(currentRange, lastExaminedTimeRange);
-      } else {
+      } else if (currentRange.end().isAfter(lastExaminedTimeRange.end())) {
         // This is the case that lastExaminedTimeRange and the current time range do not overlap.
         // If the current range from the original list ends after the last examined time range,
         // add the time range pointed to by lastExaminedTimeRange to the new list of all ranges, and
         // change the lastExaminedTimeRange to point to the current range.
-        if (currentRange.end().isAfter(lastExaminedTimeRange.end())) {
-          newTimeRanges.add(lastExaminedTimeRange);
-          lastExaminedTimeRange = currentRange;
-        } else {
-          // If lastExamiendTimeRange is later than the current range,
-          // add the current range to the new list of all ranges.
-          // The lastExaminedTimeRange pointer shouldn't move.
-          newTimeRanges.add(currentRange);
-        }
+        newTimeRanges.add(lastExaminedTimeRange);
+        lastExaminedTimeRange = currentRange;
+      } else {
+        // If lastExaminedTimeRange is later than the current range,
+        // add the current range to the new list of all ranges.
+        // The lastExaminedTimeRange pointer shouldn't move.
+        newTimeRanges.add(currentRange);
       }
 
       // If current time range is the last element in the allTimeRanges list,
@@ -88,11 +85,17 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
 
     // Finally, set the global variable allTimeRanges to this newly built list of time ranges.
     allTimeRanges = newTimeRanges;
-    Collections.sort(allTimeRanges, TimeRange.SORT_BY_TIME_RANGE_START_TIME_ASCENDING);
   }
 
-  /** Helper method for merging two time ranges. This method is public so that it can be tested. */
-  public static TimeRange mergeTwoTimeRanges(TimeRange a, TimeRange b) {
+  /**
+   * Helper method for merging two time ranges. This method is package-private so that it can be
+   * tested.
+   */
+  static TimeRange mergeTwoTimeRanges(TimeRange a, TimeRange b) {
+    if (!a.overlaps(b)) {
+      throw new IllegalArgumentException("Merging two time ranges that do not overlap is invalid");
+    }
+
     Instant newTimeRangeStart;
     Instant newTimeRangeEnd;
 
@@ -114,21 +117,35 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
   }
 
   /** Returns an iterator for the list of all time ranges. */
-  public Iterator<TimeRange> getAllTimeRanges() {
+  public Iterator<TimeRange> getAllTimeRangesIterator() {
     return allTimeRanges.iterator();
   }
 
   /**
    * Checks if a time range exists in the collection. For example, if [3:00 - 4:00] is in the
-   * collection, [3:00 - 3:30] is considered to exist as a time range in the collection.
+   * collection, [3:00 - 3:30] is considered to exist as a time range in the collection. This method
+   * uses binary search to find the time ranges whose start time is before the target range's start
+   * and whose end time is after the target range's end. Then the method calls contains to see if
+   * the target range is contained within this current range.
    */
   public boolean hasTimeRange(TimeRange timeRangeToCheck) {
-    for (TimeRange timeRange : allTimeRanges) {
-      if (timeRange.contains(timeRangeToCheck)) {
-        return true;
+    int end = allTimeRanges.size() - 1;
+    int start = 0;
+    int middle;
+
+    while (start < end) {
+      middle = (start + end) / 2;
+      TimeRange middleRange = allTimeRanges.get(middle);
+      if (middleRange.start().isAfter(timeRangeToCheck.start())) {
+        end = middle;
+      } else if (middleRange.end().isBefore(timeRangeToCheck.end())) {
+        start = middle + 1;
+      } else {
+        break;
       }
     }
-    return false;
+
+    return allTimeRanges.get(start).contains(timeRangeToCheck);
   }
 
   /**
@@ -166,6 +183,5 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
     }
 
     allTimeRanges = newTimeRanges;
-    Collections.sort(allTimeRanges, TimeRange.SORT_BY_TIME_RANGE_START_TIME_ASCENDING);
   }
 }
