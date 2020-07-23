@@ -17,7 +17,7 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
 
   /**
    * Schedules the tasks so that the longest tasks are scheduled to the first possible free time
-   * range of the day.
+   * range of the day. This approach tries to prioritize long tasks so that they are scheduled.
    */
   public Collection<ScheduledTask> schedule(
       Collection<CalendarEvent> events,
