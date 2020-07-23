@@ -183,7 +183,7 @@ public final class ArrayListTimeRangeGroupTest {
     TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
     TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
 
-    List<TimeRange> originalTimeRanges = Arrays.asList(timeRangeOne, timeRangeTwo);
+    List<TimeRange> originalTimeRanges = Arrays.asList(timeRangeTwo, timeRangeOne);
     ArrayListTimeRangeGroup timeRangeGroup = new ArrayListTimeRangeGroup(originalTimeRanges);
 
     Instant timeRangeToAddStart = timeRangeTwoStart.plusSeconds(500);
@@ -211,27 +211,72 @@ public final class ArrayListTimeRangeGroupTest {
   /** Tests for adding a time range that overlaps with all other existing ones. */
   @Test
   public void testAddCompletelyOverlappingRange() {
-    // Time Ranges: |-----A-----|     |----C----|
-    // To add:         |-----B----------|
-    // Result:     |---------------------------|
+    // Time Ranges: |-----A-----|     |----B----|    |----C----|
+    // To add:         |-----D----------|
+    // Result:     |---------------------------|     |---------|
     Instant timeRangeOneStart = Instant.now();
     Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
     Instant timeRangeTwoStart = timeRangeOneEnd.plusSeconds(3000);
     Instant timeRangeTwoEnd = timeRangeTwoStart.plusSeconds(1000);
+    Instant timeRangeThreeStart = timeRangeTwoEnd.plusSeconds(1000);
+    Instant timeRangeThreeEnd = timeRangeThreeStart.plusSeconds(1000);
 
     TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
     TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
+    TimeRange timeRangeThree = TimeRange.fromStartEnd(timeRangeThreeStart, timeRangeThreeEnd);
 
-    List<TimeRange> originalTimeRanges = Arrays.asList(timeRangeOne, timeRangeTwo);
+    List<TimeRange> originalTimeRanges = Arrays.asList(timeRangeOne, timeRangeThree, timeRangeTwo);
     ArrayListTimeRangeGroup timeRangeGroup = new ArrayListTimeRangeGroup(originalTimeRanges);
 
     Instant timeRangeToAddStart = timeRangeOneStart.plusSeconds(500);
     Instant timeRangeToAddEnd = timeRangeTwoStart.plusSeconds(500);
     TimeRange timeRangeToAdd = TimeRange.fromStartEnd(timeRangeToAddStart, timeRangeToAddEnd);
 
-    // Constructs the expected merged time range for combining A, B, and C.
+    // Constructs the expected merged time range for combining A and B.
     Instant timeRangeCombinedStart = timeRangeOneStart;
     Instant timeRangeCombinedEnd = timeRangeTwoEnd;
+    TimeRange timeRangeNew = TimeRange.fromStartEnd(timeRangeCombinedStart, timeRangeCombinedEnd);
+    List<TimeRange> expected = Arrays.asList(timeRangeThree, timeRangeNew);
+
+    timeRangeGroup.addTimeRange(timeRangeToAdd);
+    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRanges();
+
+    List<TimeRange> actual = new ArrayList();
+    while (actualIterator.hasNext()) {
+      actual.add(actualIterator.next());
+    }
+
+    Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
+    Assert.assertEquals(expected, actual);
+  }
+
+  /** Tests for adding a time range that overlaps with all other existing ones. */
+  @Test
+  public void testAddCompletelyOverlappingMultipleRanges() {
+    // Time Ranges: |-----A-----|     |----B----|   |------C-----|
+    // To add:         |--------------D----------------|
+    // Result:     |---------------------------------------------|
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
+    Instant timeRangeTwoStart = timeRangeOneEnd.plusSeconds(3000);
+    Instant timeRangeTwoEnd = timeRangeTwoStart.plusSeconds(1000);
+    Instant timeRangeThreeStart = timeRangeTwoEnd.plusSeconds(1000);
+    Instant timeRangeThreeEnd = timeRangeThreeStart.plusSeconds(1000);
+
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+    TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
+    TimeRange timeRangeThree = TimeRange.fromStartEnd(timeRangeThreeStart, timeRangeThreeEnd);
+
+    List<TimeRange> originalTimeRanges = Arrays.asList(timeRangeThree, timeRangeOne, timeRangeTwo);
+    ArrayListTimeRangeGroup timeRangeGroup = new ArrayListTimeRangeGroup(originalTimeRanges);
+
+    Instant timeRangeToAddStart = timeRangeOneStart.plusSeconds(500);
+    Instant timeRangeToAddEnd = timeRangeThreeStart.plusSeconds(500);
+    TimeRange timeRangeToAdd = TimeRange.fromStartEnd(timeRangeToAddStart, timeRangeToAddEnd);
+
+    // Constructs the expected merged time range for combining A, B, and C.
+    Instant timeRangeCombinedStart = timeRangeOneStart;
+    Instant timeRangeCombinedEnd = timeRangeThreeEnd;
     TimeRange timeRangeNew = TimeRange.fromStartEnd(timeRangeCombinedStart, timeRangeCombinedEnd);
     List<TimeRange> expected = Arrays.asList(timeRangeNew);
 
@@ -261,7 +306,7 @@ public final class ArrayListTimeRangeGroupTest {
     TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
     TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
 
-    List<TimeRange> timeRanges = Arrays.asList(timeRangeOne, timeRangeTwo);
+    List<TimeRange> timeRanges = Arrays.asList(timeRangeTwo, timeRangeOne);
     ArrayListTimeRangeGroup timeRangeGroup = new ArrayListTimeRangeGroup(timeRanges);
 
     TimeRange timeRangeToDelete =
@@ -311,6 +356,48 @@ public final class ArrayListTimeRangeGroupTest {
         TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneStart.plusSeconds(500));
     TimeRange timeRangeNewTwo =
         TimeRange.fromStartEnd(timeRangeTwoStart.plusSeconds(500), timeRangeTwoEnd);
+    List<TimeRange> expectedTimeRangesAfterDelete = Arrays.asList(timeRangeNewOne, timeRangeNewTwo);
+
+    timeRangeGroup.deleteTimeRange(timeRangeToDelete);
+    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRanges();
+
+    List<TimeRange> actual = new ArrayList();
+    while (actualIterator.hasNext()) {
+      actual.add(actualIterator.next());
+    }
+
+    Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
+    Assert.assertEquals(expectedTimeRangesAfterDelete, actual);
+  }
+
+  /** Tests for deleting a time range that overlaps with multiple existing time ranges. */
+  @Test
+  public void testDeleteOverlappingMultipleTimeRange() {
+    // Time Ranges: |-----A-----|   |---B---|  |---C---|
+    // To delete:          |-----------D----------|
+    // Results:     |------|                      |----|
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
+    Instant timeRangeTwoStart = timeRangeOneEnd.plusSeconds(500);
+    Instant timeRangeTwoEnd = timeRangeTwoStart.plusSeconds(1000);
+    Instant timeRangeThreeStart = timeRangeTwoEnd.plusSeconds(500);
+    Instant timeRangeThreeEnd = timeRangeThreeStart.plusSeconds(1000);
+
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+    TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
+    TimeRange timeRangeThree = TimeRange.fromStartEnd(timeRangeThreeStart, timeRangeThreeEnd);
+
+    List<TimeRange> timeRanges = Arrays.asList(timeRangeOne, timeRangeThree, timeRangeTwo);
+    ArrayListTimeRangeGroup timeRangeGroup = new ArrayListTimeRangeGroup(timeRanges);
+
+    TimeRange timeRangeToDelete =
+        TimeRange.fromStartEnd(
+            timeRangeOneStart.plusSeconds(500), timeRangeThreeStart.plusSeconds(100));
+
+    TimeRange timeRangeNewOne =
+        TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneStart.plusSeconds(500));
+    TimeRange timeRangeNewTwo =
+        TimeRange.fromStartEnd(timeRangeThreeStart.plusSeconds(100), timeRangeThreeEnd);
     List<TimeRange> expectedTimeRangesAfterDelete = Arrays.asList(timeRangeNewOne, timeRangeNewTwo);
 
     timeRangeGroup.deleteTimeRange(timeRangeToDelete);

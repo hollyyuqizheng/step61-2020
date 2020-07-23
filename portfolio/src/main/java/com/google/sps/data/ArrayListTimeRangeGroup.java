@@ -3,15 +3,15 @@ package com.google.sps.data;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
 /** Models an implementation of the TimeRangeGroup model using ArrayList. */
 public class ArrayListTimeRangeGroup implements TimeRangeGroup {
 
-  // This list of all the time ranges will not be sorted within the methods
-  // of this class. The caller of this class, however, can sort the list of all
-  // time ranges after they obtain it from the getter method.
+  // This list of all the time ranges will be sorted by start time ascending
+  // in add and delete methods.
   public List<TimeRange> allTimeRanges;
 
   /**
@@ -24,6 +24,7 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
         (range) -> {
           addTimeRange(range);
         });
+    Collections.sort(allTimeRanges, TimeRange.SORT_BY_TIME_RANGE_START_TIME_ASCENDING);
   }
 
   /**
@@ -87,6 +88,7 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
 
     // Finally, set the global variable allTimeRanges to this newly built list of time ranges.
     allTimeRanges = newTimeRanges;
+    Collections.sort(allTimeRanges, TimeRange.SORT_BY_TIME_RANGE_START_TIME_ASCENDING);
   }
 
   /** Helper method for merging two time ranges. This method is public so that it can be tested. */
@@ -113,7 +115,6 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
 
   /** Returns an iterator for the list of all time ranges. */
   public Iterator<TimeRange> getAllTimeRanges() {
-    // return ImmutableList.of(allTimeRanges);
     return allTimeRanges.iterator();
   }
 
@@ -165,5 +166,6 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
     }
 
     allTimeRanges = newTimeRanges;
+    Collections.sort(allTimeRanges, TimeRange.SORT_BY_TIME_RANGE_START_TIME_ASCENDING);
   }
 }

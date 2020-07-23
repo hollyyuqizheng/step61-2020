@@ -26,6 +26,10 @@ public final class TimeRange {
   private final Instant start;
   private final Duration duration;
 
+  // Comparator for sorting time ranges  by start time ascending
+  public static final Comparator<TimeRange> SORT_BY_TIME_RANGE_START_TIME_ASCENDING =
+      Comparator.comparing(TimeRange::start);
+
   // Comparator for sorting time ranges by duration ascending and then by start time ascending
   public static final Comparator<TimeRange> SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME =
       Comparator.comparing(TimeRange::duration).thenComparing(TimeRange::start);
