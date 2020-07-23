@@ -1,6 +1,6 @@
 /** Updates the calendar view and button visibility based on login status. */
 function updateCalendarView() {
-  const googleUser = gapi.auth2.getAuthInstance().currentUser.get();
+  const googleUser = GoogleAuth.currentUser.get();
   const isAuthorized = googleUser.hasGrantedScopes(SCOPE_CALENDAR_READ_ONLY);
   if (isAuthorized) {
     showCalendarView(googleUser);
@@ -16,7 +16,7 @@ function updateCalendarView() {
  * The calendar is displayed in the user's Google Calendar's time zone.
  */
 function showCalendarView(user) {
-  const googleUser = gapi.auth2.getAuthInstance().currentUser.get();
+  const googleUser = GoogleAuth.currentUser.get();
   const isAuthorized = googleUser.hasGrantedScopes(SCOPE_CALENDAR_READ_ONLY);
   if (isAuthorized) {
     const userEmail = encodeURIComponent(user.getBasicProfile().getEmail());
@@ -187,7 +187,7 @@ function addOneEventToGoogleCalendar(event) {
 
   request.execute(function() {
     // Refreshes the calendar view so that the new event shows up on it.
-    showCalendarView(gapi.auth2.getAuthInstance().currentUser.get());
+    showCalendarView(GoogleAuth.currentUser.get());
   });
 }
 
