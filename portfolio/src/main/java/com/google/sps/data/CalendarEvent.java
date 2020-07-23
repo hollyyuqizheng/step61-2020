@@ -48,6 +48,7 @@ public class CalendarEvent {
   public Instant getEndTime() {
     return endTime;
   }
+  
   @Override
   public boolean equals(Object other) {
     return other instanceof CalendarEvent && equals(this, (CalendarEvent) other);
