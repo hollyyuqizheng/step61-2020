@@ -3,7 +3,6 @@ package com.google.sps.data;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -86,7 +85,6 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
 
     // Finally, set the global variable allTimeRanges to this newly built list of time ranges.
     allTimeRanges = newTimeRanges;
-    // Collections.sort(allTimeRanges, TimeRange.SORT_BY_TIME_RANGE_START_TIME_ASCENDING);
   }
 
   /**
@@ -171,6 +169,5 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
     }
 
     allTimeRanges = newTimeRanges;
-    Collections.sort(allTimeRanges, TimeRange.SORT_BY_TIME_RANGE_START_TIME_ASCENDING);
   }
 }
