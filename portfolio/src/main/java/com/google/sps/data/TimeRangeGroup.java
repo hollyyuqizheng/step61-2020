@@ -1,7 +1,6 @@
 package com.google.sps.data;
 
-import java.util.Collection;
-import java.util.Comparator;
+import java.util.Iterator;
 
 public interface TimeRangeGroup {
 
@@ -10,9 +9,6 @@ public interface TimeRangeGroup {
    * disjoint with all other time ranges already in the group.
    */
   public void addTimeRange(TimeRange timeRange);
-
-  /** Returns the collection of all time ranges. */
-  public Collection<TimeRange> getAllTimeRanges();
 
   /**
    * Checks if a time range exists in the collection. For example, if [3:00 - 4:00] is in the
@@ -23,16 +19,12 @@ public interface TimeRangeGroup {
   /**
    * Deletes a given time range. For example, if [3:00 - 4:00] is one of the time ranges in the
    * group, deleting [3:15 - 3:30] will result in two new time ranges: [3 - 3:15], [3:30 - 4], which
-   * will replace the original [3:00 - 4:00].
-   *
-   * @return the newly modified collection of time ranges.
+   * will replace the original [3:00 - 4:00]. Another example for deleting overlapping time ranges:
+   * if [3 - 4] and [5 - 6] are in the original list, deleting [3:30 - 5:30] will result in two new
+   * ranges: [3 - 3:30] and [5:30 - 6].
    */
-  public Collection<TimeRange> deleteTimeRange(TimeRange timeRangeToDelete);
+  public void deleteTimeRange(TimeRange timeRangeToDelete);
 
-  /**
-   * Sorts the collection of time ranges based on given comparator and a boolean value that denotes
-   * if the sorting is in ascending order. The comparator and the boolean value are passed to the
-   * constructor of the class.
-   */
-  public void sortTimeRanges(Comparator<TimeRange> comparator, boolean ascending);
+  /** Returns the collection of all time ranges. */
+  public Iterator<TimeRange> getAllTimeRanges();
 }
