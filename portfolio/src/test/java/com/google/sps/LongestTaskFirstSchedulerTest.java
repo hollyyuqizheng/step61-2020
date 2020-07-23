@@ -173,13 +173,33 @@ public final class LongestTaskFirstSchedulerTest {
     Collection<ScheduledTask> expected =
         Arrays.asList(scheduledTask1, scheduledTask2, scheduledTask3);
 
-    System.out.println("===");
-    for (ScheduledTask s : actual) {
-      System.out.println(s.getTask().getName());
-      System.out.println(s.getStartTime());
-    }
-    System.out.println("===");
-
     Assert.assertEquals(actual, expected);
+  }
+
+  /** Tests for the scenario where none of the tasks can be scheduled. */
+  @Test
+  public void testNoTaskCanBeScheduled() {
+    // Working hours:   |-----------------------------------------------------|
+    // Events:                 |---|          |--------|    |-----------------|
+    Collection<CalendarEvent> events =
+        Arrays.asList(
+            new CalendarEvent("Event 1", SchedulerTestUtil.TIME_0930, SchedulerTestUtil.TIME_1000),
+            new CalendarEvent("Event 2", SchedulerTestUtil.TIME_1130, SchedulerTestUtil.TIME_1200),
+            new CalendarEvent("Event 3", SchedulerTestUtil.TIME_1300, SchedulerTestUtil.TIME_1700));
+
+    Task task1 =
+        new Task("Task A", "A", SchedulerTestUtil.DURATION_2_HOURS, SchedulerTestUtil.PRIORITY_ONE);
+    Task task2 =
+        new Task(
+            "Task B", "B", SchedulerTestUtil.DURATION_100_MINUTES, SchedulerTestUtil.PRIORITY_ONE);
+    Collection<Task> tasks = Arrays.asList(task1, task2);
+
+    LongestTaskFirstScheduler longestTaskFirstScheduler = new LongestTaskFirstScheduler();
+    Collection<ScheduledTask> actual =
+        longestTaskFirstScheduler.schedule(
+            events, tasks, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.TIME_1700);
+
+    // None of the tasks can actually be scheduled.
+    Assert.assertTrue(actual.isEmpty());
   }
 }

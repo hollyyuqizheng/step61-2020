@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 public class LongestTaskFirstScheduler implements TaskScheduler {
@@ -29,7 +30,7 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
 
     // Sorts the tasks in descending order based on duration.
     // Longest task comes first in the collection.
-    // Then sort the list again by alphabetical order ascending.
+    // Then sorts the list again by alphabetical order ascending.
     Collections.sort(
         tasksList,
         Collections.reverseOrder(sortByTaskDurationAscending).thenComparing(Task::getName));
@@ -39,7 +40,7 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
     List<TimeRange> availableTimes = calendarEventsGroup.getFreeTimeRanges();
 
     // Create a TimeRangeGroup class for the free time ranges.
-    TimeRangeGroup availableTimesGroup = new TimeRangeGroupArrayList(availableTimes);
+    TimeRangeGroup availableTimesGroup = new ArrayListTimeRangeGroup(availableTimes);
 
     List<ScheduledTask> scheduledTasks = new ArrayList<ScheduledTask>();
 
@@ -52,6 +53,7 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
         TimeRange currentFreeTimeRange = availableTimes.get(freeRangeIndex);
 
         if (currentFreeTimeRange.duration().compareTo(taskDuration) >= 0) {
+          // Construct the scheduled task based on the start time of this current time range.
           Instant scheduledTime = currentFreeTimeRange.start();
           ScheduledTask scheduledTask = new ScheduledTask(task, scheduledTime);
           scheduledTasks.add(scheduledTask);
@@ -60,7 +62,6 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
           // the original free time range.
           TimeRange scheduledTimeRange =
               TimeRange.fromStartEnd(scheduledTime, scheduledTime.plus(taskDuration));
-
           availableTimesGroup.deleteTimeRange(scheduledTimeRange);
           Iterator<TimeRange> updatedAvailableTimesGroupIterator =
               availableTimesGroup.getAllTimeRanges();

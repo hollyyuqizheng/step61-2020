@@ -16,6 +16,7 @@ public class SchedulerTestUtil {
   public static final Duration DURATION_45_MINUTES = Duration.ofSeconds(45 * 60);
   public static final Duration DURATION_60_MINUTES = Duration.ofSeconds(60 * 60);
   public static final Duration DURATION_80_MINUTES = Duration.ofSeconds(80 * 60);
+  public static final Duration DURATION_100_MINUTES = Duration.ofSeconds(100 * 60);
   public static final Duration DURATION_2_HOURS = Duration.ofSeconds(120 * 60);
 
   public static final Instant TIME_0830 = Instant.parse("2020-06-25T08:30:00Z");
