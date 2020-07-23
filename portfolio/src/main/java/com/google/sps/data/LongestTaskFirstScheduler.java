@@ -64,7 +64,7 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
               TimeRange.fromStartEnd(scheduledTime, scheduledTime.plus(taskDuration));
           availableTimesGroup.deleteTimeRange(scheduledTimeRange);
           Iterator<TimeRange> updatedAvailableTimesGroupIterator =
-              availableTimesGroup.getAllTimeRanges();
+              availableTimesGroup.getAllTimeRangesIterator();
 
           // Reconstruct availableTimes list based on the updated iterator after delete.
           availableTimes = new ArrayList();
