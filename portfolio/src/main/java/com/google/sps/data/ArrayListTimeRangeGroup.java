@@ -119,9 +119,6 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup, Iterable<TimeRan
   }
 
   /** Returns an iterator for the list of all time ranges. */
-  // public Iterator<TimeRange> getAllTimeRangesIterator() {
-  //   return allTimeRanges.iterator();
-  // }
   public Iterator<TimeRange> iterator() {
     return allTimeRanges.iterator();
   }
@@ -136,10 +133,9 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup, Iterable<TimeRan
   public boolean hasTimeRange(TimeRange timeRangeToCheck) {
     int end = allTimeRanges.size() - 1;
     int start = 0;
-    int middle;
 
     while (start < end) {
-      middle = (start + end) / 2;
+      int middle = (start + end) / 2;
       TimeRange middleRange = allTimeRanges.get(middle);
       if (middleRange.start().isAfter(timeRangeToCheck.start())) {
         end = middle - 1;
