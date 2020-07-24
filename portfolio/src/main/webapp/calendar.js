@@ -253,10 +253,10 @@ function setNewEventStartAndEndTimes() {
 /** Checks if a date is today. */
 function isToday(date) {
   const today = new Date();
-  return (
+  return 
       date.getFullYear() === today.getFullYear() &&
       date.getMonth() === today.getMonth() &&
-      date.getDate() === today.getDate());
+      date.getDate() === today.getDate();
 }
 
 /**
@@ -363,7 +363,9 @@ function checkWorkingHourRange() {
  * All arguments are of type integer.
  */
 function isWorkingHourValid(
-    workHourStartHour, workHourEndHour, workHourStartMinute,
+    workHourStartHour,
+    workHourEndHour,
+    workHourStartMinute,
     workHourEndMinute) {
   return workHourStartHour < workHourEndHour ||
       ((workHourStartHour == workHourEndHour) &&
