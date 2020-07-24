@@ -2,23 +2,22 @@ package com.google.sps.data;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 /** Models an implementation of the TimeRangeGroup model using ArrayList. */
-public class ArrayListTimeRangeGroup implements TimeRangeGroup {
+public class ArrayListTimeRangeGroup implements TimeRangeGroup, Iterable<TimeRange> {
 
   // This list of all the time ranges will be sorted by start time ascending
   // in add and delete methods. The time ranges stored in this list are
   // pair-wise disjoint at any moment.
-  public List<TimeRange> allTimeRanges;
+  private List<TimeRange> allTimeRanges;
 
   /**
    * Adds all the input time ranges to the list of all time ranges. Also sorts the list of all
    * ranges in the constructor.
    */
-  public ArrayListTimeRangeGroup(Collection<TimeRange> timeRanges) {
+  public ArrayListTimeRangeGroup(Iterable<TimeRange> timeRanges) {
     allTimeRanges = new ArrayList<TimeRange>();
     timeRanges.forEach(
         (range) -> {
@@ -54,6 +53,9 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
       // If the current range is completely contained by the lastExaminedTimeRange,
       // no merging or adding needs to happen.
       if (lastExaminedTimeRange.contains(currentRange)) {
+        if (i == allTimeRanges.size() - 1) {
+          newTimeRanges.add(lastExaminedTimeRange);
+        }
         continue;
       }
 
@@ -117,7 +119,10 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
   }
 
   /** Returns an iterator for the list of all time ranges. */
-  public Iterator<TimeRange> getAllTimeRangesIterator() {
+  // public Iterator<TimeRange> getAllTimeRangesIterator() {
+  //   return allTimeRanges.iterator();
+  // }
+  public Iterator<TimeRange> iterator() {
     return allTimeRanges.iterator();
   }
 
@@ -137,7 +142,7 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup {
       middle = (start + end) / 2;
       TimeRange middleRange = allTimeRanges.get(middle);
       if (middleRange.start().isAfter(timeRangeToCheck.start())) {
-        end = middle;
+        end = middle - 1;
       } else if (middleRange.end().isBefore(timeRangeToCheck.end())) {
         start = middle + 1;
       } else {
