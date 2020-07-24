@@ -53,11 +53,15 @@ function createScheduleRequestFromDom() {
 function onClickStartScheduling() {
   const inputTasks = collectAllTasks();
   const $emptyTaskMessage = $('#empty-scheduled-task-message');
+  const $invalidWorkingHoursMessage = $('#invalid-working-hours-message');
 
-  if (inputTasks.length == 0) {
+  if (workingStartHourHasPassed()) {
+    $invalidWorkingHoursMessage.removeClass('d-none');
+  } else if (inputTasks.length == 0) {
     $emptyTaskMessage.removeClass('d-none');
   } else {
     $emptyTaskMessage.addClass('d-none');
+    $invalidWorkingHoursMessage.addClass('d-none');
     // Create the request to send to the server using the data we collected from
     // the web form.
     fetchScheduledTasksFromServlet().then(handleScheduledTaskArray);
@@ -183,4 +187,16 @@ function addScheduledTaskToDom(scheduledTask) {
 
   const scheduledTaskList = document.getElementById('schedule-result-list');
   scheduledTaskList.appendChild(newResultCard);
+}
+
+function workingStartHourHasPassed() {
+  const workStartParts = $('#working-hour-start').val().split(':');
+  const workStartHour = parseInt(workStartParts[0]);
+  const workStartMinute = parseInt(workStartParts[1]);
+  const now = new Date();
+
+  if (now.getHours() < workStartHour || (now.getHours() == workStartHour && now.getMinutes() < workStartMinute)) {
+    return false;
+  }
+  return true;
 }

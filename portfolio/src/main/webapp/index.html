@@ -254,6 +254,9 @@
           </div>
           <h2>3. Your tasks are scheduled here!</h2>
           <div id="schedule-result-list"></div>
+          <div class="alert alert-secondary d-none" role="alert" id="invalid-working-hours-message">
+            Your working hours cannot be set in the past.
+          </div>
           <button type="button" class="btn btn-primary d-none" id="export-calendar-button" onclick="addCalendarWriteScope()">
             Looks good to me! Add them to my Google Calendar
           </button>

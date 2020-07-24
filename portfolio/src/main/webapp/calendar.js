@@ -292,45 +292,6 @@ function getClosestNextHour(nextHour, workHourStartString, workHourEndString) {
   return closestHour;
 }
 
-/**
- * Sets the default working hour start time based on user picked date
- * and the current time.
- * If user picked today to schedule for,
- * The default working hour start time is the next closest hour,
- * or the defualt working hour end time (5pm) if next hour is past end time.
- */
-function setWorkingHour() {
-  const userPickedDate = getUserPickedDateFromDom();
-  const workingHourEndString = $('#working-hour-end').val();
-  const workingHourEnd = parseInt(workingHourEndString.split(':')[0]);
-
-  // Default working hour start time is 9 AM.
-  const workingHourStartDefault = 9;
-
-  var closestHour;
-
-  if (isToday(userPickedDate)) {
-    const now = new Date();
-    var nextHour = now.getHours() + 1;
-    closestHour = nextHour;
-    if (nextHour <= workingHourStartDefault) {
-      closestHour = '09:00';
-    } else if (nextHour >= workingHourEnd) {
-      closestHour = workingHourEndString;
-    } else {
-      if (nextHour < 10) {
-        closestHour = '0' + nextHour;
-      }
-      closestHour += ':00';
-    }
-  } else {
-    closestHour = '09:00';
-  }
-
-  const $workingHourStart = $('#working-hour-start');
-  $workingHourStart.val(closestHour);
-}
-
 /** Checks the validity of the user's working hours input. */
 function checkWorkingHourRange() {
   const $startSchedulingButton = $('#start-scheduling-button');
