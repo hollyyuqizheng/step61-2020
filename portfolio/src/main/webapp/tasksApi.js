@@ -1,12 +1,13 @@
-var importMenuVisible;
-
 /**
  * This function toggles between displaying and clearing the "import
  * tasks" menu. The importMenuVisible boolean is toggled inside the
  * functions that are called.
  */
 function toggleTasks() {
-  if (importMenuVisible) {
+  const menuIsVisible =
+      $('#connect-tasks-btn').attr('data-is-import-menu-visible');
+  console.log(menuIsVisible);
+  if (menuIsVisible == 'true') {
     clearImportMenu();
   } else {
     drawImportMenu();
@@ -54,10 +55,9 @@ function importTasklist(tasklistId) {
  * logged in.
  */
 function drawImportMenu() {
-  importMenuVisible = true;
-
-  const $toggleTasksButton = $('#connect-tasks-btn')[0];
-  $toggleTasksButton.innerText = 'Unlink Tasks';
+  const $button = $('#connect-tasks-btn');
+  $button.html('Unlink Tasks');
+  $button.attr('data-is-import-menu-visible', 'true');
 
   // Create a div element to hold the custom select.
   const customSelect = document.getElementById('import-menu-wrapper');
@@ -100,10 +100,9 @@ function drawImportMenu() {
 }
 
 function clearImportMenu() {
-  importMenuVisible = false;
-
-  const $toggleTasksButton = $('#connect-tasks-btn')[0];
-  $toggleTasksButton.innerText = 'Link Tasks';
+  const $button = $('#connect-tasks-btn');
+  $button.html('Link Tasks');
+  $button.attr('data-is-import-menu-visible', 'false');
 
   const menuWrapper = document.getElementById('import-menu-wrapper');
   menuWrapper.innerHTML = '';
