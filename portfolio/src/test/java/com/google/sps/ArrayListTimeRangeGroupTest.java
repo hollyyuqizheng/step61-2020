@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
@@ -118,11 +117,71 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expected = Arrays.asList(timeRangeOne, timeRangeNew, timeRangeTwo);
 
     timeRangeGroup.addTimeRange(timeRangeToAdd);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
-    while (actualIterator.hasNext()) {
-      actual.add(actualIterator.next());
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
+    }
+
+    Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
+    Assert.assertEquals(expected, actual);
+  }
+
+  /** Tests for adding one time range that overlaps with the existing one. */
+  @Test
+  public void testAddOneOverlappingRange() {
+    // Time Ranges:       |-----A-----|
+    // To add:          |--------B--------|
+    // Result:          |-----------------|
+
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+
+    List<TimeRange> originalTimeRanges = Arrays.asList(timeRangeOne);
+    ArrayListTimeRangeGroup timeRangeGroup = new ArrayListTimeRangeGroup(originalTimeRanges);
+
+    Instant timeRangeToAddStart = timeRangeOneStart.minusSeconds(500);
+    Instant timeRangeToAddEnd = timeRangeOneEnd.plusSeconds(500);
+    TimeRange timeRangeToAdd = TimeRange.fromStartEnd(timeRangeToAddStart, timeRangeToAddEnd);
+    List<TimeRange> expected = Arrays.asList(timeRangeToAdd);
+
+    timeRangeGroup.addTimeRange(timeRangeToAdd);
+    List<TimeRange> actual = new ArrayList();
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
+    }
+
+    Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
+    Assert.assertEquals(expected, actual);
+  }
+
+  /** Tests for adding one time range that overlaps with the existing one. */
+  @Test
+  public void testAddOneOverlappingRangeAndMore() {
+    // Time Ranges:       |-----A-----|      |----C----|
+    // To add:          |--------B--------|
+    // Result:          |-----------------|  |---------|
+
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
+    Instant timeRangeTwoStart = timeRangeOneEnd.plusSeconds(3000);
+    Instant timeRangeTwoEnd = timeRangeTwoStart.plusSeconds(1000);
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+    TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
+
+    List<TimeRange> originalTimeRanges = Arrays.asList(timeRangeOne, timeRangeTwo);
+    ArrayListTimeRangeGroup timeRangeGroup = new ArrayListTimeRangeGroup(originalTimeRanges);
+
+    Instant timeRangeToAddStart = timeRangeOneStart.minusSeconds(500);
+    Instant timeRangeToAddEnd = timeRangeOneEnd.plusSeconds(500);
+    TimeRange timeRangeToAdd = TimeRange.fromStartEnd(timeRangeToAddStart, timeRangeToAddEnd);
+    List<TimeRange> expected = Arrays.asList(timeRangeTwo, timeRangeToAdd);
+
+    timeRangeGroup.addTimeRange(timeRangeToAdd);
+    List<TimeRange> actual = new ArrayList();
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
     }
 
     Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
@@ -158,11 +217,10 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expected = Arrays.asList(timeRangeTwo, timeRangeNew);
 
     timeRangeGroup.addTimeRange(timeRangeToAdd);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
-    while (actualIterator.hasNext()) {
-      actual.add(actualIterator.next());
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
     }
 
     Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
@@ -197,11 +255,9 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expected = Arrays.asList(timeRangeOne, timeRangeNew);
 
     timeRangeGroup.addTimeRange(timeRangeToAdd);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
-
     List<TimeRange> actual = new ArrayList();
-    while (actualIterator.hasNext()) {
-      actual.add(actualIterator.next());
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
     }
 
     Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
@@ -239,11 +295,10 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expected = Arrays.asList(timeRangeThree, timeRangeNew);
 
     timeRangeGroup.addTimeRange(timeRangeToAdd);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
-    while (actualIterator.hasNext()) {
-      actual.add(actualIterator.next());
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
     }
 
     Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
@@ -281,11 +336,10 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expected = Arrays.asList(timeRangeNew);
 
     timeRangeGroup.addTimeRange(timeRangeToAdd);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
-    while (actualIterator.hasNext()) {
-      actual.add(actualIterator.next());
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
     }
 
     Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
@@ -320,11 +374,10 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expected = Arrays.asList(timeRangeNewOne, timeRangeNewTwo, timeRangeTwo);
 
     timeRangeGroup.deleteTimeRange(timeRangeToDelete);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
-    while (actualIterator.hasNext()) {
-      actual.add(actualIterator.next());
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
     }
 
     Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
@@ -359,13 +412,10 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expectedTimeRangesAfterDelete = Arrays.asList(timeRangeNewOne, timeRangeNewTwo);
 
     timeRangeGroup.deleteTimeRange(timeRangeToDelete);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
-
     List<TimeRange> actual = new ArrayList();
-    while (actualIterator.hasNext()) {
-      actual.add(actualIterator.next());
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
     }
-
     Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
     Assert.assertEquals(expectedTimeRangesAfterDelete, actual);
   }
@@ -401,11 +451,10 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expectedTimeRangesAfterDelete = Arrays.asList(timeRangeNewOne, timeRangeNewTwo);
 
     timeRangeGroup.deleteTimeRange(timeRangeToDelete);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
-    while (actualIterator.hasNext()) {
-      actual.add(actualIterator.next());
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
     }
 
     Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
@@ -442,11 +491,10 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expected = Arrays.asList(timeRangeNew, timeRangeTwo);
 
     timeRangeGroup.deleteTimeRange(timeRangeToDelete);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
-    while (actualIterator.hasNext()) {
-      actual.add(actualIterator.next());
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
     }
 
     Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
@@ -475,11 +523,10 @@ public final class ArrayListTimeRangeGroupTest {
             timeRangeOneEnd.plusSeconds(100), timeRangeTwoStart.minusSeconds(100));
 
     timeRangeGroup.deleteTimeRange(timeRangeToDelete);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
-    while (actualIterator.hasNext()) {
-      actual.add(actualIterator.next());
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
     }
 
     Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
@@ -509,11 +556,10 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expectedTimeRangesAfterDelete = Arrays.asList(timeRangeTwo);
 
     timeRangeGroup.deleteTimeRange(timeRangeToDelete);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
-    while (actualIterator.hasNext()) {
-      actual.add(actualIterator.next());
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
     }
 
     Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
@@ -544,11 +590,10 @@ public final class ArrayListTimeRangeGroupTest {
     List<TimeRange> expectedTimeRangesAfterDelete = Arrays.asList(timeRangeOne);
 
     timeRangeGroup.deleteTimeRange(timeRangeToDelete);
-    Iterator<TimeRange> actualIterator = timeRangeGroup.getAllTimeRangesIterator();
 
     List<TimeRange> actual = new ArrayList();
-    while (actualIterator.hasNext()) {
-      actual.add(actualIterator.next());
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
     }
 
     Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
