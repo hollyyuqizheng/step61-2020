@@ -70,9 +70,8 @@ function createNewTask() {
 
 /** Shows the "Task Added" header. */
 function showTaskAddedHeader() {
-  const $taskListHeader = $('#task-added-header');
   if ($taskListHeader.hasClass('d-none')) {
-    $taskListHeader.removeClass('d-none');
+    $('#task-added-header').removeClass('d-none');
   }
 }
 

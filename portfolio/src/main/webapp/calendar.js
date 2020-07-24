@@ -83,9 +83,8 @@ function createNewCalendarEventUserInput() {
 
 /** Shows the "Event added" header. */
 function showEventAddedHeader() {
-  const $eventListHeader = $('#event-added-header');
   if ($eventListHeader.hasClass('d-none')) {
-    $eventListHeader.removeClass('d-none');
+    $('#event-added-header').removeClass('d-none');
   }
 }
 
