@@ -1,112 +1,40 @@
-var googleAuth;
-
-// Scopes for API access to Google Calendar
-const SCOPE_READ_ONLY = 'https://www.googleapis.com/auth/calendar.readonly';
-const SCOPE_READ_WRITE = 'https://www.googleapis.com/auth/calendar';
-
-// For the discovery document for Google Calendar API.
-const DISCOVERY_URL =
-    'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
-
-const CLIENT_ID =
-    '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
-
-// Object for all error codes
-const ERROR_CODES = {
-  popup_closed_by_user: 'popup_closed_by_user',
-  access_denied: 'access_denied'
-}; 
-
-/**
- * Loads the API's client and auth2 modules.
- * Calls the initClient function after the modules load.
- */
-function initiateCalendarAuth() {
-  gapi.load('client:auth2', initClient);
-}
-
-/** Starts authentication flow based on current user's login status. */
-function initClient() {
-  // Initializes the gapi.client object, which app uses to make API requests.
-  // Initially, the scope is read-only to view user's Google Calendar.
-  gapi.client
-      .init({
-        apiKey: API_KEY,
-        clientId: CLIENT_ID,
-        discoveryDocs: [DISCOVERY_URL],
-        scope: SCOPE_READ_ONLY
-      })
-      .then(function() {
-        googleAuth = gapi.auth2.getAuthInstance();
-
-        // Listen for sign-in state changes.
-        googleAuth.isSignedIn.listen(updateCalendarView);
-
-        // Handle initial sign-in state. (Determine if user is already signed
-        // in.)
-        handleAuth();
-      });
-}
-
-/** Signs user in if not logged in, and signs user out otherwise. */
-function handleAuth() {
-  if (googleAuth.isSignedIn.get()) {
-    googleAuth.signOut();
-  } else {
-    // User is not signed in. Start Google auth flow.
-    googleAuth.signIn()
-        .then((response) => {
-          var $importCalendarMessage = $('#import-calendar-message');
-          $importCalendarMessage.addClass('d-none');
-        })
-        .catch(function(error) {
-          handleImportAuthError(error);
-        });
-  }
-}
-
-/**
- * Updates import message box based on the error during authentication process
- * for importing.
- */
-function handleImportAuthError(e) {
-  var $importCalendarMessage = $('#import-calendar-message');
-
-  var errorMessage;
-  if (e.error === ERROR_CODES.popup_closed_by_user) {
-    errorMessage =
-        'It seems like you didn\'t complete the authorization process. ' +
-        'Please click the Login button again.'
-  } else if (e.error === ERROR_CODES.access_denied) {
-    errorMessage =
-        'You didn\'t give permission to view your Google Calendar, ' +
-        'so your calendar events cannot be viewed or imported.'
-  } else {
-    errorMessage = 'An error occurred.';
-  }
-  $importCalendarMessage.text(errorMessage).removeClass('d-none');
-}
-
-/** Disconnects current user authentication. */
-function revokeAccess() {
-  googleAuth.disconnect();
-}
-
 /** Updates the calendar view and button visibility based on login status. */
 function updateCalendarView() {
-  const googleUser = googleAuth.currentUser.get();
-  const isAuthorized = googleUser.hasGrantedScopes(SCOPE_READ_ONLY);
+  const googleUser = GoogleAuth.currentUser.get();
+  const isAuthorized = googleUser.hasGrantedScopes(SCOPE_CALENDAR_READ_ONLY);
   if (isAuthorized) {
     showCalendarView(googleUser);
-    $('#calendar-auth-button').attr('disabled', 'true');
-    $('#calendar-auth-button').attr('aria-disabled', 'true');
     $('#import-calendar-button').removeClass('d-none');
-    $('#export-calendar-button').removeClass('d-none');
   } else {
-    $('#calendar-auth-button').attr('disabled', 'false');
-    $('#calendar-auth-button').attr('aria-disabled', 'false');
     $('#import-calendar-button').addClass('d-none');
-    $('#export-calendar-button').addClass('d-none');
+  }
+}
+
+/**
+ * Retrieves the logged in user's Google email and uses that email
+ * to embed the user's Google Calendar on the UI.
+ * The calendar is displayed in the user's Google Calendar's time zone.
+ */
+function showCalendarView(user) {
+  const googleUser = GoogleAuth.currentUser.get();
+  const isAuthorized = googleUser.hasGrantedScopes(SCOPE_CALENDAR_READ_ONLY);
+  if (isAuthorized) {
+    const userEmail = encodeURIComponent(user.getBasicProfile().getEmail());
+
+    // Fetches the user's Calendar's time zone.
+    gapi.client.calendar.settings.get({setting: 'timezone'})
+        .then((responseTimeZone) => {
+          const userCalendarTimeZone =
+              encodeURIComponent(responseTimeZone.result.value);
+          const calendarViewUrl =
+              'https://calendar.google.com/calendar/embed?src=' + userEmail +
+              '&ctz=' + userCalendarTimeZone + '&mode=WEEK';
+
+          // Updates the UI so that calendar view appears.
+          $('#calendar-view')
+              .attr('src', calendarViewUrl)
+              .removeClass('d-none');
+        });
   }
 }
 
@@ -134,9 +62,9 @@ function listUpcomingEvents() {
   // The start and end time limits for imported events are
   // start and end of day of the user's picked date.
   const timeRangeStart = getUserPickedDate();
-  timeRangeStart.setHours(0, 0, 0);   
+  timeRangeStart.setHours(0, 0, 0);
   const timeRangeEnd = getUserPickedDate();
-  timeRangeEnd.setHours(24, 0, 0); 
+  timeRangeEnd.setHours(24, 0, 0);
 
   // Retrieves events on the user's calendar for the day
   // that the user has picked in the nav bar.
@@ -156,7 +84,8 @@ function listUpcomingEvents() {
         // Show message for no imported event if result list is empty.
         if (events.length == 0) {
           const pickedDate = $('#date-picker').val();
-          $emptyCalendarMessage.text(
+          $emptyCalendarMessage
+              .text(
                   'There aren\'t any events scheduled on your Google Calendar for ' +
                   pickedDate)
               .removeClass('d-none');
@@ -201,37 +130,16 @@ function listUpcomingEvents() {
 }
 
 /**
- * Retrieves the logged in user's Google email and uses that email
- * to embed the user's Google Calendar on the UI.
- * The calendar is displayed in the user's Google Calendar's time zone.
- */
-function showCalendarView(user) {
-  const userEmail = encodeURIComponent(user.getBasicProfile().getEmail());
-
-  // Fetches the user's Calendar's time zone.
-  gapi.client.calendar.settings.get({setting: 'timezone'})
-      .then((responseTimeZone) => {
-        const userCalendarTimeZone =
-            encodeURIComponent(responseTimeZone.result.value);
-        const calendarViewUrl =
-            'https://calendar.google.com/calendar/embed?src=' + userEmail +
-            '&ctz=' + userCalendarTimeZone + '&mode=WEEK';
-
-        // Updates the UI so that calendar view appears.
-        $('#calendar-view').attr('src', calendarViewUrl).removeClass('d-none');
-      });
-}
-
-/**
  * Onclick function for 'Looks good to me, export" button.
  * Asks the user for Write access to the API scope.
  */
-function addWriteScope() {
-  var googleUser = googleAuth.currentUser.get();
-  googleUser.grant({scope: SCOPE_READ_WRITE})
+function addCalendarWriteScope() {
+  var googleUser = GoogleAuth.currentUser.get();
+  googleUser.grant({scope: SCOPE_CALENDAR_READ_WRITE})
       .then((response) => {
         $('#export-calendar-message').addClass('d-none');
-        addNewEventsToGoogleCalendar();
+        const scheduledTasks = collectAllScheduledTasks();
+        addNewEventsToGoogleCalendar(scheduledTasks);
       })
       .catch(function(error) {
         handleExportAuthError(error);
@@ -240,12 +148,36 @@ function addWriteScope() {
 
 /**
  * Adds the scheduled task items back to the user's Google Calendar.
- * TODO(hollyyuqizheng): fill in the rest of the method once
- * results can be returned from the scheduling algorithm.
  */
 function addNewEventsToGoogleCalendar() {
-  const event = {};
-  addOneEventToGoogleCalendar(event);
+  const scheduledTasks = collectAllScheduledTasks();
+  scheduledTasks.forEach((scheduledTask) => {
+    const task = scheduledTask.task;
+
+    const taskStartTimeMilliseconds = Date.parse(scheduledTask.date);
+    const taskStartTime = new Date();
+
+    taskStartTime.setTime(taskStartTimeMilliseconds);
+
+    const taskEndTime = new Date();
+
+    // This is x1000 because the functions takes milliseconds
+    taskEndTime.setTime(
+        taskStartTimeMilliseconds + (task.duration * 60 * 1000));
+
+    const currentScheduledTask = {
+      summary: task.name,
+      description: task.description.value,
+      start: {
+        dateTime: taskStartTime.toISOString(),
+      },
+      end: {
+        dateTime: taskEndTime.toISOString(),
+      },
+    };
+
+    addOneEventToGoogleCalendar(currentScheduledTask);
+  });
 }
 
 /** Adds an individual event to the authorized user's Google Calendar. */
@@ -255,7 +187,7 @@ function addOneEventToGoogleCalendar(event) {
 
   request.execute(function() {
     // Refreshes the calendar view so that the new event shows up on it.
-    showCalendarView(googleAuth.currentUser.get());
+    showCalendarView(GoogleAuth.currentUser.get());
   });
 }
 
