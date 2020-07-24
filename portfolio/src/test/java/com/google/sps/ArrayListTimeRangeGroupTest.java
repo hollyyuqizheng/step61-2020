@@ -188,6 +188,67 @@ public final class ArrayListTimeRangeGroupTest {
     Assert.assertEquals(expected, actual);
   }
 
+  /** Tests for adding one time range that is contained by an existing one. */
+  @Test
+  public void testAddTimeRangeContainedByExisting() {
+    // Time Ranges:  |-------A-------|
+    // To add:          |---B-----|
+    // Result:       |---------------|
+
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+
+    List<TimeRange> originalTimeRanges = Arrays.asList(timeRangeOne);
+    ArrayListTimeRangeGroup timeRangeGroup = new ArrayListTimeRangeGroup(originalTimeRanges);
+
+    Instant timeRangeToAddStart = timeRangeOneStart.plusSeconds(100);
+    Instant timeRangeToAddEnd = timeRangeOneEnd.minusSeconds(100);
+    TimeRange timeRangeToAdd = TimeRange.fromStartEnd(timeRangeToAddStart, timeRangeToAddEnd);
+    List<TimeRange> expected = Arrays.asList(timeRangeOne);
+
+    timeRangeGroup.addTimeRange(timeRangeToAdd);
+    List<TimeRange> actual = new ArrayList();
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
+    }
+
+    Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
+    Assert.assertEquals(expected, actual);
+  }
+
+  /** Tests for adding one time range that is contained by an existing one. */
+  @Test
+  public void testAddTimeRangeContainedByExistingPlus() {
+    // Time Ranges:  |-------A-------|      |----C----|
+    // To add:          |---B-----|
+    // Result:       |---------------|      |---------|
+
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
+    Instant timeRangeTwoStart = timeRangeOneEnd.plusSeconds(3000);
+    Instant timeRangeTwoEnd = timeRangeTwoStart.plusSeconds(1000);
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+    TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
+
+    List<TimeRange> originalTimeRanges = Arrays.asList(timeRangeOne, timeRangeTwo);
+    ArrayListTimeRangeGroup timeRangeGroup = new ArrayListTimeRangeGroup(originalTimeRanges);
+
+    Instant timeRangeToAddStart = timeRangeOneStart.plusSeconds(100);
+    Instant timeRangeToAddEnd = timeRangeOneEnd.minusSeconds(100);
+    TimeRange timeRangeToAdd = TimeRange.fromStartEnd(timeRangeToAddStart, timeRangeToAddEnd);
+    List<TimeRange> expected = Arrays.asList(timeRangeOne, timeRangeTwo);
+
+    timeRangeGroup.addTimeRange(timeRangeToAdd);
+    List<TimeRange> actual = new ArrayList();
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
+    }
+
+    Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
+    Assert.assertEquals(expected, actual);
+  }
+
   /** Tests for adding a time range that overlaps another existing one. */
   @Test
   public void testAddOverlappingRange() {
@@ -253,6 +314,43 @@ public final class ArrayListTimeRangeGroupTest {
     Instant timeRangeCombinedEnd = timeRangeToAddEnd;
     TimeRange timeRangeNew = TimeRange.fromStartEnd(timeRangeCombinedStart, timeRangeCombinedEnd);
     List<TimeRange> expected = Arrays.asList(timeRangeOne, timeRangeNew);
+
+    timeRangeGroup.addTimeRange(timeRangeToAdd);
+    List<TimeRange> actual = new ArrayList();
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
+    }
+
+    Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
+    Assert.assertEquals(expected, actual);
+  }
+
+  /** Tests for adding a time range that overlaps another existing one. */
+  @Test
+  public void testAddOverlappingRangeThree() {
+    // Time Ranges:       |-----A-----|     |----C----|
+    // To add:      |-----B-----|
+    // Result:      |-----------------|     |---------|
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
+    Instant timeRangeTwoStart = timeRangeOneEnd.plusSeconds(3000);
+    Instant timeRangeTwoEnd = timeRangeTwoStart.plusSeconds(1000);
+
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+    TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
+
+    List<TimeRange> originalTimeRanges = Arrays.asList(timeRangeTwo, timeRangeOne);
+    ArrayListTimeRangeGroup timeRangeGroup = new ArrayListTimeRangeGroup(originalTimeRanges);
+
+    Instant timeRangeToAddStart = timeRangeOneStart.minusSeconds(500);
+    Instant timeRangeToAddEnd = timeRangeOneEnd.minusSeconds(500);
+    TimeRange timeRangeToAdd = TimeRange.fromStartEnd(timeRangeToAddStart, timeRangeToAddEnd);
+
+    // Constructs the expected merged time range for combining B and C.
+    Instant timeRangeCombinedStart = timeRangeToAddStart;
+    Instant timeRangeCombinedEnd = timeRangeOneEnd;
+    TimeRange timeRangeNew = TimeRange.fromStartEnd(timeRangeCombinedStart, timeRangeCombinedEnd);
+    List<TimeRange> expected = Arrays.asList(timeRangeTwo, timeRangeNew);
 
     timeRangeGroup.addTimeRange(timeRangeToAdd);
     List<TimeRange> actual = new ArrayList();
