@@ -144,8 +144,19 @@
               </div>
             </div>
             <br />
-            <button type="button" class="btn btn-primary" onclick="createNewTask()">Add this task</button>
-            <button type="button" class="btn btn-primary d-none" id="connect-tasks-btn" onclick="toggleTasks()">
+            <button
+              type="button"
+              class="btn btn-primary btn-with-top-margin"
+              onclick="createNewTask()"
+            >
+              Add this task
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary btn-with-top-margin d-none"
+              id="connect-tasks-btn"
+              onclick="toggleTasks()"
+            >
               Link Tasks
             </button>
             <div class="input-group" id="import-menu-wrapper"></div>
@@ -215,14 +226,14 @@
 
             <button
               type="button"
-              class="btn btn-primary"
+              class="btn btn-primary btn-with-top-margin"
               onclick="createNewCalendarEventUserInput(); setNewEventStartAndEndTimes()"
             >
               Add this event
             </button>
             <button
               type="button"
-              class="btn btn-primary d-none"
+              class="btn btn-primary btn-with-top-margin d-none"
               id="import-calendar-button"
               onclick="listUpcomingEvents()"
             >
@@ -242,10 +253,19 @@
         <div id="calendar-wrapper" class="col-md-12 col-lg-6 col-xl-3">
           <div id="calendar-view-wrapper">
             <iframe title="Your Google Calendar" id="calendar-view" class="d-none" scrolling="yes"></iframe>
-            <button type="button" class="btn btn-primary" id="google-auth-button" onclick="handleAuthClick()">
+            <button type="button"
+              class="btn btn-primary btn-with-top-margin"
+              id="google-auth-button"
+              onclick="handleAuthClick()"
+            >
               Log in to see your Google Calendar
             </button>
-            <button type="button" class="btn btn-primary d-none" id="google-logout-button" onclick="logOutAllApis()">
+            <button
+              type="button"
+              class="btn btn-primary btn-with-top-margin d-none"
+              id="google-logout-button"
+              onclick="logOutAllApis()"
+            >
               Log out of your Google account
             </button>
           </div>
@@ -271,7 +291,7 @@
           </div>
           <button
             type="button"
-            class="btn btn-primary d-none"
+            class="btn btn-primary btn-with-top-margin d-none"
             id="export-calendar-button"
             onclick="addCalendarWriteScope()"
           >
@@ -279,7 +299,11 @@
           </button>
           <div class="d-none" id="export-calendar-message"></div>
           <div id="sheets-message"></div>
-          <button id="sheets-export-button" class="btn btn-primary d-none" onclick="handleExportSchedule()">
+          <button
+            id="sheets-export-button"
+            class="btn btn-primary btn-with-top-margin d-none"
+            onclick="handleExportSchedule()"
+          >
             Export to Google Sheets
           </button>
           <div>
