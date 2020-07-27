@@ -40,19 +40,7 @@ function handleClientLoad() {
 
 function initAuthentication() {
   fetchApiKey().then(
-      responseJson => gapi.client
-                          .init({
-                            apiKey: responseJson['API_KEY'],
-                            clientId: CLIENT_ID,
-                            discoveryDocs: [
-                              DISCOVERY_DOCS_CALENDAR, DISCOVERY_DOCS_SHEETS,
-                              DISCOVERY_DOCS_TASKS
-                            ],
-                            scope: [
-                              SCOPE_CALENDAR_READ_ONLY, SCOPE_SHEETS_READ_WRITE,
-                              SCOPE_TASKS_READ_ONLY
-                            ].join(' ')
-                          })
+      responseJson => gapiClientInit(responseJson)
                           .then(function() {
                             GoogleAuth = gapi.auth2.getAuthInstance();
 
@@ -63,6 +51,22 @@ function initAuthentication() {
                             // is already signed in.)
                             updateSigninStatus(GoogleAuth.isSignedIn.get());
                           }));
+}
+
+function gapiClientInit(responseJson) {
+  return gapi.client
+      .init({
+        apiKey: responseJson['API_KEY'],
+        clientId: CLIENT_ID,
+        discoveryDocs: [
+          DISCOVERY_DOCS_CALENDAR, DISCOVERY_DOCS_SHEETS,
+          DISCOVERY_DOCS_TASKS
+        ],
+        scope: [
+          SCOPE_CALENDAR_READ_ONLY, SCOPE_SHEETS_READ_WRITE,
+          SCOPE_TASKS_READ_ONLY
+        ].join(' ')
+      });
 }
 
 /** Signs user in. */
