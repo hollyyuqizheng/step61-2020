@@ -21,6 +21,7 @@ public class SchedulerTestUtil {
 
   public static final Instant TIME_0830 = Instant.parse("2020-06-25T08:30:00Z");
   public static final Instant TIME_0900 = TIME_0830.plus(DURATION_30_MINUTES);
+  public static final Instant TIME_0915 = TIME_0900.plus(DURATION_15_MINUTES);
   public static final Instant TIME_0920 = TIME_0900.plus(DURATION_20_MINUTES);
   public static final Instant TIME_0930 = TIME_0900.plus(DURATION_30_MINUTES);
   public static final Instant TIME_0950 = TIME_0900.plus(DURATION_20_MINUTES);

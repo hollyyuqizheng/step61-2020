@@ -12,7 +12,7 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public final class LongestTaskFirstSchedulerTest {
 
-  /** Tests that the reverse order comparator sorts tasks by duration in descending order. */
+  /** Tests that the comparator sorts tasks by duration in descending order. */
   @Test
   public void testTaskComparator() {
     Task task1 =
@@ -41,8 +41,7 @@ public final class LongestTaskFirstSchedulerTest {
             SchedulerTestUtil.PRIORITY_ONE);
     List<Task> tasks = Arrays.asList(task1, task2, task3, task4);
 
-    Collections.sort(
-        tasks, Collections.reverseOrder(LongestTaskFirstScheduler.sortByTaskDurationAscending));
+    Collections.sort(tasks, LongestTaskFirstScheduler.sortByTaskDurationDescendingThenName);
 
     List<Task> expected = Arrays.asList(task4, task1, task3, task2);
     Assert.assertEquals(expected, tasks);
@@ -93,6 +92,7 @@ public final class LongestTaskFirstSchedulerTest {
     // Working hours:   |-----------------------------------------------------|
     // Events:                 |---|          |--------|    |-----------------|
     // Scheduled:       |--A---|   |-A-|               |--A-|
+
     Collection<CalendarEvent> events =
         Arrays.asList(
             new CalendarEvent("Event 1", SchedulerTestUtil.TIME_0930, SchedulerTestUtil.TIME_1000),
@@ -156,7 +156,6 @@ public final class LongestTaskFirstSchedulerTest {
     Collection<ScheduledTask> actual =
         longestTaskFirstScheduler.schedule(
             events, tasks, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.TIME_1700);
-
     ScheduledTask scheduledTask1 = new ScheduledTask(task1, SchedulerTestUtil.TIME_0900);
     ScheduledTask scheduledTask2 = new ScheduledTask(task1, SchedulerTestUtil.TIME_1200);
     ScheduledTask scheduledTask3 = new ScheduledTask(task1, SchedulerTestUtil.TIME_1500);
