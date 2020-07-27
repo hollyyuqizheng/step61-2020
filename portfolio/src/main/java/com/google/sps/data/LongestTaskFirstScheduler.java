@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
+/** This class models a scheduling algorithm that prioritizes scheduling longer tasks first. */
 public class LongestTaskFirstScheduler implements TaskScheduler {
 
   // Comparator for sorting tasks by duration in descending order and then by task name
@@ -45,14 +46,14 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
 
     for (Task task : tasksList) {
       Duration taskDuration = task.getDuration();
-      Optional timeRangeForTask = findTimeForTask(task, availableTimesGroup);
+      Optional<TimeRange> timeRangeForTask = findTimeForTask(task, availableTimesGroup);
 
       if (!timeRangeForTask.isPresent()) {
         continue;
       }
 
       // Create and append scheduled tasks.
-      TimeRange scheduledTimeRange = (TimeRange) timeRangeForTask.get();
+      TimeRange scheduledTimeRange = timeRangeForTask.get();
       ScheduledTask scheduledTask = new ScheduledTask(task, scheduledTimeRange.start());
       scheduledTasks.add(scheduledTask);
 
@@ -74,18 +75,17 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
    * @return an Optional that contains the time range scheduled for this task. This Optional object
    *     is empty if the task cannot be scheduled.
    */
-  private static Optional findTimeForTask(Task task, TimeRangeGroup availableTimesGroup) {
+  private static Optional<TimeRange> findTimeForTask(
+      Task task, TimeRangeGroup availableTimesGroup) {
     List<TimeRange> availableTimes = new ArrayList<TimeRange>();
     Iterator<TimeRange> availableTimesIterator = availableTimesGroup.iterator();
-    while (availableTimesIterator.hasNext()) {
-      availableTimes.add(availableTimesIterator.next());
-    }
-
     Duration taskDuration = task.getDuration();
-    Optional scheduledTimeRangeOptional = Optional.empty();
+    Optional<TimeRange> scheduledTimeRangeOptional = Optional.empty();
 
     // Find the first free time range that is longer than the current task's duration.
-    for (TimeRange currentFreeTimeRange : availableTimes) {
+    while (availableTimesIterator.hasNext()) {
+      TimeRange currentFreeTimeRange = availableTimesIterator.next();
+
       if (currentFreeTimeRange.duration().compareTo(taskDuration) < 0) {
         continue;
       }
