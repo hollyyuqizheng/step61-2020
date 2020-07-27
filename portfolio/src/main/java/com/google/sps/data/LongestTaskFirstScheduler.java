@@ -44,14 +44,11 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
 
     List<ScheduledTask> scheduledTasks = new ArrayList<ScheduledTask>();
 
-    for (int taskIndex = 0; taskIndex < tasksList.size(); taskIndex++) {
-      Task task = tasksList.get(taskIndex);
+    for (Task task : tasksList) {
       Duration taskDuration = task.getDuration();
 
       // Find the first free time range that is longer than the current task's duration.
-      for (int freeRangeIndex = 0; freeRangeIndex < availableTimes.size(); freeRangeIndex++) {
-        TimeRange currentFreeTimeRange = availableTimes.get(freeRangeIndex);
-
+      for (TimeRange currentFreeTimeRange : availableTimes) {
         if (currentFreeTimeRange.duration().compareTo(taskDuration) >= 0) {
           // Construct the scheduled task based on the start time of this current time range.
           Instant scheduledTime = currentFreeTimeRange.start();
