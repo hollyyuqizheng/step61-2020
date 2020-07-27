@@ -27,6 +27,7 @@ public class SchedulerTestUtil {
   public static final Instant TIME_1000 = TIME_0900.plus(DURATION_60_MINUTES);
   public static final Instant TIME_1020 = TIME_1000.plus(DURATION_20_MINUTES);
   public static final Instant TIME_1030 = TIME_1000.plus(DURATION_30_MINUTES);
+  public static final Instant TIME_1050 = TIME_1030.plus(DURATION_20_MINUTES);
   public static final Instant TIME_1100 = TIME_1000.plus(DURATION_60_MINUTES);
   public static final Instant TIME_1120 = TIME_1100.plus(DURATION_20_MINUTES);
   public static final Instant TIME_1130 = TIME_1030.plus(DURATION_60_MINUTES);
@@ -34,6 +35,8 @@ public class SchedulerTestUtil {
   public static final Instant TIME_1300 = TIME_1200.plus(DURATION_60_MINUTES);
   public static final Instant TIME_1400 = TIME_1300.plus(DURATION_60_MINUTES);
   public static final Instant TIME_1500 = TIME_1400.plus(DURATION_60_MINUTES);
+  public static final Instant TIME_1520 = TIME_1500.plus(DURATION_20_MINUTES);
+  public static final Instant TIME_1530 = TIME_1500.plus(DURATION_30_MINUTES);
   public static final Instant TIME_1600 = TIME_1500.plus(DURATION_60_MINUTES);
   public static final Instant TIME_1700 = TIME_1600.plus(DURATION_60_MINUTES);
   public static final Instant TIME_1800 = TIME_1700.plus(DURATION_60_MINUTES);
