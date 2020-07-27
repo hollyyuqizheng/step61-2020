@@ -53,8 +53,7 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
 
       // Create and append scheduled tasks.
       TimeRange scheduledTimeRange = (TimeRange) timeRangeForTask.get();
-      Instant scheduledTime = scheduledTimeRange.start();
-      ScheduledTask scheduledTask = new ScheduledTask(task, scheduledTime);
+      ScheduledTask scheduledTask = new ScheduledTask(task, scheduledTimeRange.start());
       scheduledTasks.add(scheduledTask);
 
       // Delete the scheduled time range from the time range group.
