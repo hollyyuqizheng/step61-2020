@@ -12,7 +12,7 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public final class LongestTaskFirstSchedulerTest {
 
-  /** Tests that the reverse order comparator sorts tasks by duration in descending order. */
+  /** Tests that the comparator sorts tasks by duration in descending order. */
   @Test
   public void testTaskComparator() {
     Task task1 =
@@ -41,8 +41,7 @@ public final class LongestTaskFirstSchedulerTest {
             SchedulerTestUtil.PRIORITY_ONE);
     List<Task> tasks = Arrays.asList(task1, task2, task3, task4);
 
-    Collections.sort(
-        tasks, Collections.reverseOrder(LongestTaskFirstScheduler.sortByTaskDurationAscending));
+    Collections.sort(tasks, LongestTaskFirstScheduler.sortByTaskDurationDescendingThenName);
 
     List<Task> expected = Arrays.asList(task4, task1, task3, task2);
     Assert.assertEquals(expected, tasks);
@@ -88,15 +87,14 @@ public final class LongestTaskFirstSchedulerTest {
   }
 
   /**
-   * This scenario contains a task that is too long to be scheduled. The other tasks check if the
-   * algorithm schedules each task in the minimally long free time range, eg. a 1-hour task will be
-   * scheduled to an 1-hour free time range instead of a 1.5-hour free time range.
+   * This scenario contains a task that is too long to be scheduled. The other tasks are scheduled
+   * to the first time slot that has enough time for this task.
    */
   @Test
   public void testMaxTimeScheduled() {
-    // Working hours:   |-----------------------------------------------------|
-    // Events:                 |---|          |--------|    |-----------------|
-    // Scheduled tasks: |-D-|      |--C--|-E|          |-B--|
+    // Working hours:   |---------------------------------------------------------|
+    // Events:                     |---|          |--------|    |-----------------|
+    // Scheduled tasks: |-D-|-E-|      |--C--|             |-B--|
     Collection<CalendarEvent> events =
         Arrays.asList(
             new CalendarEvent("Event 1", SchedulerTestUtil.TIME_0930, SchedulerTestUtil.TIME_1000),
@@ -129,10 +127,9 @@ public final class LongestTaskFirstSchedulerTest {
     ScheduledTask scheduledTask2 = new ScheduledTask(task2, SchedulerTestUtil.TIME_1200);
     ScheduledTask scheduledTask3 = new ScheduledTask(task3, SchedulerTestUtil.TIME_1000);
     ScheduledTask scheduledTask4 = new ScheduledTask(task4, SchedulerTestUtil.TIME_0900);
-    ScheduledTask scheduledTask5 = new ScheduledTask(task5, SchedulerTestUtil.TIME_1120);
+    ScheduledTask scheduledTask5 = new ScheduledTask(task5, SchedulerTestUtil.TIME_0915);
     Collection<ScheduledTask> expected =
         Arrays.asList(scheduledTask3, scheduledTask2, scheduledTask4, scheduledTask5);
-
     Assert.assertEquals(actual, expected);
   }
 
