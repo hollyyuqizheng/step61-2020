@@ -60,20 +60,39 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
           TimeRange scheduledTimeRange =
               TimeRange.fromStartEnd(scheduledTime, scheduledTime.plus(taskDuration));
           availableTimesGroup.deleteTimeRange(scheduledTimeRange);
-          Iterator<TimeRange> updatedAvailableTimesGroupIterator = availableTimesGroup.iterator();
-
-          // Reconstruct availableTimes list based on the updated iterator after delete.
-          availableTimes = new ArrayList();
-          while (updatedAvailableTimesGroupIterator.hasNext()) {
-            availableTimes.add(updatedAvailableTimesGroupIterator.next());
-          }
-
-          Collections.sort(
-              availableTimes, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
+          availableTimes =
+              (ArrayList<TimeRange>) reconstructAvailableTimeRanges(availableTimesGroup);
 
           // Break out of the inner for loop, as the current task
           // is scheduled and the outer loops needs to move to the next task.
           break;
+        }
+      }
+
+      // If at this point the function hasn't broken out of the inner for loop yet,
+      // there isn't any individual free time range that is long enough for the current task.
+      // At this point, the availableTimes also hasn't been modified based on the current task.
+      // Run the logic on splitting up the task into smaller chunks.
+
+      // If the total duration of available free times is longer than the task's duration,
+      // then this task can be split up into smaller blocks to be scheduled.
+      // Otherwise, there is not enough free time in the day for this task, so this
+      // task will not be scheduled.
+      if (availableTimesGroup.getTotalDuration().compareTo(taskDuration) > 0) {
+        Iterator<TimeRange> availableTimesGroupIterator = availableTimesGroup.iterator();
+        while (taskDuration.getSeconds() > 0) {
+          while (availableTimesGroupIterator.hasNext()) {
+            TimeRange currentFreeTimeRange = availableTimesGroupIterator.next();
+            Instant scheduledTime = currentFreeTimeRange.start();
+            ScheduledTask scheduledTask = new ScheduledTask(task, scheduledTime);
+            scheduledTasks.add(scheduledTask);
+            availableTimesGroup.deleteTimeRange(currentFreeTimeRange);
+            availableTimes = reconstructAvailableTimeRanges(availableTimesGroup);
+
+            // Decrease the current task's duration after scheduling part of it
+            // to this free time range.
+            taskDuration = taskDuration.minus(currentFreeTimeRange.duration());
+          }
         }
       }
     }
@@ -84,5 +103,18 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
   /** Returns the scheduler's type, which is Longest Task First. */
   public SchedulingAlgorithmType getSchedulingAlgorithmType() {
     return SchedulingAlgorithmType.LONGEST_TASK_FIRST;
+  }
+
+  private List<TimeRange> reconstructAvailableTimeRanges(TimeRangeGroup updatedTimeRangeGroup) {
+    Iterator<TimeRange> updatedAvailableTimesGroupIterator = updatedTimeRangeGroup.iterator();
+
+    List<TimeRange> updatedAvailableTimes = new ArrayList();
+    while (updatedAvailableTimesGroupIterator.hasNext()) {
+      updatedAvailableTimes.add(updatedAvailableTimesGroupIterator.next());
+    }
+
+    Collections.sort(
+        updatedAvailableTimes, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
+    return updatedAvailableTimes;
   }
 }

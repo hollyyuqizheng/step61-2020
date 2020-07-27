@@ -1,5 +1,6 @@
 package com.google.sps.data;
 
+import java.time.Duration;
 import java.util.Iterator;
 
 public interface TimeRangeGroup {
@@ -26,6 +27,8 @@ public interface TimeRangeGroup {
   public void deleteTimeRange(TimeRange timeRangeToDelete);
 
   /** Returns an iterator for the collection of all time ranges. */
-  // public Iterator<TimeRange> getAllTimeRangesIterator();
   public Iterator<TimeRange> iterator();
+
+  /** Returns the total duration of all time ranges in the collection. */
+  public Duration getTotalDuration();
 }

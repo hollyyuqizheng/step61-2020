@@ -1,5 +1,6 @@
 package com.google.sps.data;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -188,5 +189,14 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup, Iterable<TimeRan
     }
 
     allTimeRanges = newTimeRanges;
+  }
+
+  /** Returns the total duration of the list of time ranges. */
+  public Duration getTotalDuration() {
+    Duration totalDuration = Duration.ofSeconds(0);
+    for (TimeRange range : allTimeRanges) {
+      totalDuration = totalDuration.plus(range.duration());
+    }
+    return totalDuration;
   }
 }
