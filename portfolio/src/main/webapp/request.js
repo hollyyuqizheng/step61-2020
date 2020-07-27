@@ -55,7 +55,7 @@ function onClickStartScheduling() {
   const $emptyTaskMessage = $('#empty-scheduled-task-message');
   const $invalidWorkingHoursMessage = $('#invalid-working-hours-message');
 
-  if (workingStartHourHasPassed()) {
+  if (isToday(getUserPickedDateFromDom()) && workingStartHourHasPassed()) {
     $invalidWorkingHoursMessage.removeClass('d-none');
   } else if (inputTasks.length == 0) {
     $emptyTaskMessage.removeClass('d-none');
