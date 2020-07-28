@@ -8,7 +8,7 @@ import java.util.List;
 
 /**
  * Models an implementation of the TimeRangeGroup model using LinkedList. This is a slightly
- * modified version of what hollyyuqizheng wrote for the ArrayList implementation. 
+ * modified version of what hollyyuqizheng wrote for the ArrayList implementation.
  */
 public class LinkedListTimeRangeGroup implements TimeRangeGroup {
 
@@ -51,8 +51,7 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
     // any existing time range merges with, if necessary.
     TimeRange lastExaminedTimeRange = timeRange;
 
-    for (int i = 0; i < allTimeRanges.size(); i++) {
-      TimeRange currentRange = allTimeRanges.get(i);
+    for (TimeRange currentRange : allTimeRanges) {
 
       // If the current range is completely contained by the lastExaminedTimeRange,
       // no merging or adding needs to happen.
@@ -81,7 +80,7 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
 
       // If current time range is the last element in the allTimeRanges list,
       // add the last examined time range to the new list.
-      if (i == allTimeRanges.size() - 1) {
+      if (currentRange.equals(allTimeRanges.get(allTimeRanges.size() - 1))) {
         newTimeRanges.add(lastExaminedTimeRange);
       }
     }
@@ -127,7 +126,7 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
   /**
    * Checks if a time range exists in the collection. For example, if [3:00 - 4:00] is in the
    * collection, [3:00 - 3:30] is considered to exist as a time range in the collection. This method
-   * uses linear search to find the time ranges whose start time is before the target range's start
+   * uses binary search to find the time ranges whose start time is before the target range's start
    * and whose end time is after the target range's end. Then the method calls contains to see if
    * the target range is contained within this current range.
    */
