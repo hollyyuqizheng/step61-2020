@@ -41,7 +41,7 @@ public class TaskGroup {
    * This method takes in an enumarated SchedulingAlgorithmType and returns
    * a PriorityQueue constructed using the Comparator appropriate for the
    * SchedulingAlgorithmType that was passed in.
-  */
+   */
   public PriorityQueue<Task> getQueueFromAlgorithmType(SchedulingAlgorithmType schedulingAlgorithmType) {
     switch(schedulingAlgorithmType) {
       case SHORTEST_TASK_FIRST:
