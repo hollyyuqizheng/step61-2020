@@ -120,9 +120,6 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup, Iterable<TimeRan
   }
 
   /** Returns an iterator for the list of all time ranges. */
-  // public Iterator<TimeRange> getAllTimeRangesIterator() {
-  //   return allTimeRanges.iterator();
-  // }
   public Iterator<TimeRange> iterator() {
     return allTimeRanges.iterator();
   }

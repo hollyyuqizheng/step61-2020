@@ -14,7 +14,7 @@ public final class LongestTaskFirstSchedulerTest {
 
   /** Tests that the comparator sorts tasks by duration in descending order. */
   @Test
-  public void testTaskComparator() {
+  public void testTaskComparatorDuration() {
     Task task1 =
         new Task(
             "Task 1",
@@ -41,15 +41,50 @@ public final class LongestTaskFirstSchedulerTest {
             SchedulerTestUtil.PRIORITY_ONE);
     List<Task> tasks = Arrays.asList(task1, task2, task3, task4);
 
-    Collections.sort(tasks, LongestTaskFirstScheduler.sortByTaskDurationDescendingThenName);
+    Collections.sort(tasks, LongestTaskFirstScheduler.sortByTaskDurationDescendingThenPriority);
 
     List<Task> expected = Arrays.asList(task4, task1, task3, task2);
     Assert.assertEquals(expected, tasks);
   }
 
+  /** Tests that the comparator also sorts tasks by priority in descending order. */
+  @Test
+  public void testTaskComparatorPriority() {
+    Task task1 =
+        new Task(
+            "Task 1",
+            "First task",
+            SchedulerTestUtil.DURATION_30_MINUTES,
+            SchedulerTestUtil.PRIORITY_ONE);
+    Task task2 =
+        new Task(
+            "Task 2",
+            "Second task",
+            SchedulerTestUtil.DURATION_20_MINUTES,
+            SchedulerTestUtil.PRIORITY_THREE);
+    Task task3 =
+        new Task(
+            "Task 3",
+            "Third task",
+            SchedulerTestUtil.DURATION_20_MINUTES,
+            SchedulerTestUtil.PRIORITY_ONE);
+    Task task4 =
+        new Task(
+            "Task 4",
+            "Fourth task",
+            SchedulerTestUtil.DURATION_20_MINUTES,
+            SchedulerTestUtil.PRIORITY_TWO);
+    List<Task> tasks = Arrays.asList(task1, task2, task3, task4);
+
+    Collections.sort(tasks, LongestTaskFirstScheduler.sortByTaskDurationDescendingThenPriority);
+
+    List<Task> expected = Arrays.asList(task1, task2, task4, task3);
+    Assert.assertEquals(expected, tasks);
+  }
+
   /**
    * Tests for a basic scenario where all free time ranges can be scheduled. Tests for the ordering
-   * of the test (longest task first, and then alphabetical order).
+   * of the test (longest task first).
    */
   @Test
   public void testLongestFirst() {
@@ -91,7 +126,7 @@ public final class LongestTaskFirstSchedulerTest {
   public void testOneTaskSplit() {
     // Working hours:   |-----------------------------------------------------|
     // Events:                 |---|          |--------|    |-----------------|
-    // Scheduled:       |--A---|   |-A-|               |--A-|
+    // Scheduled:       |--A---|   |-----A----|
 
     Collection<CalendarEvent> events =
         Arrays.asList(
@@ -112,23 +147,21 @@ public final class LongestTaskFirstSchedulerTest {
             events, tasks, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.TIME_1700);
 
     ScheduledTask scheduledTask1 = new ScheduledTask(task1, SchedulerTestUtil.TIME_0900);
-    ScheduledTask scheduledTask2 = new ScheduledTask(task1, SchedulerTestUtil.TIME_1200);
-    ScheduledTask scheduledTask3 = new ScheduledTask(task1, SchedulerTestUtil.TIME_1000);
-    Collection<ScheduledTask> expected =
-        Arrays.asList(scheduledTask1, scheduledTask2, scheduledTask3);
+    ScheduledTask scheduledTask2 = new ScheduledTask(task1, SchedulerTestUtil.TIME_1000);
+    Collection<ScheduledTask> expected = Arrays.asList(scheduledTask1, scheduledTask2);
 
     Assert.assertEquals(actual, expected);
   }
 
   /**
-   * In this scenario, A is split up into 3 blocks, C is split up into 2 blocks, B cannot be
+   * In this scenario, A is split up into 2 blocks, C is split up into 2 blocks, B cannot be
    * scheduled, D is scheduled as a whole, and E cannot be scheduled in the end.
    */
   @Test
   public void testMaxTimeScheduled() {
-    // Working hours:   |---------------------------------------------------------------|
-    // Events:                 |---|          |--------|    |--------|           |------|
-    // Scheduled tasks: |--A---|   |--A-|--C--|        |--A-|        |-C-|-D-|
+    // Working hours:   |--------------------------------------------------------------------|
+    // Events:                 |---|          |--------|         |--------|           |------|
+    // Scheduled tasks: |--A---|   |----A-----|        |----C----|        |-C-|-D-|
     Collection<CalendarEvent> events =
         Arrays.asList(
             new CalendarEvent("Event 1", SchedulerTestUtil.TIME_0930, SchedulerTestUtil.TIME_1000),
@@ -157,26 +190,20 @@ public final class LongestTaskFirstSchedulerTest {
         longestTaskFirstScheduler.schedule(
             events, tasks, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.TIME_1700);
     ScheduledTask scheduledTask1 = new ScheduledTask(task1, SchedulerTestUtil.TIME_0900);
-    ScheduledTask scheduledTask2 = new ScheduledTask(task1, SchedulerTestUtil.TIME_1200);
-    ScheduledTask scheduledTask3 = new ScheduledTask(task1, SchedulerTestUtil.TIME_1500);
-    ScheduledTask scheduledTask4 = new ScheduledTask(task3, SchedulerTestUtil.TIME_1530);
-    ScheduledTask scheduledTask5 = new ScheduledTask(task3, SchedulerTestUtil.TIME_1000);
-    ScheduledTask scheduledTask6 = new ScheduledTask(task4, SchedulerTestUtil.TIME_1050);
+    ScheduledTask scheduledTask2 = new ScheduledTask(task1, SchedulerTestUtil.TIME_1000);
+    ScheduledTask scheduledTask3 = new ScheduledTask(task3, SchedulerTestUtil.TIME_1200);
+    ScheduledTask scheduledTask4 = new ScheduledTask(task3, SchedulerTestUtil.TIME_1500);
+    ScheduledTask scheduledTask5 = new ScheduledTask(task4, SchedulerTestUtil.TIME_1520);
     Collection<ScheduledTask> expected =
         Arrays.asList(
-            scheduledTask1,
-            scheduledTask2,
-            scheduledTask3,
-            scheduledTask4,
-            scheduledTask5,
-            scheduledTask6);
+            scheduledTask1, scheduledTask2, scheduledTask3, scheduledTask4, scheduledTask5);
 
-    System.out.println("-----");
-    for (ScheduledTask t : actual) {
-      System.out.println(t.getTask().getName());
-      System.out.println(t.getStartTime());
-    }
-    System.out.println("-----");
+    // System.out.println("-----");
+    // for (ScheduledTask t : actual) {
+    //   System.out.println(t.getTask().getName());
+    //   System.out.println(t.getStartTime());
+    // }
+    // System.out.println("-----");
 
     Assert.assertEquals(actual, expected);
   }
@@ -217,6 +244,42 @@ public final class LongestTaskFirstSchedulerTest {
     ScheduledTask scheduledTask3 = new ScheduledTask(task3, SchedulerTestUtil.TIME_1100);
     Collection<ScheduledTask> expected =
         Arrays.asList(scheduledTask1, scheduledTask2, scheduledTask3);
+
+    Assert.assertEquals(actual, expected);
+  }
+
+  /** Tests for scenario where tasks of equal duration will be scheduled based on priority. */
+  @Test
+  public void testEqualDurationPriorityFirst() {
+    // Working hours:   |-----------------------------------------|
+    // Events:               |---|     |--------------------------|
+    // Scheduled tasks: |-C--|   |--A--|
+    Collection<CalendarEvent> events =
+        Arrays.asList(
+            new CalendarEvent("Event 1", SchedulerTestUtil.TIME_0930, SchedulerTestUtil.TIME_1000),
+            new CalendarEvent("Event 2", SchedulerTestUtil.TIME_1030, SchedulerTestUtil.TIME_1700));
+
+    Task task1 =
+        new Task(
+            "Task A", "A", SchedulerTestUtil.DURATION_30_MINUTES, SchedulerTestUtil.PRIORITY_ONE);
+    Task task2 =
+        new Task(
+            "Task B", "B", SchedulerTestUtil.DURATION_10_MINUTES, SchedulerTestUtil.PRIORITY_ONE);
+    Task task3 =
+        new Task(
+            "Task C", "C", SchedulerTestUtil.DURATION_30_MINUTES, SchedulerTestUtil.PRIORITY_THREE);
+    Collection<Task> tasks = Arrays.asList(task1, task2, task3);
+
+    LongestTaskFirstScheduler longestTaskFirstScheduler = new LongestTaskFirstScheduler();
+    Collection<ScheduledTask> actual =
+        longestTaskFirstScheduler.schedule(
+            events, tasks, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.TIME_1700);
+
+    ScheduledTask scheduledTask3 = new ScheduledTask(task3, SchedulerTestUtil.TIME_0900);
+    ScheduledTask scheduledTask1 = new ScheduledTask(task1, SchedulerTestUtil.TIME_1000);
+    // Task B cannot be scheduled.
+
+    Collection<ScheduledTask> expected = Arrays.asList(scheduledTask3, scheduledTask1);
 
     Assert.assertEquals(actual, expected);
   }
