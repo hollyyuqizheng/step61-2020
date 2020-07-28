@@ -13,7 +13,8 @@ import java.util.Optional;
 /** This class models a scheduling algorithm that prioritizes scheduling longer tasks first. */
 public class LongestTaskFirstScheduler implements TaskScheduler {
 
-  // Comparator for sorting tasks by duration in descending order and then by task priority.
+  // Comparator for sorting tasks by duration in descending order and then by task priority
+  // descending.
   public static final Comparator<Task> sortByTaskDurationDescendingThenPriority =
       Comparator.comparing(Task::getDuration).reversed().thenComparing(Task::getPriority);
 
@@ -33,7 +34,7 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
     // Sorts the tasks in descending order based on duration.
     // Longest task comes first in the collection.
     // Then sorts the list again by alphabetical order ascending.
-    Collections.sort(tasksList, sortByTaskDurationDescendingThenName);
+    Collections.sort(tasksList, sortByTaskDurationDescendingThenPriority);
 
     CalendarEventsGroup calendarEventsGroup =
         new CalendarEventsGroup(eventsList, workHoursStartTime, workHoursEndTime);
