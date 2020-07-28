@@ -42,10 +42,7 @@ function createScheduleRequestFromDom() {
   const tasks = collectAllTasks();
   const algorithmType = document.getElementById('algorithm-type').value;
   const scheduleRequest = new ScheduleRequest(
-      events,
-      tasks,
-      getTimeObject(startTime),
-      getTimeObject(endTime),
+      events, tasks, getTimeObject(startTime), getTimeObject(endTime),
       algorithmType);
   return scheduleRequest;
 }
@@ -54,15 +51,33 @@ function createScheduleRequestFromDom() {
  * Gets called when the user hits 'Start Scheduling'.
  */
 function onClickStartScheduling() {
-  // Create the request to send to the server using the data we collected from
-  // the web form.
-  fetchScheduledTasksFromServlet().then(handleScheduledTaskArray);
+  const inputTasks = collectAllTasks();
+  const $emptyTaskMessage = $('#empty-scheduled-task-message');
+  const $invalidWorkingHoursMessage = $('#invalid-working-hours-message');
+
+  if (workingStartHourHasPassed()) {
+    $invalidWorkingHoursMessage.removeClass('d-none');
+  } else if (inputTasks.length == 0) {
+    $emptyTaskMessage.removeClass('d-none');
+  } else {
+    $emptyTaskMessage.addClass('d-none');
+    $invalidWorkingHoursMessage.addClass('d-none');
+    // Create the request to send to the server using the data we collected from
+    // the web form.
+    fetchScheduledTasksFromServlet().then(handleScheduledTaskArray);
+  }
 }
 
 /**
  * Updates the UI to show the results of a query.
  */
 function handleScheduledTaskArray(scheduledTaskArray) {
+  // Show the 2 export buttons only after scheduling finishes normally.
+  const $exportCalendarButton = $('#export-calendar-button');
+  const $exportSheetsButton = $('#sheets-export-button');
+  $exportCalendarButton.removeClass('d-none');
+  $exportSheetsButton.removeClass('d-none');
+
   const resultElement = document.getElementById('schedule-result-list');
   resultElement.innerHTML = '';
   scheduledTaskArray.forEach(addScheduledTaskToDom);
@@ -83,8 +98,8 @@ function collectAllScheduledTasks() {
         cardBody.childNodes[0].getAttribute('data-task-name');
     const scheduledTaskScheduledTime =
         cardBody.childNodes[1].getAttribute('data-task-time');
-    const scheduledTaskDurationMinutes =
-        parseInt(cardBody.childNodes[2].getAttribute('data-task-duration-minutes'));
+    const scheduledTaskDurationMinutes = parseInt(
+        cardBody.childNodes[2].getAttribute('data-task-duration-minutes'));
     const scheduledTaskDescription =
         cardBody.childNodes[3].getAttribute('data-task-description');
     const scheduledTaskPriority =
@@ -172,4 +187,16 @@ function addScheduledTaskToDom(scheduledTask) {
 
   const scheduledTaskList = document.getElementById('schedule-result-list');
   scheduledTaskList.appendChild(newResultCard);
+}
+
+function workingStartHourHasPassed() {
+  const workStartParts = $('#working-hour-start').val().split(':');
+  const workStartHour = parseInt(workStartParts[0]);
+  const workStartMinute = parseInt(workStartParts[1]);
+  const now = new Date();
+
+  if (now.getHours() < workStartHour || (now.getHours() == workStartHour && now.getMinutes() < workStartMinute)) {
+    return false;
+  }
+  return true;
 }
