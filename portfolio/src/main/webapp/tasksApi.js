@@ -6,7 +6,6 @@
 function toggleTasks() {
   const menuIsVisible =
       $('#connect-tasks-btn').attr('data-is-import-menu-visible');
-  console.log(menuIsVisible);
   if (menuIsVisible == 'true') {
     clearImportMenu();
   } else {
