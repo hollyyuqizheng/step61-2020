@@ -49,6 +49,19 @@ public final class ArrayListTimeRangeGroupTest {
     Assert.assertFalse(timeRangeGroup.hasTimeRange(timeRangeFive));
   }
 
+  /** Tests for the has method in an empty time range group. */
+  @Test
+  public void testHasRangeEmpty() {
+    List<TimeRange> timeRanges = Arrays.asList();
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
+
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+    ArrayListTimeRangeGroup timeRangeGroup = new ArrayListTimeRangeGroup(timeRanges);
+
+    Assert.assertFalse(timeRangeGroup.hasTimeRange(timeRangeOne));
+  }
+
   /** Tests for merging two overlapping ranges. */
   @Test
   public void testMergeTwoRanges() {

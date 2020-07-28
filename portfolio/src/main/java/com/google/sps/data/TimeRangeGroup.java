@@ -26,6 +26,5 @@ public interface TimeRangeGroup {
   public void deleteTimeRange(TimeRange timeRangeToDelete);
 
   /** Returns an iterator for the collection of all time ranges. */
-  // public Iterator<TimeRange> getAllTimeRangesIterator();
   public Iterator<TimeRange> iterator();
 }

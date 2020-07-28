@@ -131,6 +131,10 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup, Iterable<TimeRan
    * the target range is contained within this current range.
    */
   public boolean hasTimeRange(TimeRange timeRangeToCheck) {
+    if (allTimeRanges.isEmpty()) {
+      return false;
+    }
+
     int end = allTimeRanges.size() - 1;
     int start = 0;
 
