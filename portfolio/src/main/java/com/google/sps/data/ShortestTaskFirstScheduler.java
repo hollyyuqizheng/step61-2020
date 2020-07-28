@@ -39,13 +39,13 @@ class ShortestTaskFirstScheduler implements TaskScheduler {
       Instant workHoursEndTime) {
     List<CalendarEvent> eventsList = new ArrayList<CalendarEvent>(events);
     List<Task> tasksList = new ArrayList<Task>(tasks);
-    Collections.sort(tasksList, sortByTaskDurationThenName);
     CalendarEventsGroup calendarEventsGroup =
         new CalendarEventsGroup(eventsList, workHoursStartTime, workHoursEndTime);
     List<TimeRange> availableTimes = calendarEventsGroup.getFreeTimeRanges();
+    TaskGroup taskGroup = new TaskGroup(tasksList);
+    taskGroup.sortTasksWithAlgorithmType(getSchedulingAlgorithmType());
     List<ScheduledTask> scheduledTasks = new ArrayList<ScheduledTask>();
     int rangeIndex = 0;
-    int taskIndex = 0;
     // Instant indicating the start time we are currently trying to schedule
     // events in.
     Instant currentScheduleTime = workHoursStartTime;
@@ -55,9 +55,9 @@ class ShortestTaskFirstScheduler implements TaskScheduler {
     // duration so if one task did not fit in the given range then we know no
     // later ones will fit either). We create new Task objects for the result
     // so data structures passed in are never changed.
-    while (rangeIndex < availableTimes.size() && taskIndex < tasksList.size()) {
+    while (rangeIndex < availableTimes.size() && taskGroup.hasNext()) {
       TimeRange availableTimeRange = availableTimes.get(rangeIndex);
-      Task task = tasksList.get(taskIndex);
+      Task task = taskGroup.getTask();
       // Either time is already past the start of the time range or we should
       // update it (maybe this is our first iteration in the range).
       if (availableTimeRange.start().isAfter(currentScheduleTime)) {
@@ -70,7 +70,7 @@ class ShortestTaskFirstScheduler implements TaskScheduler {
         ScheduledTask scheduledTask = new ScheduledTask(task, currentScheduleTime);
         scheduledTasks.add(scheduledTask);
         currentScheduleTime = currentScheduleTime.plusSeconds(task.getDuration().getSeconds());
-        taskIndex++;
+        taskGroup.incIndex();
       } else {
         rangeIndex++;
       }
