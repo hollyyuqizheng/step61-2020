@@ -131,18 +131,35 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
 
     for (TimeRange currentFreeTimeRange : currentAvailableTimes) {
       if (taskDuration.getSeconds() > 0) {
-        // Construct the scheduled task object.
         Instant scheduledTime = currentFreeTimeRange.start();
-        ScheduledTask scheduledTask = new ScheduledTask(task, scheduledTime);
-        scheduledTasks.add(scheduledTask);
+
+        String taskName = task.getName();
+        String taskDescription = "";
+        if (task.getDescription().isPresent()) {
+          taskDescription = task.getDescription().get();
+        }
+        TaskPriority taskPriority = task.getPriority();
 
         // If task's current duration is longer than the free time's,
         // this means the entirety of the free time range is scheduled to this task.
         if (taskDuration.compareTo(currentFreeTimeRange.duration()) > 0) {
+          // Constructs a new taks object with the current free time range's duration.
+          Task taskWithActualScheduledDuration =
+              new Task(taskName, taskDescription, currentFreeTimeRange.duration(), taskPriority);
+          ScheduledTask scheduledTask =
+              new ScheduledTask(taskWithActualScheduledDuration, scheduledTime);
+          scheduledTasks.add(scheduledTask);
+
           availableTimesGroup.deleteTimeRange(currentFreeTimeRange);
           taskDuration = taskDuration.minus(currentFreeTimeRange.duration());
         } else {
           // Otherwise, only part of the free time range is needed to schedule this task.
+          Task taskWithActualScheduledDuration =
+              new Task(taskName, taskDescription, taskDuration, taskPriority);
+          ScheduledTask scheduledTask =
+              new ScheduledTask(taskWithActualScheduledDuration, scheduledTime);
+          scheduledTasks.add(scheduledTask);
+
           Instant scheduledTaskEndTime = scheduledTime.plus(taskDuration);
           TimeRange scheduledTaskTimeRange =
               TimeRange.fromStartEnd(scheduledTime, scheduledTaskEndTime);

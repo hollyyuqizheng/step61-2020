@@ -146,8 +146,16 @@ public final class LongestTaskFirstSchedulerTest {
         longestTaskFirstScheduler.schedule(
             events, tasks, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.TIME_1700);
 
-    ScheduledTask scheduledTask1 = new ScheduledTask(task1, SchedulerTestUtil.TIME_0900);
-    ScheduledTask scheduledTask2 = new ScheduledTask(task1, SchedulerTestUtil.TIME_1000);
+    // These are the shortened segments of task A.
+    Task task1A =
+        new Task(
+            "Task A", "A", SchedulerTestUtil.DURATION_30_MINUTES, SchedulerTestUtil.PRIORITY_ONE);
+    Task task1B =
+        new Task(
+            "Task A", "A", SchedulerTestUtil.DURATION_90_MINUTES, SchedulerTestUtil.PRIORITY_ONE);
+
+    ScheduledTask scheduledTask1 = new ScheduledTask(task1A, SchedulerTestUtil.TIME_0900);
+    ScheduledTask scheduledTask2 = new ScheduledTask(task1B, SchedulerTestUtil.TIME_1000);
     Collection<ScheduledTask> expected = Arrays.asList(scheduledTask1, scheduledTask2);
 
     Assert.assertEquals(actual, expected);
@@ -189,21 +197,27 @@ public final class LongestTaskFirstSchedulerTest {
     Collection<ScheduledTask> actual =
         longestTaskFirstScheduler.schedule(
             events, tasks, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.TIME_1700);
-    ScheduledTask scheduledTask1 = new ScheduledTask(task1, SchedulerTestUtil.TIME_0900);
-    ScheduledTask scheduledTask2 = new ScheduledTask(task1, SchedulerTestUtil.TIME_1000);
-    ScheduledTask scheduledTask3 = new ScheduledTask(task3, SchedulerTestUtil.TIME_1200);
-    ScheduledTask scheduledTask4 = new ScheduledTask(task3, SchedulerTestUtil.TIME_1500);
+
+    Task task1A =
+        new Task(
+            "Task A", "A", SchedulerTestUtil.DURATION_30_MINUTES, SchedulerTestUtil.PRIORITY_ONE);
+    Task task1B =
+        new Task(
+            "Task A", "A", SchedulerTestUtil.DURATION_90_MINUTES, SchedulerTestUtil.PRIORITY_ONE);
+    Task task3A =
+        new Task(
+            "Task C", "C", SchedulerTestUtil.DURATION_60_MINUTES, SchedulerTestUtil.PRIORITY_ONE);
+    Task task3B =
+        new Task(
+            "Task C", "C", SchedulerTestUtil.DURATION_20_MINUTES, SchedulerTestUtil.PRIORITY_ONE);
+    ScheduledTask scheduledTask1 = new ScheduledTask(task1A, SchedulerTestUtil.TIME_0900);
+    ScheduledTask scheduledTask2 = new ScheduledTask(task1B, SchedulerTestUtil.TIME_1000);
+    ScheduledTask scheduledTask3 = new ScheduledTask(task3A, SchedulerTestUtil.TIME_1200);
+    ScheduledTask scheduledTask4 = new ScheduledTask(task3B, SchedulerTestUtil.TIME_1500);
     ScheduledTask scheduledTask5 = new ScheduledTask(task4, SchedulerTestUtil.TIME_1520);
     Collection<ScheduledTask> expected =
         Arrays.asList(
             scheduledTask1, scheduledTask2, scheduledTask3, scheduledTask4, scheduledTask5);
-
-    // System.out.println("-----");
-    // for (ScheduledTask t : actual) {
-    //   System.out.println(t.getTask().getName());
-    //   System.out.println(t.getStartTime());
-    // }
-    // System.out.println("-----");
 
     Assert.assertEquals(actual, expected);
   }
@@ -282,5 +296,29 @@ public final class LongestTaskFirstSchedulerTest {
     Collection<ScheduledTask> expected = Arrays.asList(scheduledTask3, scheduledTask1);
 
     Assert.assertEquals(actual, expected);
+  }
+
+  /** Tests for the scenario where no task can be scheduled. */
+  @Test
+  public void testNoTaskScheduled() {
+    // Working hours:   |-----------------------------------------|
+    // Events:               |---|     |--------------------------|
+    // Scheduled tasks:
+    Collection<CalendarEvent> events =
+        Arrays.asList(
+            new CalendarEvent("Event 1", SchedulerTestUtil.TIME_0930, SchedulerTestUtil.TIME_1000),
+            new CalendarEvent("Event 2", SchedulerTestUtil.TIME_1030, SchedulerTestUtil.TIME_1700));
+
+    Task task1 =
+        new Task(
+            "Task A", "A", SchedulerTestUtil.DURATION_80_MINUTES, SchedulerTestUtil.PRIORITY_ONE);
+    Collection<Task> tasks = Arrays.asList(task1);
+
+    LongestTaskFirstScheduler longestTaskFirstScheduler = new LongestTaskFirstScheduler();
+    Collection<ScheduledTask> actual =
+        longestTaskFirstScheduler.schedule(
+            events, tasks, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.TIME_1700);
+
+    Assert.assertTrue(actual.isEmpty());
   }
 }
