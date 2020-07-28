@@ -3,7 +3,7 @@ const TIME_UNIT = {
   HOURS: 'hours'
 };
 
-var ID_COUNTER = 0;
+var TASK_ID_COUNTER = 0;
 
 /**
  * Models a task that is displayed on the UI.
@@ -39,6 +39,7 @@ class Task {
 function createNewTask() {
   const name = $('#new-task-name').val();
   const description = $('#new-task-description').val();
+  // TODO(raulcruise): Create a JavaScript class for duration
   const length = parseInt($('#new-task-estimated-length').val());
   const lengthUnit = $('#new-task-estimated-length-unit').val();
   const priority = parseInt($('#new-task-priority').val());
@@ -62,14 +63,23 @@ function createNewTask() {
   }
 
   const newTask = new Task(
-      name, description, getDurationMinutes(length, lengthUnit),
-      parseInt(priority));
+      name, description, getDurationMinutes(length, lengthUnit), priority);
 
   updateTaskList(newTask, lengthUnit);
 }
 
+/** Shows the "Task Added" header. */
+function showTaskAddedHeader() {
+  const $taskListHeader = $('#task-added-header');
+  if ($taskListHeader.hasClass('d-none')) {
+    $taskListHeader.removeClass('d-none');
+  }
+}
+
 /** Display Task information from user input. */
 function updateTaskList(newTask, lengthUnit) {
+  showTaskAddedHeader();
+
   const newTaskCard = document.createElement('div');
   newTaskCard.classList.add('card');
 
@@ -87,7 +97,6 @@ function updateTaskList(newTask, lengthUnit) {
   descriptionText.innerText = newTask.description;
   cardBody.appendChild(descriptionText);
 
-  // WORK IN HERE
   // Create row for all modifiable content
   const inputRow = document.createElement('div');
   inputRow.classList.add('form-row');
@@ -97,21 +106,23 @@ function updateTaskList(newTask, lengthUnit) {
   durationColumn.classList.add('col');
 
   const durationLabel = document.createElement('label');
-  durationLabel.setAttribute('for', 'duration-input-' + ID_COUNTER);
+  durationLabel.setAttribute('for', 'duration-input-' + TASK_ID_COUNTER);
   durationLabel.innerText = 'Duration:';
 
   const durationInput = document.createElement('input');
   durationInput.classList.add('form-control');
-  durationInput.setAttribute('id', 'duration-input-' + ID_COUNTER);
-
-  if (lengthUnit === TIME_UNIT.HOURS) {
-    // Task duration is set in minutes, so divide that duration by 60
-    // to get the number of hous. 
+  durationInput.setAttribute('id', 'duration-input-' + TASK_ID_COUNTER);
+  if (lengthUnit == TIME_UNIT.HOURS) {
     durationInput.setAttribute('value', newTask.duration / 60);
-  } else {
+    $('#task-length-unit-message').removeClass('d-block');
+  } else if (lengthUnit == TIME_UNIT.MINUTES) {
     durationInput.setAttribute('value', newTask.duration);
+    $('#task-length-unit-message').removeClass('d-block');
+  } else {
+    $('#task-length-unit-message').addClass('d-block');
+    return;
   }
-  
+
   durationColumn.appendChild(durationLabel);
   durationColumn.appendChild(durationInput);
   inputRow.appendChild(durationColumn);
@@ -121,26 +132,27 @@ function updateTaskList(newTask, lengthUnit) {
   unitColumn.classList.add('col');
 
   const unitLabel = document.createElement('label');
-  unitLabel.setAttribute('for', 'unit-select-' + ID_COUNTER);
+  unitLabel.setAttribute('for', 'unit-select-' + TASK_ID_COUNTER);
   unitLabel.innerText = 'Unit:';
 
   const unitSelect = document.createElement('select');
   unitSelect.classList.add('form-control');
-  unitSelect.setAttribute('id', 'unit-select-' + ID_COUNTER);
+  unitSelect.setAttribute('id', 'unit-select-' + TASK_ID_COUNTER);
   unitSelect.setAttribute('selected', lengthUnit);
 
-  var option = unitSelect.appendChild(document.createElement('option'));
-  option.setAttribute('value', TIME_UNIT.MINUTES);
-  option.innerText = 'minute(s)';
+  const optionMinutes =
+      unitSelect.appendChild(document.createElement('option'));
+  optionMinutes.setAttribute('value', TIME_UNIT.MINUTES);
+  optionMinutes.innerText = 'minute(s)';
 
-  var optionTwo = unitSelect.appendChild(document.createElement('option'));
-  optionTwo.setAttribute('value', TIME_UNIT.HOURS);
-  optionTwo.innerText = 'hour(s)';
+  const optionHours = unitSelect.appendChild(document.createElement('option'));
+  optionHours.setAttribute('value', TIME_UNIT.HOURS);
+  optionHours.innerText = 'hour(s)';
 
   if (lengthUnit == TIME_UNIT.MINUTES) {
-    option.setAttribute('selected', '');
+    optionMinutes.setAttribute('selected', '');
   } else {
-    optionTwo.setAttribute('selected', '');
+    optionHours.setAttribute('selected', '');
   }
 
   unitColumn.appendChild(unitLabel);
@@ -152,12 +164,12 @@ function updateTaskList(newTask, lengthUnit) {
   priorityColumn.classList.add('col');
 
   const priorityLabel = document.createElement('label');
-  priorityLabel.setAttribute('for', 'priority-select-' + ID_COUNTER);
+  priorityLabel.setAttribute('for', 'priority-select-' + TASK_ID_COUNTER);
   priorityLabel.innerText = 'Priority:';
 
   const prioritySelect = document.createElement('select');
   prioritySelect.classList.add('form-control');
-  prioritySelect.setAttribute('id', 'priority-select-' + ID_COUNTER);
+  prioritySelect.setAttribute('id', 'priority-select-' + TASK_ID_COUNTER);
 
   for (var i = 1; i <= 5; i++) {
     option = prioritySelect.appendChild(document.createElement('option'));
@@ -183,7 +195,10 @@ function updateTaskList(newTask, lengthUnit) {
   taskList.innterHTML = '';
   taskList.appendChild(newTaskCard);
 
-  ID_COUNTER++;
+  // Clear the create task inputs once the data is transferred
+  // onto the UI.
+  clearNewTaskInputs();
+  TASK_ID_COUNTER++;
 
   // The delete button removes the task's card from the UI.
   deleteButton.onclick = function(newTaskCard) {
@@ -223,12 +238,29 @@ function collectAllTasks() {
         parseInt(taskBody.childNodes[2].childNodes[2].childNodes[1].value);
 
     const task = new Task(
-        taskName, taskDescription,
-        getDurationMinutes(taskLength, taskLengthUnit), taskPriority);
-    //const taskJson = JSON.stringify(task);
+        taskName,
+        taskDescription,
+        getDurationMinutes(taskLength, taskLengthUnit),
+        taskPriority);
     allTasks.push(task);
   });
   return allTasks;
+}
+
+function clearTasks() {
+  const taskList = document.getElementById('new-task-list');
+  taskList.innerHTML = '';
+}
+
+/**
+ * This method clears inputs from the create new task UI
+ * once a user has added a Task by setting the input values
+ * to empty strings.
+ */
+function clearNewTaskInputs() {
+  $('#new-task-estimated-length').val('');
+  $('#new-task-name').val('');
+  $('#new-task-description').val('');
 }
 
 /**
@@ -257,3 +289,7 @@ function validateTaskDuration(duration) {
     return {isValid: true, errorMessage: null};
   }
 }
+
+module.exports.getDurationMinutes = getDurationMinutes;
+module.exports.validateTaskDuration = validateTaskDuration;
+module.exports.validateTaskName = validateTaskName;

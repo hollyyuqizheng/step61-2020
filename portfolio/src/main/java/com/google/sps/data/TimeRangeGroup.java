@@ -1,58 +1,30 @@
 package com.google.sps.data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Iterator;
 
-public class TimeRangeGroup {
-
-  public List<TimeRange> allTimeRanges;
-
-  public TimeRangeGroup() {
-    allTimeRanges = new ArrayList();
-  }
-
-  public void addTimeRange(TimeRange newTimeRange) {
-    if (!allTimeRanges.contains(newTimeRange)) {
-      allTimeRanges.add(newTimeRange);
-    }
-  }
-
-  public List<TimeRange> getAllTimeRanges() {
-    return allTimeRanges;
-  }
+public interface TimeRangeGroup {
 
   /**
-   * Deletes a time range from the list of all time ranges.
-   *
-   * @return the modifed list of time ranges.
+   * Adds a new time range into the collection of time ranges. This newly added time range should be
+   * disjoint with all other time ranges already in the group.
    */
-  public List<TimeRange> deleteTimeRange(TimeRange timeRange) {
-    if (allTimeRanges.contains(timeRange)) {
-      allTimeRanges.remove(timeRange);
-    } else {
-      throw new IllegalArgumentException("This time range does not represent any free time range.");
-    }
-    return allTimeRanges;
-  }
+  public void addTimeRange(TimeRange timeRange);
 
   /**
-   * Modifies an original time range with a new one.
-   *
-   * @return the modified list of time ranges.
+   * Checks if a time range exists in the collection. For example, if [3:00 - 4:00] is in the
+   * collection, [3:00 - 3:30] is considered to exist as a time range in the collection.
    */
-  public List<TimeRange> modifyTimeRange(TimeRange originalTimeRange, TimeRange newTimeRange) {
-    if (originalTimeRange.start().isAfter(newTimeRange.start())
-        || originalTimeRange.end().isBefore(newTimeRange.end())) {
-      throw new IllegalArgumentException(
-          "New time range can only be shorter than original time range");
-    }
+  public boolean hasTimeRange(TimeRange timeRange);
 
-    allTimeRanges.remove(originalTimeRange);
-    allTimeRanges.add(newTimeRange);
+  /**
+   * Deletes a given time range. For example, if [3:00 - 4:00] is one of the time ranges in the
+   * group, deleting [3:15 - 3:30] will result in two new time ranges: [3 - 3:15], [3:30 - 4], which
+   * will replace the original [3:00 - 4:00]. Another example for deleting overlapping time ranges:
+   * if [3 - 4] and [5 - 6] are in the original list, deleting [3:30 - 5:30] will result in two new
+   * ranges: [3 - 3:30] and [5:30 - 6].
+   */
+  public void deleteTimeRange(TimeRange timeRangeToDelete);
 
-    // Sorts all free time ranges before returning.
-    Collections.sort(allTimeRanges, TimeRange.sortByTimeRangeStartTimeAscending);
-    return allTimeRanges;
-  }
+  /** Returns an iterator for the collection of all time ranges. */
+  public Iterator<TimeRange> iterator();
 }

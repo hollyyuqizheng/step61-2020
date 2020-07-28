@@ -25,10 +25,9 @@ import java.util.Comparator;
 public final class TimeRange {
   private final Instant start;
   private final Duration duration;
-
-  // Comparator for sorting time ranges by start time
-  public static final Comparator<TimeRange> sortByTimeRangeStartTimeAscending =
-      Comparator.comparing(TimeRange::start);
+  // Comparator for sorting time ranges by duration ascending and then by start time ascending
+  public static final Comparator<TimeRange> SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME =
+      Comparator.comparing(TimeRange::duration).thenComparing(TimeRange::start);
 
   private TimeRange(Instant start, Duration duration) {
     this.start = start;
@@ -47,7 +46,7 @@ public final class TimeRange {
 
   /** Returns the end of the range. This ending value is the closing exclusive bound. */
   public Instant end() {
-    return Instant.ofEpochSecond(start.getEpochSecond() + duration.getSeconds());
+    return start.plus(duration);
   }
 
   @Override
@@ -57,7 +56,7 @@ public final class TimeRange {
 
   @Override
   public String toString() {
-    return String.format("Range: [%d, %d)", start.toString(), this.end().toString());
+    return String.format("Range: [%s, %s]", start.toString(), this.end().toString());
   }
 
   public static boolean equals(TimeRange a, TimeRange b) {
@@ -66,7 +65,67 @@ public final class TimeRange {
 
   /** Creates a {@code TimeRange} from {@code start} to {@code end}. */
   public static TimeRange fromStartEnd(Instant start, Instant end) {
-    return new TimeRange(
-        start, Duration.ofSeconds(end.getEpochSecond() - start.getEpochSecond() + 1));
+    return new TimeRange(start, Duration.ofSeconds(end.getEpochSecond() - start.getEpochSecond()));
+  }
+
+  /**
+   * Checks if this range completely contains another range. This means that {@code otherRange} is a
+   * subset of this range. This is an inclusive bounds, meaning that if two ranges are the same,
+   * they contain each other.
+   */
+  public boolean contains(TimeRange otherRange) {
+    // If this range has no duration, it cannot contain anything.
+    if (duration.getSeconds() <= 0) {
+      return false;
+    }
+
+    // If the other range has no duration, then it is treated like a point that is
+    // anchored in its start time.
+    if (otherRange.duration.getSeconds() <= 0) {
+      return timeRangeContainsPoint(this, otherRange.start);
+    }
+
+    // Checks if the time range contains the other range's start and end points.
+    return timeRangeContainsPoint(this, otherRange.start)
+        && timeRangeContainsPoint(this, otherRange.end());
+  }
+
+  /**
+   * Checks if a time range contains a time point. Helper method for contains and overlaps. This
+   * method is package-private so that it can be tested.
+   */
+  static boolean timeRangeContainsPoint(TimeRange range, Instant point) {
+    // If a range has no duration, it cannot contain anything.
+    if (range.duration.getSeconds() <= 0) {
+      return false;
+    }
+
+    // If the point comes before the start of the range, the range cannot contain it.
+    if (point.getEpochSecond() < range.start.getEpochSecond()) {
+      return false;
+    }
+
+    // This is to make sure [8 - 8:30] contains 8:30, for example.
+    // The end of a time range is considered part of this time range,
+    // so that [8 - 8:30] and [8:30 - 9] can be considered as overlapping.
+    return point.getEpochSecond() <= range.start.getEpochSecond() + range.duration.getSeconds();
+  }
+
+  /**
+   * Checks if two ranges overlap. This means that at least some part of one range falls within the
+   * bounds of another range.
+   */
+  public boolean overlaps(TimeRange otherRange) {
+    // For two ranges to overlap, one range must contain the start of another range.
+    // Case 1: |---| |---|
+    //
+    // Case 2: |---|
+    //            |---|
+    // Case 3: |---------|
+    //            |---|
+    // Case 4:    |--------|
+    //         |-----|
+    return (timeRangeContainsPoint(this, otherRange.start())
+        || timeRangeContainsPoint(otherRange, start));
   }
 }
