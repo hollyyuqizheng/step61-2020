@@ -120,7 +120,9 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
 
   /**
    * Keeps splitting up the task to schedule the currently avaible free time ranges until all of the
-   * task is scheduled across the different time ranges.
+   * task is scheduled across the different time ranges. When this method is called, the task
+   * duration has already been checked against current free time range and this task is for sure
+   * able to be scheduled.
    */
   private void splitUpTaskToSchedule(
       Task task, TimeRangeGroup availableTimesGroup, List<ScheduledTask> scheduledTasks) {
