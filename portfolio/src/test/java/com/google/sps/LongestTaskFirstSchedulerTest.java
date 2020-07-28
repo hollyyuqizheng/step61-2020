@@ -14,7 +14,7 @@ public final class LongestTaskFirstSchedulerTest {
 
   /** Tests that the comparator sorts tasks by duration in descending order. */
   @Test
-  public void testTaskComparator() {
+  public void testTaskComparatorDuration() {
     Task task1 =
         new Task(
             "Task 1",
@@ -44,6 +44,41 @@ public final class LongestTaskFirstSchedulerTest {
     Collections.sort(tasks, LongestTaskFirstScheduler.sortByTaskDurationDescendingThenName);
 
     List<Task> expected = Arrays.asList(task4, task1, task3, task2);
+    Assert.assertEquals(expected, tasks);
+  }
+
+  /** Tests that the comparator also sorts tasks by priority in descending order. */
+  @Test
+  public void testTaskComparatorPriority() {
+    Task task1 =
+        new Task(
+            "Task 1",
+            "First task",
+            SchedulerTestUtil.DURATION_30_MINUTES,
+            SchedulerTestUtil.PRIORITY_ONE);
+    Task task2 =
+        new Task(
+            "Task 2",
+            "Second task",
+            SchedulerTestUtil.DURATION_20_MINUTES,
+            SchedulerTestUtil.PRIORITY_THREE);
+    Task task3 =
+        new Task(
+            "Task 3",
+            "Third task",
+            SchedulerTestUtil.DURATION_20_MINUTES,
+            SchedulerTestUtil.PRIORITY_ONE);
+    Task task4 =
+        new Task(
+            "Task 4",
+            "Fourth task",
+            SchedulerTestUtil.DURATION_20_MINUTES,
+            SchedulerTestUtil.PRIORITY_TWO);
+    List<Task> tasks = Arrays.asList(task1, task2, task3, task4);
+
+    Collections.sort(tasks, LongestTaskFirstScheduler.sortByTaskDurationDescendingThenName);
+
+    List<Task> expected = Arrays.asList(task1, task2, task4, task3);
     Assert.assertEquals(expected, tasks);
   }
 

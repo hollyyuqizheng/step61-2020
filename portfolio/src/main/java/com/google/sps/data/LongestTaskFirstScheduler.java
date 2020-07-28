@@ -13,10 +13,9 @@ import java.util.Optional;
 /** This class models a scheduling algorithm that prioritizes scheduling longer tasks first. */
 public class LongestTaskFirstScheduler implements TaskScheduler {
 
-  // Comparator for sorting tasks by duration in descending order and then by task name
-  // alphabetically.
-  public static final Comparator<Task> sortByTaskDurationDescendingThenName =
-      Comparator.comparing(Task::getDuration).reversed().thenComparing(Task::getName);
+  // Comparator for sorting tasks by duration in descending order and then by task priority.
+  public static final Comparator<Task> sortByTaskDurationDescendingThenPriority =
+      Comparator.comparing(Task::getDuration).reversed().thenComparing(Task::getPriority);
 
   /**
    * Schedules the tasks so that the longest tasks are scheduled to the first possible free time
