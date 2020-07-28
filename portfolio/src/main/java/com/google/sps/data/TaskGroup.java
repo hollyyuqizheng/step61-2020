@@ -47,15 +47,18 @@ public class TaskGroup {
     }
   }
 
-  public Task getTask() {
-    return tasks.get(tasksIndex);
+  public Task peek() {
+    if (!isEmpty()) {
+      return tasks.get(0);
+    }
+    return null;
   }
 
-  public void incIndex() {
-    tasksIndex++;
+  public void remove() {
+    tasks.remove(0);
   }
 
-  public boolean hasNext() {
-    return tasksIndex < tasks.size();
+  public boolean isEmpty() {
+    return tasks.size() == 0;
   }
 }

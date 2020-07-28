@@ -55,9 +55,9 @@ class ShortestTaskFirstScheduler implements TaskScheduler {
     // duration so if one task did not fit in the given range then we know no
     // later ones will fit either). We create new Task objects for the result
     // so data structures passed in are never changed.
-    while (rangeIndex < availableTimes.size() && taskGroup.hasNext()) {
+    while (rangeIndex < availableTimes.size() && !taskGroup.isEmpty()) {
       TimeRange availableTimeRange = availableTimes.get(rangeIndex);
-      Task task = taskGroup.getTask();
+      Task task = taskGroup.peek();
       // Either time is already past the start of the time range or we should
       // update it (maybe this is our first iteration in the range).
       if (availableTimeRange.start().isAfter(currentScheduleTime)) {
@@ -70,7 +70,7 @@ class ShortestTaskFirstScheduler implements TaskScheduler {
         ScheduledTask scheduledTask = new ScheduledTask(task, currentScheduleTime);
         scheduledTasks.add(scheduledTask);
         currentScheduleTime = currentScheduleTime.plusSeconds(task.getDuration().getSeconds());
-        taskGroup.incIndex();
+        taskGroup.remove();
       } else {
         rangeIndex++;
       }
