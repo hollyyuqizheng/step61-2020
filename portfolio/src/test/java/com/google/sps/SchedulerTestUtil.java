@@ -13,6 +13,7 @@ public class SchedulerTestUtil {
   public static final Duration DURATION_15_MINUTES = Duration.ofSeconds(15 * 60);
   public static final Duration DURATION_20_MINUTES = Duration.ofSeconds(20 * 60);
   public static final Duration DURATION_30_MINUTES = Duration.ofSeconds(30 * 60);
+  public static final Duration DURATION_40_MINUTES = Duration.ofSeconds(40 * 60);
   public static final Duration DURATION_45_MINUTES = Duration.ofSeconds(45 * 60);
   public static final Duration DURATION_60_MINUTES = Duration.ofSeconds(60 * 60);
   public static final Duration DURATION_80_MINUTES = Duration.ofSeconds(80 * 60);

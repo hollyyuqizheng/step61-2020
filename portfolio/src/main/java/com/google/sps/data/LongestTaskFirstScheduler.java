@@ -50,13 +50,9 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
       Optional<TimeRange> timeRangeForTask = findTimeForTask(task, availableTimesGroup);
 
       if (!timeRangeForTask.isPresent()) {
-        // If the total duration of available free times is longer than the task's duration,
-        // then this task can be split up into smaller blocks to be scheduled.
-        // Otherwise, there is not enough free time in the day for this task, so this
-        // task will not be scheduled.
-        if (availableTimesGroup.getTotalDuration().compareTo(task.getDuration()) > 0) {
-          splitUpTaskToSchedule(task, availableTimesGroup, scheduledTasks);
-        }
+        // Try to break up the current task and schedule it as much as possible.
+        boolean isTaskCompletelyScheduled =
+            splitUpTaskToSchedule(task, availableTimesGroup, scheduledTasks);
       } else {
         // This is the case that the current task can be scheduled entirely to one free time range.
         TimeRange scheduledTimeRange = timeRangeForTask.get();
@@ -120,20 +116,23 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
 
   /**
    * Keeps splitting up the task to schedule the currently avaible free time ranges until all of the
-   * task is scheduled across the different time ranges. When this method is called, the task
-   * duration has already been checked against current free time range and this task is for sure
-   * able to be scheduled.
+   * task is scheduled across the different time ranges. When this method is called, the task may or
+   * may not be complete scheduled.
+   *
+   * @return a boolean value representing whether or not the task is complete scheduled.
    */
-  private void splitUpTaskToSchedule(
+  private boolean splitUpTaskToSchedule(
       Task task, TimeRangeGroup availableTimesGroup, List<ScheduledTask> scheduledTasks) {
     List<TimeRange> currentAvailableTimes = constructAvailableTimeRanges(availableTimesGroup);
     Duration taskDuration = task.getDuration();
+    int taskSegmentCount = 1;
 
     for (TimeRange currentFreeTimeRange : currentAvailableTimes) {
       if (taskDuration.getSeconds() > 0) {
         Instant scheduledTime = currentFreeTimeRange.start();
 
-        String taskName = task.getName();
+        // Reconstruct the task segment's name.
+        String taskName = task.getName() + " (Part " + taskSegmentCount + ")";
         String taskDescription = "";
         if (task.getDescription().isPresent()) {
           taskDescription = task.getDescription().get();
@@ -167,10 +166,16 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
           taskDuration = taskDuration.minus(scheduledTaskTimeRange.duration());
 
           // This is also the last free time range that is needed to complete the scheduling
-          // for the current task, so break out of the for loop now.
-          break;
+          // for the current task, so return true.
+          return true;
         }
+        taskSegmentCount++;
       }
     }
+
+    // If iterating through all current time ranges finishes, and the task still isn't
+    // completely scheduled, return false to indicate that this task is not
+    // completely scheduled.
+    return false;
   }
 }
