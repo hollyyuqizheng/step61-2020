@@ -42,7 +42,7 @@ class ShortestTaskFirstScheduler implements TaskScheduler {
     CalendarEventsGroup calendarEventsGroup =
         new CalendarEventsGroup(eventsList, workHoursStartTime, workHoursEndTime);
     List<TimeRange> availableTimes = calendarEventsGroup.getFreeTimeRanges();
-    TaskGroup taskGroup = new TaskGroup(tasksList, getSchedulingAlgorithmType());
+    TaskQueue taskQueue = new TaskQueue(tasksList, getSchedulingAlgorithmType());
     List<ScheduledTask> scheduledTasks = new ArrayList<ScheduledTask>();
     int rangeIndex = 0;
     // Instant indicating the start time we are currently trying to schedule
@@ -54,9 +54,9 @@ class ShortestTaskFirstScheduler implements TaskScheduler {
     // duration so if one task did not fit in the given range then we know no
     // later ones will fit either). We create new Task objects for the result
     // so data structures passed in are never changed.
-    while (rangeIndex < availableTimes.size() && !taskGroup.isEmpty()) {
+    while (rangeIndex < availableTimes.size() && !taskQueue.isEmpty()) {
       TimeRange availableTimeRange = availableTimes.get(rangeIndex);
-      Task task = taskGroup.peek();
+      Task task = taskQueue.peek();
       // Either time is already past the start of the time range or we should
       // update it (maybe this is our first iteration in the range).
       if (availableTimeRange.start().isAfter(currentScheduleTime)) {
@@ -69,7 +69,7 @@ class ShortestTaskFirstScheduler implements TaskScheduler {
         ScheduledTask scheduledTask = new ScheduledTask(task, currentScheduleTime);
         scheduledTasks.add(scheduledTask);
         currentScheduleTime = currentScheduleTime.plusSeconds(task.getDuration().getSeconds());
-        taskGroup.remove();
+        taskQueue.remove();
       } else {
         rangeIndex++;
       }
