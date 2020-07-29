@@ -25,8 +25,6 @@ public final class TaskQueueTest {
   
   private final TaskPriority LOW_PRIORITY = new TaskPriority(1);
 
-
-
   /**
    * Expect the TaskQueue constructor to throw an IllegalArgumentException if 
    * null is passed in place of a list of Tasks.
@@ -67,17 +65,11 @@ public final class TaskQueueTest {
     List<Task> actual = new ArrayList<Task>();
 
     TaskQueue taskQueue = new TaskQueue(taskList, SHORTEST_TASK_FIRST);
-    
-    actual.add(taskQueue.peek());
-    taskQueue.remove();
-    actual.add(taskQueue.peek());
-    taskQueue.remove();
-    actual.add(taskQueue.peek());
-    taskQueue.remove();
-    actual.add(taskQueue.peek());
-    taskQueue.remove();
-    actual.add(taskQueue.peek());
-    taskQueue.remove();
+
+    for (int i = 0; i < expected.size(); i++) {
+      actual.add(taskQueue.peek());
+      taskQueue.remove();
+    }
 
     Assert.assertEquals(expected, actual);
   }
