@@ -82,6 +82,32 @@ public final class LongestTaskFirstSchedulerTest {
     Assert.assertEquals(expected, tasks);
   }
 
+  /** Tests for the task renaming method. */
+  @Test
+  public void testTaskRenaming() {
+    Task task1 =
+        new Task(
+            "Task A (Part 1)",
+            "A",
+            SchedulerTestUtil.DURATION_20_MINUTES,
+            SchedulerTestUtil.PRIORITY_ONE);
+    ScheduledTask scheduledTask1 = new ScheduledTask(task1, SchedulerTestUtil.TIME_0900);
+    ScheduledTask scheduledTask1After =
+        LongestTaskFirstScheduler.changeTaskNameToOriginal(scheduledTask1);
+    Assert.assertEquals(scheduledTask1After.getTask().getName(), "Task A");
+
+    Task task2 =
+        new Task(
+            "(Weird name) (Part 1)",
+            "A",
+            SchedulerTestUtil.DURATION_20_MINUTES,
+            SchedulerTestUtil.PRIORITY_ONE);
+    ScheduledTask scheduledTask2 = new ScheduledTask(task2, SchedulerTestUtil.TIME_0900);
+    ScheduledTask scheduledTask2After =
+        LongestTaskFirstScheduler.changeTaskNameToOriginal(scheduledTask2);
+    Assert.assertEquals(scheduledTask2After.getTask().getName(), "(Weird name)");
+  }
+
   /**
    * Tests for a basic scenario where all free time ranges can be scheduled. Tests for the ordering
    * of the test (longest task first).
@@ -117,6 +143,10 @@ public final class LongestTaskFirstSchedulerTest {
     ScheduledTask scheduledTask2 = new ScheduledTask(task2, SchedulerTestUtil.TIME_1020);
     Collection<ScheduledTask> expected =
         Arrays.asList(scheduledTask1, scheduledTask3, scheduledTask2);
+
+    for (ScheduledTask t : actual) {
+      System.out.println(t.getTask().getName());
+    }
 
     Assert.assertEquals(actual, expected);
   }
