@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 /**
- * This class holds a List of tasks and includes functions to sort
- * the List and retrieve elements.
+ * This class holds a PriorityQueue of tasks and includes functions to
+ * retrieve its elements.
  */
-public class TaskGroup {
+public class TaskQueue {
   private final static int DEFAULT_QUEUE_SIZE = 15;
 
   private final PriorityQueue<Task> tasks;
@@ -20,12 +20,12 @@ public class TaskGroup {
       Comparator.comparing(Task::getDuration).thenComparing(Task::getName);
 
   /**
-   * The TaskGroup constructor takes in an unsorted list of Tasks and
+   * The TaskQueue constructor takes in an unsorted list of Tasks and
    * the SchedulingAlgorithmType which it then uses to create a PriorityQueue
    * using a Comparator specifically for the algorithm type. Once the
    * PriorityQueue is created, all the tasks are added.
    */
-  public TaskGroup(List<Task> taskList, SchedulingAlgorithmType schedulingAlgorithmType) {
+  public TaskQueue(List<Task> taskList, SchedulingAlgorithmType schedulingAlgorithmType) {
     if (taskList == null) {
       throw new IllegalArgumentException("Tasklist cannot be null");
     }
