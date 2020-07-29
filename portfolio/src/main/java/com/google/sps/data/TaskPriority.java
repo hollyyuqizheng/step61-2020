@@ -1,7 +1,7 @@
 package com.google.sps.data;
 
 /** Handles range checking, and allows retrieval of the priority value. */
-public final class TaskPriority implements Comparable<TaskPriority> {
+public final class TaskPriority {
   private final int priority;
 
   // Constants for minimum and maximum priority levels.
@@ -27,14 +27,5 @@ public final class TaskPriority implements Comparable<TaskPriority> {
 
   private static boolean equals(TaskPriority a, TaskPriority b) {
     return a.priority == b.priority;
-  }
-
-  /**
-   * This method, when used in a comparator based on task priority, will sort the tasks by priority
-   * descending, so the highest priority will come first after the sorting.
-   */
-  @Override
-  public int compareTo(TaskPriority otherTaskPriority) {
-    return Integer.compare(otherTaskPriority.getPriority(), priority);
   }
 }
