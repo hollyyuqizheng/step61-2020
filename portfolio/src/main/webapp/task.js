@@ -290,6 +290,16 @@ function validateTaskDuration(duration) {
   }
 }
 
+/** If the user's picked date is not today, updates the header for adding task to reflect the picked date. */
+function setTaskHeaderDate() {
+  const pickedDate = getUserPickedDateFromDom();
+  if (!isToday(pickedDate)) {
+    const $taskHeader = $('#task-instruction-title');
+    $taskHeader.text('1. Add any tasks you want to schedule for ' + pickedDate.toDateString());
+  }
+  
+}
+
 module.exports.getDurationMinutes = getDurationMinutes;
 module.exports.validateTaskDuration = validateTaskDuration;
 module.exports.validateTaskName = validateTaskName;
