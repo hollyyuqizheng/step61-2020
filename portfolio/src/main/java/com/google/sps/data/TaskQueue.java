@@ -42,7 +42,7 @@ public class TaskGroup {
    * a PriorityQueue constructed using the Comparator appropriate for the
    * SchedulingAlgorithmType that was passed in.
    */
-  public PriorityQueue<Task> getQueueFromAlgorithmType(SchedulingAlgorithmType schedulingAlgorithmType) {
+  private PriorityQueue<Task> getQueueFromAlgorithmType(SchedulingAlgorithmType schedulingAlgorithmType) {
     switch(schedulingAlgorithmType) {
       case SHORTEST_TASK_FIRST:
         return new PriorityQueue<Task>(DEFAULT_QUEUE_SIZE, sortByTaskDurationThenName);
