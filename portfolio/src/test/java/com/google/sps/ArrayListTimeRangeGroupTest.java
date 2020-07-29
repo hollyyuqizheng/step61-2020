@@ -1,6 +1,5 @@
 package com.google.sps.data;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -710,24 +709,5 @@ public final class ArrayListTimeRangeGroupTest {
 
     Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
     Assert.assertEquals(expectedTimeRangesAfterDelete, actual);
-  }
-
-  /** Tests for the getTotalDuration method. */
-  @Test
-  public void testTotalDuration() {
-    Instant timeRangeOneStart = Instant.now();
-    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
-    Instant timeRangeTwoStart = timeRangeOneEnd.plusSeconds(1000);
-    Instant timeRangeTwoEnd = timeRangeTwoStart.plusSeconds(1000);
-
-    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
-    TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
-
-    List<TimeRange> timeRanges = Arrays.asList(timeRangeOne, timeRangeTwo);
-    ArrayListTimeRangeGroup timeRangeGroup = new ArrayListTimeRangeGroup(timeRanges);
-
-    Duration expected = Duration.ofSeconds(2000);
-    Duration actual = timeRangeGroup.getTotalDuration();
-    Assert.assertEquals(actual, expected);
   }
 }
