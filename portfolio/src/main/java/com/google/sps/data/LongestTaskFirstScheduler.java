@@ -56,7 +56,8 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
       } else {
         // This is the case that the current task can be scheduled entirely to one free time range.
         TimeRange scheduledTimeRange = timeRangeForTask.get();
-        ScheduledTask scheduledTask = new ScheduledTask(task, scheduledTimeRange.start());
+        ScheduledTask scheduledTask =
+            new ScheduledTask(task, scheduledTimeRange.start(), /* isCompletelyScheduled= */ true);
         scheduledTasks.add(scheduledTask);
         availableTimesGroup.deleteTimeRange(scheduledTimeRange);
       }
@@ -126,6 +127,7 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
     List<TimeRange> currentAvailableTimes = constructAvailableTimeRanges(availableTimesGroup);
     Duration taskDuration = task.getDuration();
     int taskSegmentCount = 1;
+    List<ScheduledTask> taskSegments = new ArrayList<ScheduledTask>();
 
     for (TimeRange currentFreeTimeRange : currentAvailableTimes) {
       if (taskDuration.getSeconds() > 0) {
@@ -145,9 +147,14 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
           // Constructs a new taks object with the current free time range's duration.
           Task taskWithActualScheduledDuration =
               new Task(taskName, taskDescription, currentFreeTimeRange.duration(), taskPriority);
+          // Assumes this task can be scheduled for now.
+          // If not, the true tag will be overwritten at the end of the method.
           ScheduledTask scheduledTask =
-              new ScheduledTask(taskWithActualScheduledDuration, scheduledTime);
-          scheduledTasks.add(scheduledTask);
+              new ScheduledTask(
+                  taskWithActualScheduledDuration,
+                  scheduledTime,
+                  /* isCompletelyScheduled= */ true);
+          taskSegments.add(scheduledTask);
 
           availableTimesGroup.deleteTimeRange(currentFreeTimeRange);
           taskDuration = taskDuration.minus(currentFreeTimeRange.duration());
@@ -156,7 +163,15 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
           Task taskWithActualScheduledDuration =
               new Task(taskName, taskDescription, taskDuration, taskPriority);
           ScheduledTask scheduledTask =
-              new ScheduledTask(taskWithActualScheduledDuration, scheduledTime);
+              new ScheduledTask(
+                  taskWithActualScheduledDuration,
+                  scheduledTime,
+                  /* isCompletelyScheduled= */ true);
+
+          for (ScheduledTask taskSegment : taskSegments) {
+            scheduledTasks.add(taskSegment);
+          }
+          // Also add the currently scheduled task segment.
           scheduledTasks.add(scheduledTask);
 
           Instant scheduledTaskEndTime = scheduledTime.plus(taskDuration);
@@ -174,8 +189,14 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
     }
 
     // If iterating through all current time ranges finishes, and the task still isn't
-    // completely scheduled, return false to indicate that this task is not
-    // completely scheduled.
+    // completely scheduled, then this task is only partially scheduled.
+    // Go through all the segments for this task, and set their completeness to false.
+    // Return false to indicate that this task is not completely scheduled.
+    for (ScheduledTask taskSegment : taskSegments) {
+      taskSegment.setCompleteness(false);
+      scheduledTasks.add(taskSegment);
+    }
+
     return false;
   }
 }
