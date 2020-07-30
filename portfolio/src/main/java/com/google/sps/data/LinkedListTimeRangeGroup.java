@@ -132,7 +132,7 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
   /**
    * Checks if a time range exists in the collection. For example, if [3:00 - 4:00] is in the
    * collection, [3:00 - 3:30] is considered to exist as a time range in the collection. This method
-   * uses binary search to find the time ranges whose start time is before the target range's start
+   * uses linear search to find the time ranges whose start time is before the target range's start
    * and whose end time is after the target range's end. Then the method calls contains to see if
    * the target range is contained within this current range.
    */
