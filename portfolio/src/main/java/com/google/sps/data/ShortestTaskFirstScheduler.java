@@ -17,9 +17,9 @@ package com.google.sps.data;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 class ShortestTaskFirstScheduler implements TaskScheduler {
   private static final Comparator<CalendarEvent> sortByEventStartTimeAscending =
@@ -67,7 +67,7 @@ class ShortestTaskFirstScheduler implements TaskScheduler {
           .plusSeconds(task.getDuration().getSeconds())
           .isAfter(availableTimeRange.end())) {
         ScheduledTask scheduledTask =
-            new ScheduledTask(task, currentScheduleTime, /* isCompletelyScheduled= */ true);
+            new ScheduledTask(task, currentScheduleTime, Optional.of(true));
         scheduledTasks.add(scheduledTask);
         currentScheduleTime = currentScheduleTime.plusSeconds(task.getDuration().getSeconds());
         taskQueue.remove();

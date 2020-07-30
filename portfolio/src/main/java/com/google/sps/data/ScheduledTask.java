@@ -1,6 +1,7 @@
 package com.google.sps.data;
 
 import java.time.Instant;
+import java.util.Optional;
 
 /**
  * This is a wrapper class for scheduled tasks. Includes a Task and the Instant when it is
@@ -9,9 +10,9 @@ import java.time.Instant;
 public class ScheduledTask {
   private final Task task;
   private final Instant startTime;
-  private boolean isCompletelyScheduled;
+  private Optional<Boolean> isCompletelyScheduled;
 
-  public ScheduledTask(Task task, Instant startTime, boolean isCompletelyScheduled) {
+  public ScheduledTask(Task task, Instant startTime, Optional<Boolean> isCompletelyScheduled) {
     if (task == null) {
       throw new IllegalArgumentException("Task cannot be null");
     }
@@ -40,7 +41,7 @@ public class ScheduledTask {
     return a.task.equals(b.task) && a.startTime.equals(b.startTime);
   }
 
-  public void setCompleteness(boolean scheduleStatus) {
-    isCompletelyScheduled = scheduleStatus;
+  public void setCompleteness(Optional<Boolean> isCompletelyScheduled) {
+    this.isCompletelyScheduled = isCompletelyScheduled;
   }
 }

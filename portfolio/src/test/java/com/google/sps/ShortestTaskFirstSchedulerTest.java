@@ -46,7 +46,8 @@ public final class ShortestTaskFirstSchedulerTest {
             SchedulerTestUtil.PRIORITY_ONE);
     Collection<Task> tasks = Arrays.asList(task1);
     ScheduledTask scheduledTask1 =
-        new ScheduledTask(task1, SchedulerTestUtil.TIME_0900, /* isCompletelyScheduled= */ true);
+        new ScheduledTask(
+            task1, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.completelyScheduled);
 
     Collection<ScheduledTask> actual =
         shortestTaskFirstScheduler.schedule(
@@ -89,13 +90,17 @@ public final class ShortestTaskFirstSchedulerTest {
     // Scheduled tasks throughout the file are meant to correspond with the
     // same numbered regular task, they are not numbered by their startTime.
     ScheduledTask scheduledTask1 =
-        new ScheduledTask(task1, SchedulerTestUtil.TIME_0920, /* isCompletelyScheduled= */ true);
+        new ScheduledTask(
+            task1, SchedulerTestUtil.TIME_0920, SchedulerTestUtil.completelyScheduled);
     ScheduledTask scheduledTask2 =
-        new ScheduledTask(task2, SchedulerTestUtil.TIME_0950, /* isCompletelyScheduled= */ true);
+        new ScheduledTask(
+            task2, SchedulerTestUtil.TIME_0950, SchedulerTestUtil.completelyScheduled);
     ScheduledTask scheduledTask3 =
-        new ScheduledTask(task3, SchedulerTestUtil.TIME_0900, /* isCompletelyScheduled= */ true);
+        new ScheduledTask(
+            task3, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.completelyScheduled);
     ScheduledTask scheduledTask4 =
-        new ScheduledTask(task4, SchedulerTestUtil.TIME_1020, /* isCompletelyScheduled= */ true);
+        new ScheduledTask(
+            task4, SchedulerTestUtil.TIME_1020, SchedulerTestUtil.completelyScheduled);
 
     Collection<ScheduledTask> actual =
         shortestTaskFirstScheduler.schedule(
@@ -131,9 +136,11 @@ public final class ShortestTaskFirstSchedulerTest {
             SchedulerTestUtil.PRIORITY_ONE);
     Collection<Task> tasks = Arrays.asList(task1, task2);
     ScheduledTask scheduledTask1 =
-        new ScheduledTask(task1, SchedulerTestUtil.TIME_0900, /* isCompletelyScheduled= */ true);
+        new ScheduledTask(
+            task1, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.completelyScheduled);
     ScheduledTask scheduledTask2 =
-        new ScheduledTask(task2, SchedulerTestUtil.TIME_1000, /* isCompletelyScheduled= */ true);
+        new ScheduledTask(
+            task2, SchedulerTestUtil.TIME_1000, SchedulerTestUtil.completelyScheduled);
 
     Collection<ScheduledTask> actual =
         shortestTaskFirstScheduler.schedule(
@@ -158,7 +165,8 @@ public final class ShortestTaskFirstSchedulerTest {
             SchedulerTestUtil.PRIORITY_ONE);
     Collection<Task> tasks = Arrays.asList(task1);
     ScheduledTask scheduledTask1 =
-        new ScheduledTask(task1, SchedulerTestUtil.TIME_0900, /* isCompletelyScheduled= */ true);
+        new ScheduledTask(
+            task1, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.completelyScheduled);
     Collection<ScheduledTask> actual =
         shortestTaskFirstScheduler.schedule(
             events, tasks, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.TIME_1700);
@@ -182,7 +190,8 @@ public final class ShortestTaskFirstSchedulerTest {
             SchedulerTestUtil.PRIORITY_ONE);
     Collection<Task> tasks = Arrays.asList(task1);
     ScheduledTask scheduledTask1 =
-        new ScheduledTask(task1, SchedulerTestUtil.TIME_0930, /* isCompletelyScheduled= */ true);
+        new ScheduledTask(
+            task1, SchedulerTestUtil.TIME_0930, SchedulerTestUtil.completelyScheduled);
     Collection<ScheduledTask> actual =
         shortestTaskFirstScheduler.schedule(
             events, tasks, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.TIME_1700);
@@ -204,7 +213,8 @@ public final class ShortestTaskFirstSchedulerTest {
             SchedulerTestUtil.PRIORITY_ONE);
     Collection<Task> tasks = Arrays.asList(task1);
     ScheduledTask scheduledTask1 =
-        new ScheduledTask(task1, SchedulerTestUtil.TIME_0900, /* isCompletelyScheduled= */ true);
+        new ScheduledTask(
+            task1, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.completelyScheduled);
 
     Collection<ScheduledTask> actual =
         shortestTaskFirstScheduler.schedule(
@@ -247,9 +257,11 @@ public final class ShortestTaskFirstSchedulerTest {
             SchedulerTestUtil.PRIORITY_ONE);
     Collection<Task> tasks = Arrays.asList(task1, task2, task3, task4);
     ScheduledTask scheduledTask1 =
-        new ScheduledTask(task1, SchedulerTestUtil.TIME_0920, /* isCompletelyScheduled= */ true);
+        new ScheduledTask(
+            task1, SchedulerTestUtil.TIME_0920, SchedulerTestUtil.completelyScheduled);
     ScheduledTask scheduledTask3 =
-        new ScheduledTask(task3, SchedulerTestUtil.TIME_0900, /* isCompletelyScheduled= */ true);
+        new ScheduledTask(
+            task3, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.completelyScheduled);
 
     Collection<ScheduledTask> actual =
         shortestTaskFirstScheduler.schedule(
