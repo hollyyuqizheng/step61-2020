@@ -43,7 +43,6 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
       return;
     }
     ListIterator<TimeRange> iterator = allTimeRanges.listIterator();
-    // List<TimeRange> newTimeRanges = new LinkedList<TimeRange>();
 
     // This variable represents the latest time range previously exmamined.
     // Initially, this variable points to the time range we want to add.
@@ -52,25 +51,14 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
     // any existing time range merges with, if necessary.
     TimeRange lastExaminedTimeRange = timeRange;
 
-    // We need to start off with a currentRange inside the loop
-    TimeRange currentRange = iterator.next();
-
-    // The reason I used a true is because moving back and forth in the
-    // linked list can be confusing. Each case should be handled differently
-    // so using iterator.hasNext() and currentRange=iterator.next() in each
-    // iteration of this loop would make things harder to keep track of.
-    while (true) {
+    while (iterator.hasNext()) {
+      TimeRange currentRange = iterator.next();
 
       // If the current range is completely contained by the lastExaminedTimeRange,
       // we need to remove the current range from the list as lastExaminedTimeRange
       // will eventually replace it.
       if (lastExaminedTimeRange.contains(currentRange)) {
         iterator.remove();
-        if (iterator.hasNext()) {
-          currentRange = iterator.next();
-        } else {
-          break;
-        }
         continue;
       }
 
@@ -90,9 +78,6 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
         iterator.next();
         lastExaminedTimeRange = currentRange;
       }
-      // The arraylist implementation had an else statement here. This case
-      // would mean the element is in the correct spot so no changes are
-      // required, hence it is empty in this implementation.
 
       // If current time range is the last element in the allTimeRanges list,
       // then there are two cases: if we just updated our pointer and are at
@@ -107,12 +92,7 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
         // loop because it is the final range in the process.
         break;
       }
-      // We move forward
-      currentRange = iterator.next();
     }
-
-    // Finally, set the global variable allTimeRanges to this newly built list of time ranges.
-    // allTimeRanges = newTimeRanges;
   }
 
   /**
@@ -202,8 +182,6 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
           iterator.add(TimeRange.fromStartEnd(toDeleteRangeEnd, currentRangeEnd));
         }
       }
-      // If it does not overlap then it is in the right place.
-      // newTimeRanges.add(currentRange);
     }
   }
 }
