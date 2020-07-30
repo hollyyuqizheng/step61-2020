@@ -46,11 +46,7 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
 
     for (Task task : tasksList) {
       List<ScheduledTask> currentScheduledTasks = scheduleOneTask(task, availableTimesGroup);
-
-      currentScheduledTasks.forEach(
-          (scheduledTask) -> {
-            scheduledTasks.add(scheduledTask);
-          });
+      currentScheduledTasks.forEach(scheduledTasks::add);
     }
 
     return scheduledTasks;
@@ -65,10 +61,7 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
   private List<TimeRange> constructAvailableTimeRanges(TimeRangeGroup updatedTimeRangeGroup) {
     Iterator<TimeRange> updatedAvailableTimesGroupIterator = updatedTimeRangeGroup.iterator();
     List<TimeRange> updatedAvailableTimes = new ArrayList();
-    while (updatedAvailableTimesGroupIterator.hasNext()) {
-      updatedAvailableTimes.add(updatedAvailableTimesGroupIterator.next());
-    }
-
+    updatedTimeRangeGroup.iterator().forEachRemaining(updatedAvailableTimes::add);
     return updatedAvailableTimes;
   }
 
@@ -100,7 +93,6 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
 
     for (TimeRange currentFreeTimeRange : currentAvailableTimes) {
       if (taskDuration.getSeconds() == 0) {
-        checkForTaskRenaming(newScheduledTasks);
         return newScheduledTasks;
       }
 
@@ -108,7 +100,6 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
 
       // Reconstruct the task segment's name.
       String taskName = task.getName() + " (Part " + taskSegmentCount + ")";
-      taskSegmentCount++;
 
       String taskDescription = task.getDescription().orElse("");
       TaskPriority taskPriority = task.getPriority();
@@ -116,7 +107,7 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
       // If task's current duration is longer than the free time's,
       // this means the entirety of the free time range is scheduled to this task.
       if (taskDuration.compareTo(currentFreeTimeRange.duration()) > 0) {
-        // Constructs a new taks object with the current free time range's duration.
+        // Constructs a new task object with the current free time range's duration.
         Task taskWithActualScheduledDuration =
             new Task(taskName, taskDescription, currentFreeTimeRange.duration(), taskPriority);
         TimeRange scheduledTaskTimeRange =
@@ -129,6 +120,13 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
         taskDuration = taskDuration.minus(scheduledTaskTimeRange.duration());
       } else {
         // Otherwise, only part of the free time range is needed to schedule this task.
+        // In this case, if the count of segment is 1, then the task can be scheduled in its
+        // entirety.
+        // Retrieve the task's original name without the "(Part 1)" suffix.
+        if (taskSegmentCount == 1) {
+          taskName = task.getName();
+        }
+
         Task taskWithActualScheduledDuration =
             new Task(taskName, taskDescription, taskDuration, taskPriority);
         TimeRange scheduledTaskTimeRange =
@@ -141,9 +139,10 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
 
         // This is also the last free time range that is needed to complete the scheduling
         // for the current task.
-        checkForTaskRenaming(newScheduledTasks);
         return newScheduledTasks;
       }
+
+      taskSegmentCount++;
     }
     // If iterating through all current time ranges finishes, and the task still isn't
     // completely scheduled, then this task cannot be completely scheduled.
@@ -170,38 +169,5 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
     availableTimesGroup.deleteTimeRange(scheduledTaskTimeRange);
 
     return scheduledTaskTimeRange;
-  }
-
-  /**
-   * This method is called when a task can be completely scheduled before returning that scheduled
-   * task. Checks to see if this scheduled task needs to be renamed back to its original name. If
-   * there is only one task in the newly scheduled list of tasks, then this task is completely
-   * scheduled within one time range, so the name should not include "(Part 1)".
-   */
-  private void checkForTaskRenaming(List<ScheduledTask> newScheduledTasks) {
-    if (newScheduledTasks.size() == 1) {
-      ScheduledTask scheduledTask = newScheduledTasks.get(0);
-      ScheduledTask scheduledTaskWithOriginalName = changeTaskNameToOriginal(scheduledTask);
-      newScheduledTasks.set(0, scheduledTaskWithOriginalName);
-    }
-  }
-
-  /** Creates a new ScheduledTask with "(Part 1)" removed. */
-  static ScheduledTask changeTaskNameToOriginal(ScheduledTask scheduledTask) {
-    Task task = scheduledTask.getTask();
-    String currentScheduledTaskName = task.getName();
-    String taskOriginalName = currentScheduledTaskName.split(" \\(Part ")[0];
-
-    Task taskWithOriginalName =
-        new Task(
-            taskOriginalName,
-            task.getDescription().orElse(""),
-            task.getDuration(),
-            task.getPriority());
-
-    ScheduledTask scheduledTaskWithNewName =
-        new ScheduledTask(taskWithOriginalName, scheduledTask.getStartTime());
-
-    return scheduledTaskWithNewName;
   }
 }
