@@ -43,8 +43,4 @@ public class ScheduledTask {
   public void setCompleteness(boolean scheduleStatus) {
     isCompletelyScheduled = scheduleStatus;
   }
-
-  public boolean getCompleteness() {
-    return isCompletelyScheduled;
-  }
 }
