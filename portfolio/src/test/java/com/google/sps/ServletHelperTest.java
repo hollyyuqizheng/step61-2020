@@ -1,7 +1,7 @@
 package com.google.sps.data;
 
-import java.time.Instant;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import org.json.JSONArray;
@@ -14,10 +14,7 @@ import org.junit.runners.JUnit4;
 @RunWith(JUnit4.class)
 public final class ServletHelperTest {
 
-  /** 
-   * Make sure that collectEventsFromJsonArray() handles no events and no
-   * errors are thrown. 
-   */
+  /** Make sure that collectEventsFromJsonArray() handles no events and no errors are thrown. */
   @Test
   public void noEvents() {
     String eventsJson = "{\"events\":[]}";
@@ -28,10 +25,10 @@ public final class ServletHelperTest {
     Assert.assertEquals(expectedEvents, actualEvents);
   }
 
-  /** 
-   * Make sure that collectEventsFromJsonArray() handles at least one events
-   * and no errors are thrown. 
-  */
+  /**
+   * Make sure that collectEventsFromJsonArray() handles at least one events and no errors are
+   * thrown.
+   */
   @Test
   public void someEvents() {
     String eventsJson =
