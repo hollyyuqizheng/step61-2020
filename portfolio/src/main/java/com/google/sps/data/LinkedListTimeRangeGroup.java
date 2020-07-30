@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Models an implementation of the TimeRangeGroup model using LinkedList. This is a slightly
@@ -41,8 +42,8 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
       allTimeRanges.add(timeRange);
       return;
     }
-
-    List<TimeRange> newTimeRanges = new LinkedList<TimeRange>();
+    ListIterator<TimeRange> iterator = allTimeRanges.listIterator();
+    // List<TimeRange> newTimeRanges = new LinkedList<TimeRange>();
 
     // This variable represents the latest time range previously exmamined.
     // Initially, this variable points to the time range we want to add.
@@ -51,42 +52,67 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
     // any existing time range merges with, if necessary.
     TimeRange lastExaminedTimeRange = timeRange;
 
-    for (TimeRange currentRange : allTimeRanges) {
+    // We need to start off with a currentRange inside the loop
+    TimeRange currentRange = iterator.next();
+
+    // The reason I used a true is because moving back and forth in the
+    // linked list can be confusing. Each case should be handled differently
+    // so using iterator.hasNext() and currentRange=iterator.next() in each
+    // iteration of this loop would make things harder to keep track of.
+    while (true) {
 
       // If the current range is completely contained by the lastExaminedTimeRange,
-      // no merging or adding needs to happen.
+      // we need to remove the current range from the list as lastExaminedTimeRange
+      // will eventually replace it.
       if (lastExaminedTimeRange.contains(currentRange)) {
+        iterator.remove();
+        if (iterator.hasNext()) {
+          currentRange = iterator.next();
+        } else {
+          break;
+        }
         continue;
       }
 
       // The case for when two time ranges need to be merged.
-      // Change the lastExaminedTimeRange pointer to the new time range created
-      // after the merging.
+      // Similar to the case above, it will eventually be replaced so we can
+      // remove currentRange
       if (lastExaminedTimeRange.overlaps(currentRange)) {
         lastExaminedTimeRange = mergeTwoTimeRanges(currentRange, lastExaminedTimeRange);
+        iterator.remove();
       } else if (currentRange.end().isAfter(lastExaminedTimeRange.end())) {
         // This is the case that lastExaminedTimeRange and the current time range do not overlap.
         // If the current range from the original list ends after the last examined time range,
-        // add the time range pointed to by lastExaminedTimeRange to the new list of all ranges, and
-        // change the lastExaminedTimeRange to point to the current range.
-        newTimeRanges.add(lastExaminedTimeRange);
+        // add the time range pointed to by lastExaminedTimeRange to the new list before the current
+        // range,and change the lastExaminedTimeRange to point to the current range.
+        iterator.previous();
+        iterator.add(lastExaminedTimeRange);
+        iterator.next();
         lastExaminedTimeRange = currentRange;
-      } else {
-        // If lastExaminedTimeRange is later than the current range,
-        // add the current range to the new list of all ranges.
-        // The lastExaminedTimeRange pointer shouldn't move.
-        newTimeRanges.add(currentRange);
       }
+      // The arraylist implementation had an else statement here. This case
+      // would mean the element is in the correct spot so no changes are
+      // required, hence it is empty in this implementation.
 
       // If current time range is the last element in the allTimeRanges list,
-      // add the last examined time range to the new list.
-      if (currentRange.equals(allTimeRanges.get(allTimeRanges.size() - 1))) {
-        newTimeRanges.add(lastExaminedTimeRange);
+      // then there are two cases: if we just updated our pointer and are at
+      // the same element then there is no need to add it. However, if
+      // lastExaminedTimeRange does not match, this means lastExaminedTimeRange
+      // actually belongs at the end of the new list.
+      if (!iterator.hasNext()) {
+        if (!currentRange.equals(lastExaminedTimeRange)) {
+          iterator.add(lastExaminedTimeRange);
+        }
+        // Once we, potentially, add the last element we should end the
+        // loop because it is the final range in the process.
+        break;
       }
+      // We move forward
+      currentRange = iterator.next();
     }
 
     // Finally, set the global variable allTimeRanges to this newly built list of time ranges.
-    allTimeRanges = newTimeRanges;
+    // allTimeRanges = newTimeRanges;
   }
 
   /**
@@ -152,28 +178,32 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
    * original list, deleting [3:30 - 5:30] will result in two new ranges: [3 - 3:30] and [5:30 - 6].
    */
   public void deleteTimeRange(TimeRange timeRangeToDelete) {
-    List<TimeRange> newTimeRanges = new LinkedList<TimeRange>();
 
-    for (TimeRange currentRange : allTimeRanges) {
+    ListIterator<TimeRange> iterator = allTimeRanges.listIterator();
+
+    while (iterator.hasNext()) {
+      TimeRange currentRange = iterator.next();
       if (currentRange.overlaps(timeRangeToDelete)) {
         Instant currentRangeStart = currentRange.start();
         Instant currentRangeEnd = currentRange.end();
         Instant toDeleteRangeStart = timeRangeToDelete.start();
         Instant toDeleteRangeEnd = timeRangeToDelete.end();
 
+        // If currentRange overlaps then it is about to be modified so we
+        // remove it and later add the fixed versions.
+        iterator.remove();
+
         // Construct one or two new time ranges after the deletion.
         if (currentRangeStart.isBefore(toDeleteRangeStart)) {
-          newTimeRanges.add(TimeRange.fromStartEnd(currentRangeStart, toDeleteRangeStart));
+          iterator.add(TimeRange.fromStartEnd(currentRangeStart, toDeleteRangeStart));
         }
 
         if (currentRangeEnd.isAfter(toDeleteRangeEnd)) {
-          newTimeRanges.add(TimeRange.fromStartEnd(toDeleteRangeEnd, currentRangeEnd));
+          iterator.add(TimeRange.fromStartEnd(toDeleteRangeEnd, currentRangeEnd));
         }
-      } else {
-        newTimeRanges.add(currentRange);
       }
+      // If it does not overlap then it is in the right place.
+      // newTimeRanges.add(currentRange);
     }
-
-    allTimeRanges = newTimeRanges;
   }
 }
