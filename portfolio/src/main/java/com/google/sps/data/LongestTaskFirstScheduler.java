@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 
 /** This class models a scheduling algorithm that prioritizes scheduling longer tasks first. */
@@ -59,7 +58,6 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
 
   /** Constructs a list for the updated available time ranges after deletion. */
   private List<TimeRange> constructAvailableTimeRanges(TimeRangeGroup updatedTimeRangeGroup) {
-    Iterator<TimeRange> updatedAvailableTimesGroupIterator = updatedTimeRangeGroup.iterator();
     List<TimeRange> updatedAvailableTimes = new ArrayList();
     updatedTimeRangeGroup.iterator().forEachRemaining(updatedAvailableTimes::add);
     return updatedAvailableTimes;
