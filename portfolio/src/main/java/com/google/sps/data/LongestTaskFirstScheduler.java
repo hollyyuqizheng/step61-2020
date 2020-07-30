@@ -4,17 +4,11 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 /** This class models a scheduling algorithm that prioritizes scheduling longer tasks first. */
 public class LongestTaskFirstScheduler implements TaskScheduler {
-
-  // Comparator for sorting tasks by duration in descending order and then by task priority
-  // descending.
-  public static final Comparator<Task> sortByTaskDurationDescendingThenPriority =
-      Comparator.comparing(Task::getDuration).reversed().thenComparing(Task::getPriority);
 
   /**
    * Schedules the tasks so that the longest tasks are scheduled to the first possible free time
@@ -29,10 +23,7 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
     List<CalendarEvent> eventsList = new ArrayList<CalendarEvent>(events);
     List<Task> tasksList = new ArrayList<Task>(tasks);
 
-    // Sorts the tasks in descending order based on duration.
-    // Longest task comes first in the collection.
-    // Then sorts the list again by task priority.
-    Collections.sort(tasksList, sortByTaskDurationDescendingThenPriority);
+    TaskQueue taskQueue = new TaskQueue(tasksList, getSchedulingAlgorithmType());
 
     CalendarEventsGroup calendarEventsGroup =
         new CalendarEventsGroup(eventsList, workHoursStartTime, workHoursEndTime);
@@ -43,9 +34,11 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
 
     List<ScheduledTask> scheduledTasks = new ArrayList<ScheduledTask>();
 
-    for (Task task : tasksList) {
+    while (!taskQueue.isEmpty()) {
+      Task task = taskQueue.peek();
       List<ScheduledTask> currentScheduledTasks = scheduleOneTask(task, availableTimesGroup);
       currentScheduledTasks.forEach(scheduledTasks::add);
+      taskQueue.remove();
     }
 
     return scheduledTasks;
@@ -71,10 +64,10 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
    * <p>When this method is called, the task may or may not be complete scheduled. The task may be
    * scheduled into one entire free time range, or the task could be split into multiple time
    * ranges. When a task is split, new tasks are created to model the segment of the current task
-   * and these new tasks are added to the list of all scheduled tasks.
+   * and these new tasks are added to the list of all newly scheduled tasks.
    *
-   * @return a list of newly scheduled tasks. If this list is empty, then the current task cannot be
-   *     scheduled.
+   * @return a list of newly scheduled tasks. If this list is empty, then it means the current task
+   *     cannot be scheduled at all.
    */
   private List<ScheduledTask> scheduleOneTask(Task task, TimeRangeGroup availableTimesGroup) {
     List<TimeRange> currentAvailableTimes = constructAvailableTimeRanges(availableTimesGroup);
@@ -90,6 +83,7 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
     int taskSegmentCount = 1;
 
     for (TimeRange currentFreeTimeRange : currentAvailableTimes) {
+      // If the task has been entirely scheduled, return the list of new scheduled tasks.
       if (taskDuration.getSeconds() == 0) {
         return newScheduledTasks;
       }
@@ -114,13 +108,11 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
                 scheduledTime,
                 newScheduledTasks,
                 availableTimesGroup);
-
         taskDuration = taskDuration.minus(scheduledTaskTimeRange.duration());
       } else {
         // Otherwise, only part of the free time range is needed to schedule this task.
         // In this case, if the count of segment is 1, then the task can be scheduled in its
-        // entirety.
-        // Retrieve the task's original name without the "(Part 1)" suffix.
+        // entirety. Retrieve the task's original name without the "(Part 1)" suffix.
         if (taskSegmentCount == 1) {
           taskName = task.getName();
         }
@@ -133,18 +125,23 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
                 scheduledTime,
                 newScheduledTasks,
                 availableTimesGroup);
-        taskDuration = taskDuration.minus(scheduledTaskTimeRange.duration());
 
-        // This is also the last free time range that is needed to complete the scheduling
-        // for the current task.
+        // This is the last free time range that is needed to complete the scheduling
+        // for the current task, so return the list of new scheduled tasks here.
+        // These new scheduled task segments are marked with "true" for completeness tag,
+        // and these tags do not need to be changed.
         return newScheduledTasks;
       }
-
       taskSegmentCount++;
     }
+
     // If iterating through all current time ranges finishes, and the task still isn't
-    // completely scheduled, then this task cannot be completely scheduled.
-    // TODO(hollyyuqizheng): add logic for UI updates for the partially scheduled tasks.
+    // completely scheduled, then this task is only partially scheduled.
+    // Go through all the segments for this task, and set their completeness to false.
+    Optional<Boolean> isCompletelyScheduled = Optional.of(false);
+    for (ScheduledTask taskSegment : newScheduledTasks) {
+      taskSegment.setCompleteness(isCompletelyScheduled);
+    }
     return newScheduledTasks;
   }
 
@@ -159,7 +156,11 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
       TimeRangeGroup availableTimesGroup) {
     Duration taskDuration = task.getDuration();
 
-    ScheduledTask scheduledTask = new ScheduledTask(task, scheduledTime);
+    Optional<Boolean> isCompletelyScheduled = Optional.of(true);
+
+    // Assumes this task can be scheduled for now.
+    // If not, the true tag will be overwritten at the end of the scheduleOneTask method.
+    ScheduledTask scheduledTask = new ScheduledTask(task, scheduledTime, isCompletelyScheduled);
     scheduledTasks.add(scheduledTask);
 
     Instant scheduledTaskEndTime = scheduledTime.plus(taskDuration);

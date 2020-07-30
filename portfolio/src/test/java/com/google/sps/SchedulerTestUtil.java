@@ -2,6 +2,7 @@ package com.google.sps.data;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Optional;
 
 public class SchedulerTestUtil {
   public static final Instant BEGINNING_OF_DAY = Instant.parse("2020-06-25T00:00:00Z");
@@ -26,7 +27,7 @@ public class SchedulerTestUtil {
   public static final Instant TIME_0915 = TIME_0900.plus(DURATION_15_MINUTES);
   public static final Instant TIME_0920 = TIME_0900.plus(DURATION_20_MINUTES);
   public static final Instant TIME_0930 = TIME_0900.plus(DURATION_30_MINUTES);
-  public static final Instant TIME_0950 = TIME_0900.plus(DURATION_20_MINUTES);
+  public static final Instant TIME_0950 = TIME_0930.plus(DURATION_20_MINUTES);
   public static final Instant TIME_1000 = TIME_0900.plus(DURATION_60_MINUTES);
   public static final Instant TIME_1020 = TIME_1000.plus(DURATION_20_MINUTES);
   public static final Instant TIME_1030 = TIME_1000.plus(DURATION_30_MINUTES);
@@ -51,4 +52,7 @@ public class SchedulerTestUtil {
   public static final TaskPriority PRIORITY_THREE = new TaskPriority(3);
   public static final TaskPriority PRIORITY_FOUR = new TaskPriority(4);
   public static final TaskPriority PRIORITY_FIVE = new TaskPriority(5);
+
+  public static final Optional<Boolean> completelyScheduled = Optional.of(true);
+  public static final Optional<Boolean> notCompletelyScheduled = Optional.of(false);
 }

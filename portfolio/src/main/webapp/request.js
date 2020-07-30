@@ -30,6 +30,7 @@ const SCHEDULED_TIME_INITIAL_TEXT = 'Scheduled for: ';
 const DURATION_INITIAL_TEXT = 'Duration (minutes): ';
 const DESCRIPTION_INITIAL_TEXT = 'Description: ';
 const PRIORITY_INITIAL_TEXT = 'Priority: ';
+const INCOMPLETE_WARNING_TEXT = 'This task cannot be scheduled completely.'; 
 
 /**
  * Gets all of the scheduling information from the UI and returns a
@@ -126,6 +127,7 @@ function collectAllScheduledTasks() {
 function fetchScheduledTasksFromServlet() {
   const scheduleRequest = createScheduleRequestFromDom();
   const json = JSON.stringify(scheduleRequest);
+
   return fetch('/schedule', {method: 'POST', body: json}).then((response) => {
     return response.json();
   });
@@ -138,6 +140,8 @@ function fetchScheduledTasksFromServlet() {
 function addScheduledTaskToDom(scheduledTask) {
   const task = scheduledTask.task;
   const taskName = task.name;
+  const isTaskCompletelyScheduled = scheduledTask.isCompletelyScheduled;
+
   // Changes seconds into minutes.
   const taskDurationMinutes = task.duration.seconds / 60;
   const taskDescription = task.description.value;
@@ -166,7 +170,6 @@ function addScheduledTaskToDom(scheduledTask) {
   timeText.setAttribute('data-task-time', taskDate);
   cardBody.appendChild(timeText);
 
-
   const durationText = document.createElement('p');
   durationText.classList.add('card-text');
   durationText.innerText = DURATION_INITIAL_TEXT + taskDurationMinutes;
@@ -185,6 +188,14 @@ function addScheduledTaskToDom(scheduledTask) {
   priorityText.setAttribute('data-task-priority', taskPriority);
   cardBody.appendChild(priorityText);
 
+  if (!isTaskCompletelyScheduled) {
+    const incompleteWarning = document.createElement('div');
+    incompleteWarning.classList.add('alert');
+    incompleteWarning.classList.add('alert-warning');
+    incompleteWarning.innerText = INCOMPLETE_WARNING_TEXT; 
+    cardBody.appendChild(incompleteWarning); 
+  }
+  
   const scheduledTaskList = document.getElementById('schedule-result-list');
   scheduledTaskList.appendChild(newResultCard);
 }
