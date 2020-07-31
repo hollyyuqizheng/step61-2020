@@ -234,6 +234,8 @@ function setNewEventStartAndEndTimes() {
 
   const userPickedDate = getUserPickedDateFromDom();
   var defaultEventStartHour;
+  // Default new event is 1 hour long, which is 9 - 10 AM
+  var defaultEventEndHour = "10:00"; 
 
   if (isToday(userPickedDate)) {
     // If user picked today to schedule for,
@@ -243,12 +245,13 @@ function setNewEventStartAndEndTimes() {
     var nextHour = now.getHours() + 1;
     defaultEventStartHour =
         getClosestNextHour(nextHour, workHourStartString, workHourEndString);
+    defaultEventEndHour = getClosestNextHour(nextHour+1, workHourStartString, workHourEndString);
   } else {
     defaultEventStartHour = workHourStartString;
   }
 
   $('#new-event-start-time').val(defaultEventStartHour);
-  $('#new-event-end-time').val(workHourEndString);
+  $('#new-event-end-time').val(defaultEventEndHour);
 }
 
 /** Checks if a date is today. */
