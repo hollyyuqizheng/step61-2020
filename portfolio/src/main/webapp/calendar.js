@@ -226,16 +226,15 @@ function constructTodayString(year, month, date) {
 /**
  * Sets the default calendar event start and times.
  * The default start time is set to the closest hour.
- * The default end time is set to the end of working hour.
+ * The default end time is set to one hour after the start time. 
  */
 function setNewEventStartAndEndTimes() {
-  const workHourStartString = $('#working-hour-start').val();
-  const workHourEndString = $('#working-hour-end').val();
+  const workingHourStartString = $('#working-hour-start').val();
+  const workingHourEndString = $('#working-hour-end').val();
 
   const userPickedDate = getUserPickedDateFromDom();
   var defaultEventStartHour;
-  // Default new event is 1 hour long, which is 9 - 10 AM
-  var defaultEventEndHour = "10:00"; 
+  var defaultEventEndHour; 
 
   if (isToday(userPickedDate)) {
     // If user picked today to schedule for,
@@ -244,10 +243,12 @@ function setNewEventStartAndEndTimes() {
     const now = new Date();
     var nextHour = now.getHours() + 1;
     defaultEventStartHour =
-        getClosestNextHour(nextHour, workHourStartString, workHourEndString);
-    defaultEventEndHour = getClosestNextHour(nextHour+1, workHourStartString, workHourEndString);
+        getClosestNextHour(nextHour, workingHourStartString, workingHourEndString);
+    defaultEventEndHour = getClosestNextHour(nextHour+1, workingHourStartString, workingHourEndString);
   } else {
-    defaultEventStartHour = workHourStartString;
+    defaultEventStartHour = workingHourStartString;
+    const workingHourStart = parseInt(workingHourStartString.split(":")[0]);
+    defaultEventEndHour = getClosestNextHour(workingHourStart+1, workingHourStartString, workingHourEndString);
   }
 
   $('#new-event-start-time').val(defaultEventStartHour);
