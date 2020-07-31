@@ -244,11 +244,11 @@ function setNewEventStartAndEndTimes() {
     var nextHour = now.getHours() + 1;
     defaultEventStartHour =
         getClosestNextHour(nextHour, workingHourStartString, workingHourEndString);
-    defaultEventEndHour = getClosestNextHour(nextHour+1, workingHourStartString, workingHourEndString);
+    defaultEventEndHour = getClosestNextHour(nextHour + 1, workingHourStartString, workingHourEndString);
   } else {
     defaultEventStartHour = workingHourStartString;
     const workingHourStart = parseInt(workingHourStartString.split(":")[0]);
-    defaultEventEndHour = getClosestNextHour(workingHourStart+1, workingHourStartString, workingHourEndString);
+    defaultEventEndHour = getClosestNextHour(workingHourStart + 1, workingHourStartString, workingHourEndString);
   }
 
   $('#new-event-start-time').val(defaultEventStartHour);
