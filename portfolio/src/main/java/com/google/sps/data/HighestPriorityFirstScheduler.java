@@ -34,7 +34,6 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
     List<ScheduledTask> scheduledTasks = new ArrayList<ScheduledTask>();
 
     Iterator<TimeRange> availableTimesIterator = availableTimesGroup.iterator();
-    int rangeIndex = 0;
 
     Instant currentScheduleTime = workHoursStartTime;
 
