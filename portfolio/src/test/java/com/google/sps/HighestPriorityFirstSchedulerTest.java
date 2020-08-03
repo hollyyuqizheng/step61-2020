@@ -306,4 +306,107 @@ public final class HighestPriorityFirstSchedulerTest {
 
     Assert.assertEquals(expected, actual);
   }
+
+  /** Test the algorithm logic more thoroughly. */
+  @Test
+  public void regularTestCase() {
+    HighestPriorityFirstScheduler highestPriorityFirstScheduler =
+        new HighestPriorityFirstScheduler();
+
+    Collection<CalendarEvent> events =
+        Arrays.asList(
+            new CalendarEvent("Event 1", SchedulerTestUtil.TIME_0930, SchedulerTestUtil.TIME_1000),
+            new CalendarEvent("Event 2", SchedulerTestUtil.TIME_1030, SchedulerTestUtil.TIME_1100),
+            new CalendarEvent("Event 3", SchedulerTestUtil.TIME_1300, SchedulerTestUtil.TIME_1500));
+    Task task1 =
+        new Task(
+            "Task 1",
+            "First task",
+            SchedulerTestUtil.DURATION_30_MINUTES,
+            SchedulerTestUtil.PRIORITY_FIVE);
+    Task task2 =
+        new Task(
+            "Task 2",
+            "Second task",
+            SchedulerTestUtil.DURATION_15_MINUTES,
+            SchedulerTestUtil.PRIORITY_FOUR);
+    Task task3 =
+        new Task(
+            "Task 3",
+            "Third task",
+            SchedulerTestUtil.DURATION_10_MINUTES,
+            SchedulerTestUtil.PRIORITY_THREE);
+    Task task4 =
+        new Task(
+            "Task 4",
+            "Fifth task",
+            SchedulerTestUtil.DURATION_15_MINUTES,
+            SchedulerTestUtil.PRIORITY_FIVE);
+    Task task5 =
+        new Task(
+            "Task 5",
+            "Sixth task",
+            SchedulerTestUtil.DURATION_45_MINUTES,
+            SchedulerTestUtil.PRIORITY_FOUR);
+    Task task6 =
+        new Task(
+            "Task 6",
+            "Seventh task",
+            SchedulerTestUtil.DURATION_20_MINUTES,
+            SchedulerTestUtil.PRIORITY_THREE);
+    Task task7 =
+        new Task(
+            "Task 7",
+            "Fourth task",
+            SchedulerTestUtil.DURATION_10_MINUTES,
+            SchedulerTestUtil.PRIORITY_FIVE);
+    Task task8 =
+        new Task(
+            "Task 8",
+            "Eighth task",
+            SchedulerTestUtil.DURATION_30_MINUTES,
+            SchedulerTestUtil.PRIORITY_FOUR);
+
+    Collection<Task> tasks = Arrays.asList(task1, task2, task3, task4, task5, task6, task7, task8);
+    ScheduledTask scheduledTask1 =
+        new ScheduledTask(
+            task1, SchedulerTestUtil.TIME_1000, SchedulerTestUtil.completelyScheduled);
+    ScheduledTask scheduledTask2 =
+        new ScheduledTask(
+            task2, SchedulerTestUtil.TIME_1100, SchedulerTestUtil.completelyScheduled);
+    ScheduledTask scheduledTask3 =
+        new ScheduledTask(
+            task3, SchedulerTestUtil.TIME_1230, SchedulerTestUtil.completelyScheduled);
+    ScheduledTask scheduledTask4 =
+        new ScheduledTask(
+            task4, SchedulerTestUtil.TIME_0910, SchedulerTestUtil.completelyScheduled);
+    ScheduledTask scheduledTask5 =
+        new ScheduledTask(
+            task5, SchedulerTestUtil.TIME_1145, SchedulerTestUtil.completelyScheduled);
+    ScheduledTask scheduledTask6 =
+        new ScheduledTask(
+            task6, SchedulerTestUtil.TIME_1240, SchedulerTestUtil.completelyScheduled);
+    ScheduledTask scheduledTask7 =
+        new ScheduledTask(
+            task7, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.completelyScheduled);
+    ScheduledTask scheduledTask8 =
+        new ScheduledTask(
+            task8, SchedulerTestUtil.TIME_1115, SchedulerTestUtil.completelyScheduled);
+
+    Collection<ScheduledTask> actual =
+        highestPriorityFirstScheduler.schedule(
+            events, tasks, SchedulerTestUtil.TIME_0900, SchedulerTestUtil.TIME_1500);
+    Collection<ScheduledTask> expected =
+        Arrays.asList(
+            scheduledTask7,
+            scheduledTask4,
+            scheduledTask1,
+            scheduledTask2,
+            scheduledTask8,
+            scheduledTask5,
+            scheduledTask3,
+            scheduledTask6);
+
+    Assert.assertEquals(expected, actual);
+  }
 }
