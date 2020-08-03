@@ -2,21 +2,14 @@ package com.google.sps.data;
 
 import java.time.Instant;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.ListIterator;
 
 /**
  * Models an implementation of the TimeRangeGroup model using LinkedList. This is a slightly
- * modified version of what hollyyuqizheng wrote for the ArrayList implementation.
+ * modified version of the ArrayList implementation.
  */
-public class LinkedListTimeRangeGroup implements TimeRangeGroup {
-
-  // This list of all the time ranges will be sorted by start time ascending
-  // in add and delete methods. The time ranges stored in this list are
-  // pair-wise disjoint at any moment.
-  public List<TimeRange> allTimeRanges;
+public class LinkedListTimeRangeGroup extends AbstractListTimeRangeGroup implements TimeRangeGroup {
 
   /**
    * Adds all the input time ranges to the list of all time ranges. Also sorts the list of all
@@ -43,6 +36,7 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
       return;
     }
     ListIterator<TimeRange> iterator = allTimeRanges.listIterator();
+    // List<TimeRange> newTimeRanges = new LinkedList<TimeRange>();
 
     // This variable represents the latest time range previously exmamined.
     // Initially, this variable points to the time range we want to add.
@@ -51,21 +45,31 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
     // any existing time range merges with, if necessary.
     TimeRange lastExaminedTimeRange = timeRange;
 
-    while (iterator.hasNext()) {
-      TimeRange currentRange = iterator.next();
+    // We need to start off with a currentRange inside the loop
+    TimeRange currentRange = iterator.next();
+
+    // The reason I used a true is because moving back and forth in the
+    // linked list can be confusing. Each case should be handled differently
+    // so using iterator.hasNext() and currentRange=iterator.next() in each
+    // iteration of this loop would make things harder to keep track of.
+    while (true) {
 
       // If the current range is completely contained by the lastExaminedTimeRange,
       // we need to remove the current range from the list as lastExaminedTimeRange
       // will eventually replace it.
-      if (lastExaminedTimeRange.contains(currentRange)) {
+      if (lastExaminedTimeRange.contains(currentRange)
+          && !lastExaminedTimeRange.equals(currentRange)) {
         iterator.remove();
-        continue;
+        if (iterator.hasNext()) {
+          currentRange = iterator.next();
+        }
       }
 
       // The case for when two time ranges need to be merged.
       // Similar to the case above, it will eventually be replaced so we can
       // remove currentRange
-      if (lastExaminedTimeRange.overlaps(currentRange)) {
+      if (lastExaminedTimeRange.overlaps(currentRange)
+          && !lastExaminedTimeRange.contains(currentRange)) {
         lastExaminedTimeRange = mergeTwoTimeRanges(currentRange, lastExaminedTimeRange);
         iterator.remove();
       } else if (currentRange.end().isAfter(lastExaminedTimeRange.end())) {
@@ -88,56 +92,23 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
         if (!currentRange.equals(lastExaminedTimeRange)) {
           iterator.add(lastExaminedTimeRange);
         }
-        // Once we, potentially, add the last element we should end the
+        // Once we add the last element we should end the
         // loop because it is the final range in the process.
         break;
       }
+      // We move forward
+      currentRange = iterator.next();
     }
-  }
-
-  /**
-   * Helper method for merging two time ranges. This method is package-private so that it can be
-   * tested.
-   */
-  static TimeRange mergeTwoTimeRanges(TimeRange a, TimeRange b) {
-    if (!a.overlaps(b)) {
-      throw new IllegalArgumentException("Merging two time ranges that do not overlap is invalid");
-    }
-
-    Instant newTimeRangeStart;
-    Instant newTimeRangeEnd;
-
-    // The new time range after merging should have the earlier start time
-    // and the later end time among the two overlapping time ranges.
-    if (a.start().isBefore(b.start())) {
-      newTimeRangeStart = a.start();
-    } else {
-      newTimeRangeStart = b.start();
-    }
-
-    if (a.end().isBefore(b.end())) {
-      newTimeRangeEnd = b.end();
-    } else {
-      newTimeRangeEnd = a.end();
-    }
-
-    return TimeRange.fromStartEnd(newTimeRangeStart, newTimeRangeEnd);
-  }
-
-  /** Returns an iterator for the list of all time ranges. */
-  public Iterator<TimeRange> getAllTimeRangesIterator() {
-    return allTimeRanges.iterator();
   }
 
   /**
    * Checks if a time range exists in the collection. For example, if [3:00 - 4:00] is in the
    * collection, [3:00 - 3:30] is considered to exist as a time range in the collection. This method
-   * uses linear search to find the time ranges whose start time is before the target range's start
+   * uses binary search to find the time ranges whose start time is before the target range's start
    * and whose end time is after the target range's end. Then the method calls contains to see if
    * the target range is contained within this current range.
    */
   public boolean hasTimeRange(TimeRange timeRangeToCheck) {
-
     for (TimeRange currentRange : allTimeRanges) {
       if (currentRange.contains(timeRangeToCheck)) {
         return true;
@@ -158,29 +129,29 @@ public class LinkedListTimeRangeGroup implements TimeRangeGroup {
    * original list, deleting [3:30 - 5:30] will result in two new ranges: [3 - 3:30] and [5:30 - 6].
    */
   public void deleteTimeRange(TimeRange timeRangeToDelete) {
-
     ListIterator<TimeRange> iterator = allTimeRanges.listIterator();
 
     while (iterator.hasNext()) {
       TimeRange currentRange = iterator.next();
-      if (currentRange.overlaps(timeRangeToDelete)) {
-        Instant currentRangeStart = currentRange.start();
-        Instant currentRangeEnd = currentRange.end();
-        Instant toDeleteRangeStart = timeRangeToDelete.start();
-        Instant toDeleteRangeEnd = timeRangeToDelete.end();
+      if (!currentRange.overlaps(timeRangeToDelete)) {
+        continue;
+      }
+      Instant currentRangeStart = currentRange.start();
+      Instant currentRangeEnd = currentRange.end();
+      Instant toDeleteRangeStart = timeRangeToDelete.start();
+      Instant toDeleteRangeEnd = timeRangeToDelete.end();
 
-        // If currentRange overlaps then it is about to be modified so we
-        // remove it and later add the fixed versions.
-        iterator.remove();
+      // If currentRange overlaps then it is about to be modified so we
+      // remove it and later add the fixed versions.
+      iterator.remove();
 
-        // Construct one or two new time ranges after the deletion.
-        if (currentRangeStart.isBefore(toDeleteRangeStart)) {
-          iterator.add(TimeRange.fromStartEnd(currentRangeStart, toDeleteRangeStart));
-        }
+      // Construct one or two new time ranges after the deletion.
+      if (currentRangeStart.isBefore(toDeleteRangeStart)) {
+        iterator.add(TimeRange.fromStartEnd(currentRangeStart, toDeleteRangeStart));
+      }
 
-        if (currentRangeEnd.isAfter(toDeleteRangeEnd)) {
-          iterator.add(TimeRange.fromStartEnd(toDeleteRangeEnd, currentRangeEnd));
-        }
+      if (currentRangeEnd.isAfter(toDeleteRangeEnd)) {
+        iterator.add(TimeRange.fromStartEnd(toDeleteRangeEnd, currentRangeEnd));
       }
     }
   }
