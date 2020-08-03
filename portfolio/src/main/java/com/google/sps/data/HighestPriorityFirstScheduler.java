@@ -38,6 +38,11 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
     Instant currentScheduleTime = workHoursStartTime;
 
     Boolean getNextTimeRange = true;
+
+    // Set the first availableTimeRange using the first list value
+    // in order to avoid getting the value from the availableTimesIterator
+    // which would prevent the while loop from running if there were to
+    // only be a single availableTimeRange.
     TimeRange availableTimeRange = availableTimes.get(0);
 
     while (availableTimesIterator.hasNext() && !taskQueue.isEmpty()) {
@@ -56,29 +61,49 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
         ScheduledTask scheduledTask =
             new ScheduledTask(task, currentScheduleTime, Optional.of(true));
         scheduledTasks.add(scheduledTask);
+
+        // Delete the TimeRange that has been scheduled over so that different priority tasks
+        // won't be scheduled over the same time.
         availableTimesGroup.deleteTimeRange(
             TimeRange.fromStartEnd(
                 scheduledTask.getStartTime(),
                 scheduledTask
                     .getStartTime()
                     .plusSeconds(scheduledTask.getTask().getDuration().getSeconds())));
+
+        // Push the currentScheduleTime back by the amount that was scheduled.
         currentScheduleTime = currentScheduleTime.plusSeconds(task.getDuration().getSeconds());
         taskQueue.remove();
+
+        // If the next task's priority is different from the task that was just scheduled,
+        // then reset the availableTimesIterator, currentScheduleTime, and make the loop
+        // grab a TimeRange. We go back to the first availableTimeRange in order to schedule
+        // more tasks towards the beginning of the availableTimes.
         if (!taskQueue.isEmpty()
             && taskQueue.peek().getPriority().getPriority() != task.getPriority().getPriority()) {
           availableTimesIterator = availableTimesGroup.iterator();
           currentScheduleTime = workHoursStartTime;
           getNextTimeRange = true;
         } else {
+          // If the task's priority is not different, then we can simply continue running the
+          // the loop without retrieving the next availableTimeRange since there might be
+          // some time left over towards the end of the current one.
           getNextTimeRange = false;
         }
       } else if (!availableTimesIterator.hasNext()) {
-        taskQueue.remove();
-        if (!taskQueue.isEmpty()
-            && taskQueue.peek().getPriority().getPriority() != task.getPriority().getPriority()) {
+        // If we've reached the end of the availableTimeRange group and we can't schedule a task,
+        // then we can remove all the remaining tasks of equal priority since they will all be
+        // longer in duration therefore, they will not be able to be scheduled either.
+        if (!taskQueue.isEmpty()) {
           availableTimesIterator = availableTimesGroup.iterator();
+          while (!taskQueue.isEmpty()
+              && taskQueue.peek().getPriority().getPriority() == task.getPriority().getPriority()) {
+            taskQueue.remove();
+          }
         }
       } else {
+        // Get the next TimeRange if the Task cannot be scheduled but we aren't at the final
+        // TimeRange.
         getNextTimeRange = true;
       }
     }
