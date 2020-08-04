@@ -12,7 +12,9 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
   private static final Comparator<ScheduledTask> sortByScheduledStartTimeAscending =
       Comparator.comparing(ScheduledTask::getStartTime);
 
-  /** This method schedules tasks from highest to lowest priority and */
+  /**
+   * This method schedules tasks from highest to lowest priority and shortest to longest duration.
+   */
   public Collection<ScheduledTask> schedule(
       Collection<CalendarEvent> events,
       Collection<Task> tasks,
