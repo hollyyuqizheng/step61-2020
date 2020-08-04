@@ -156,6 +156,33 @@ public final class ArrayListTimeRangeGroupTest {
     Assert.assertEquals(expected, actual);
   }
 
+  @Test
+  public void testAddExactSameRange() {
+    // Time Ranges:       |----------|
+    // To add:            |----------|
+    // Result:            |----------|
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+
+    List<TimeRange> originalTimeRanges = Arrays.asList(timeRangeOne);
+    ArrayListTimeRangeGroup timeRangeGroup = new ArrayListTimeRangeGroup(originalTimeRanges);
+
+    Instant timeRangeToAddStart = timeRangeOneStart;
+    Instant timeRangeToAddEnd = timeRangeOneEnd;
+    TimeRange timeRangeToAdd = TimeRange.fromStartEnd(timeRangeToAddStart, timeRangeToAddEnd);
+    List<TimeRange> expected = Arrays.asList(timeRangeToAdd);
+
+    timeRangeGroup.addTimeRange(timeRangeToAdd);
+    List<TimeRange> actual = new ArrayList();
+    for (TimeRange t : timeRangeGroup) {
+      actual.add(t);
+    }
+
+    Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
+    Assert.assertEquals(expected, actual);
+  }
+
   /** Tests for adding one time range that overlaps with the existing one. */
   @Test
   public void testAddOneOverlappingRangeAndMore() {
