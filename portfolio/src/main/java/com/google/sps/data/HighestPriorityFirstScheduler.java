@@ -88,10 +88,7 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
         // longer in duration therefore, they will not be able to be scheduled either.
         if (!taskQueue.isEmpty()) {
           availableTimesIndex = 0;
-          while (!taskQueue.isEmpty()
-              && taskQueue.peek().getPriority().getPriority() == task.getPriority().getPriority()) {
-            taskQueue.remove();
-          }
+          removeTasksWithPriority(taskQueue, task.getPriority());
         }
       } else {
         // Get the next TimeRange if the Task cannot be scheduled but we aren't at the final
@@ -102,6 +99,13 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
 
     Collections.sort(scheduledTasks, sortByScheduledStartTimeAscending);
     return scheduledTasks;
+  }
+
+  private void removeTasksWithPriority(TaskQueue taskQueue, TaskPriority taskPriority) {
+    while (!taskQueue.isEmpty()
+        && taskQueue.peek().getPriority().getPriority() == taskPriority.getPriority()) {
+      taskQueue.remove();
+    }
   }
 
   private boolean isNextTaskDifferentPriority(TaskQueue taskQueue, Task task) {
