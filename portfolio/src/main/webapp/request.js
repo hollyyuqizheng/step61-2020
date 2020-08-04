@@ -188,7 +188,7 @@ function addScheduledTaskToDom(scheduledTask) {
   priorityText.setAttribute('data-task-priority', taskPriority);
   cardBody.appendChild(priorityText);
 
-  if (!isTaskCompletelyScheduled) {
+  if (!Object.values(isTaskCompletelyScheduled)[0]) {
     const incompleteWarning = document.createElement('div');
     incompleteWarning.classList.add('alert');
     incompleteWarning.classList.add('alert-warning');
