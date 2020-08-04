@@ -65,7 +65,7 @@ public final class TaskQueueTest {
 
     TaskQueue taskQueue = new TaskQueue(taskList, SHORTEST_TASK_FIRST);
 
-    for (int i = 0; i < expected.size(); i++) {
+    for (Task task : expected) {
       actual.add(taskQueue.peek());
       taskQueue.remove();
     }
@@ -97,7 +97,7 @@ public final class TaskQueueTest {
 
     TaskQueue taskQueue = new TaskQueue(taskList, HIGHEST_PRIORITY_FIRST);
 
-    for (int i = 0; i < expected.size(); i++) {
+    for (Task task : expected) {
       actual.add(taskQueue.peek());
       taskQueue.remove();
     }
@@ -149,7 +149,7 @@ public final class TaskQueueTest {
 
     TaskQueue taskQueue = new TaskQueue(taskList, HIGHEST_PRIORITY_FIRST);
 
-    for (int i = 0; i < expected.size(); i++) {
+    for (Task task : expected) {
       actual.add(taskQueue.peek());
       taskQueue.remove();
     }
@@ -207,7 +207,7 @@ public final class TaskQueueTest {
 
     TaskQueue taskQueue = new TaskQueue(taskList, HIGHEST_PRIORITY_FIRST);
 
-    for (int i = 0; i < expected.size(); i++) {
+    for (Task task : expected) {
       actual.add(taskQueue.peek());
       taskQueue.remove();
     }
