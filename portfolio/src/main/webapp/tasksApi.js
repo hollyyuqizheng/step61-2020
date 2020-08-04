@@ -42,7 +42,7 @@ function importTasklist(tasklistId) {
         var tasks = taskResponse.result.items;
         if (tasks) {
           tasks.forEach(task => {
-            const newTask = new Task(task.title, task.notes, 60, 3);
+            const newTask = new Task(task.title, task.notes, 30, 3);
             updateTaskList(newTask, TIME_UNIT.MINUTES);
           });
         }
