@@ -1,7 +1,6 @@
 package com.google.sps.data;
 
 import java.time.Instant;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.ListIterator;
 
@@ -15,18 +14,16 @@ public class LinkedListTimeRangeGroup extends AbstractListTimeRangeGroup impleme
    * Adds all the input time ranges to the list of all time ranges. Also sorts the list of all
    * ranges in the constructor.
    */
-  public LinkedListTimeRangeGroup(Collection<TimeRange> timeRanges) {
+  public LinkedListTimeRangeGroup(Iterable<TimeRange> timeRanges) {
     allTimeRanges = new LinkedList<TimeRange>();
-    timeRanges.forEach(
-        (range) -> {
-          addTimeRange(range);
-        });
+    addAllTimeRanges(timeRanges);
   }
 
   /**
    * Adds a new time range to the list. If the time range to add overlaps with any existing time
    * range, the overlapping time ranges will be merged.
    */
+  @Override
   public void addTimeRange(TimeRange timeRange) {
     // If the original allTimeRanges list is empty,
     // this is the first time we add anything to the list,
@@ -63,12 +60,11 @@ public class LinkedListTimeRangeGroup extends AbstractListTimeRangeGroup impleme
           currentRange = iterator.next();
         }
       }
-
-      // The case for when two time ranges need to be merged.
-      // Similar to the case above, it will eventually be replaced so we can
-      // remove currentRange
       if (lastExaminedTimeRange.overlaps(currentRange)
           && !lastExaminedTimeRange.contains(currentRange)) {
+        // The case for when two time ranges need to be merged.
+        // Similar to the case above, it will eventually be replaced so we can
+        // remove currentRange
         lastExaminedTimeRange = mergeTwoTimeRanges(currentRange, lastExaminedTimeRange);
         iterator.remove();
       } else if (currentRange.end().isAfter(lastExaminedTimeRange.end())) {
@@ -107,6 +103,7 @@ public class LinkedListTimeRangeGroup extends AbstractListTimeRangeGroup impleme
    * and whose end time is after the target range's end. Then the method calls contains to see if
    * the target range is contained within this current range.
    */
+  @Override
   public boolean hasTimeRange(TimeRange timeRangeToCheck) {
     for (TimeRange currentRange : allTimeRanges) {
       if (currentRange.contains(timeRangeToCheck)) {
@@ -127,6 +124,7 @@ public class LinkedListTimeRangeGroup extends AbstractListTimeRangeGroup impleme
    * <p>Another example for deleting overlapping time ranges: if [3 - 4] and [5 - 6] are in the
    * original list, deleting [3:30 - 5:30] will result in two new ranges: [3 - 3:30] and [5:30 - 6].
    */
+  @Override
   public void deleteTimeRange(TimeRange timeRangeToDelete) {
     ListIterator<TimeRange> iterator = allTimeRanges.listIterator();
 
