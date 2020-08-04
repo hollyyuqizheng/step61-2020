@@ -63,16 +63,23 @@ function createNewTask() {
   }
 
   const newTask = new Task(
-      name,
-      description,
-      getDurationMinutes(length, lengthUnit),
-      priority);
-  
+      name, description, getDurationMinutes(length, lengthUnit), priority);
+
   updateTaskList(newTask, lengthUnit);
+}
+
+/** Shows the "Task Added" header. */
+function showTaskAddedHeader() {
+  const $taskListHeader = $('#task-added-header');
+  if ($taskListHeader.hasClass('d-none')) {
+    $taskListHeader.removeClass('d-none');
+  }
 }
 
 /** Display Task information from user input. */
 function updateTaskList(newTask, lengthUnit) {
+  showTaskAddedHeader();
+
   const newTaskCard = document.createElement('div');
   newTaskCard.classList.add('card');
 
@@ -133,7 +140,8 @@ function updateTaskList(newTask, lengthUnit) {
   unitSelect.setAttribute('id', 'unit-select-' + TASK_ID_COUNTER);
   unitSelect.setAttribute('selected', lengthUnit);
 
-  const optionMinutes = unitSelect.appendChild(document.createElement('option'));
+  const optionMinutes =
+      unitSelect.appendChild(document.createElement('option'));
   optionMinutes.setAttribute('value', TIME_UNIT.MINUTES);
   optionMinutes.innerText = 'minute(s)';
 
@@ -213,7 +221,7 @@ function getDurationMinutes(duration, unit) {
  * cards used to display input Task information.
  */
 function collectAllTasks() {
-  const allTaskJson = new Array();
+  const allTasks = new Array();
 
   // Get task list element to run through cards collecting data.
   const taskList = document.getElementById('new-task-list');
@@ -234,10 +242,9 @@ function collectAllTasks() {
         taskDescription,
         getDurationMinutes(taskLength, taskLengthUnit),
         taskPriority);
-    const taskJson = JSON.stringify(task);
-    allTaskJson.push(taskJson);
+    allTasks.push(task);
   });
-  return allTaskJson;
+  return allTasks;
 }
 
 function clearTasks() {
@@ -281,6 +288,16 @@ function validateTaskDuration(duration) {
   } else {
     return {isValid: true, errorMessage: null};
   }
+}
+
+/** If the user's picked date is not today, updates the header for adding task to reflect the picked date. */
+function setTaskHeaderDate() {
+  const pickedDate = getUserPickedDateFromDom();
+  if (!isToday(pickedDate)) {
+    const $taskHeader = $('#task-instruction-title');
+    $taskHeader.text('1. Add any tasks you want to schedule for ' + pickedDate.toDateString());
+  }
+  
 }
 
 module.exports.getDurationMinutes = getDurationMinutes;

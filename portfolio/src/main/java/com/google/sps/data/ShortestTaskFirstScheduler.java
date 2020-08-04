@@ -17,9 +17,9 @@ package com.google.sps.data;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 class ShortestTaskFirstScheduler implements TaskScheduler {
   private static final Comparator<CalendarEvent> sortByEventStartTimeAscending =
@@ -39,13 +39,12 @@ class ShortestTaskFirstScheduler implements TaskScheduler {
       Instant workHoursEndTime) {
     List<CalendarEvent> eventsList = new ArrayList<CalendarEvent>(events);
     List<Task> tasksList = new ArrayList<Task>(tasks);
-    Collections.sort(tasksList, sortByTaskDurationThenName);
     CalendarEventsGroup calendarEventsGroup =
         new CalendarEventsGroup(eventsList, workHoursStartTime, workHoursEndTime);
     List<TimeRange> availableTimes = calendarEventsGroup.getFreeTimeRanges();
+    TaskQueue taskQueue = new TaskQueue(tasksList, getSchedulingAlgorithmType());
     List<ScheduledTask> scheduledTasks = new ArrayList<ScheduledTask>();
     int rangeIndex = 0;
-    int taskIndex = 0;
     // Instant indicating the start time we are currently trying to schedule
     // events in.
     Instant currentScheduleTime = workHoursStartTime;
@@ -55,9 +54,9 @@ class ShortestTaskFirstScheduler implements TaskScheduler {
     // duration so if one task did not fit in the given range then we know no
     // later ones will fit either). We create new Task objects for the result
     // so data structures passed in are never changed.
-    while (rangeIndex < availableTimes.size() && taskIndex < tasksList.size()) {
+    while (rangeIndex < availableTimes.size() && !taskQueue.isEmpty()) {
       TimeRange availableTimeRange = availableTimes.get(rangeIndex);
-      Task task = tasksList.get(taskIndex);
+      Task task = taskQueue.peek();
       // Either time is already past the start of the time range or we should
       // update it (maybe this is our first iteration in the range).
       if (availableTimeRange.start().isAfter(currentScheduleTime)) {
@@ -67,10 +66,11 @@ class ShortestTaskFirstScheduler implements TaskScheduler {
       if (!currentScheduleTime
           .plusSeconds(task.getDuration().getSeconds())
           .isAfter(availableTimeRange.end())) {
-        ScheduledTask scheduledTask = new ScheduledTask(task, currentScheduleTime);
+        ScheduledTask scheduledTask =
+            new ScheduledTask(task, currentScheduleTime, Optional.of(true));
         scheduledTasks.add(scheduledTask);
         currentScheduleTime = currentScheduleTime.plusSeconds(task.getDuration().getSeconds());
-        taskIndex++;
+        taskQueue.remove();
       } else {
         rangeIndex++;
       }

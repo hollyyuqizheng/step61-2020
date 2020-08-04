@@ -1,64 +1,16 @@
-var GoogleAuth;
-
-// Scope for read access to Tasks API
-const SCOPE_TASKS_READ = 'https://www.googleapis.com/auth/tasks.readonly';
-
-const TASKS_CLIENT_ID =
-    '499747085593-hvi6n4kdrbbfvcuo1c9a9tu9oaf62cr2.apps.googleusercontent.com';
-
-const TASKS_DISCOVERY_DOCS =
-    'https://www.googleapis.com/discovery/v1/apis/tasks/v1/rest';
-
-function fetchApiKey() {
-  return fetch('./appConfigServlet').then(response => response.json());
-}
-
-function handleClientLoadTasks() {
-  // Load the API's client and auth2 modules.
-  // Call the initClient function after the modules load.
-  gapi.load('client:auth2', initClientTasks);
-}
-
-function initClientTasks() {
-  fetchApiKey().then(responseJson =>
-      gapi.client.init({
-        apiKey: responseJson['API_KEY'],
-        clientId: TASKS_CLIENT_ID,
-        discoveryDocs: [TASKS_DISCOVERY_DOCS],
-        scope: SCOPE_TASKS_READ
-      })
-      .then(function() {
-        GoogleAuth = gapi.auth2.getAuthInstance();
-
-        // Listen for sign-in state changes.
-        GoogleAuth.isSignedIn.listen(updateSigninStatus);
-
-        // Handle initial sign-in state. (Determine if user
-        // is already signed in.)
-        updateSigninStatus(GoogleAuth.isSignedIn.get());
-      }));
-}
-
-function handleAuthClick() {
-  clearAuthErrorPrompt();
-  if (GoogleAuth.isSignedIn.get()) {
-    // User is authorized and has clicked "Sign out" button.
-    GoogleAuth.signOut();
-  } else {
-    // User is not signed in. Start Google auth flow.
-    GoogleAuth.signIn().catch(error => {
-      handleTaskAuthError(error);
-    });
-  }
-}
-
-function updateSigninStatus(isSignedIn) {
-  if (isSignedIn) {
-    drawImportMenu();
-  } else {
+/**
+ * This function toggles between displaying and clearing the "import
+ * tasks" menu. The importMenuVisible boolean is toggled inside the
+ * functions that are called.
+ */
+function toggleTasks() {
+  const menuIsVisible =
+      $('#connect-tasks-btn').attr('data-is-import-menu-visible');
+  if (menuIsVisible == 'true') {
     clearImportMenu();
+  } else {
+    drawImportMenu();
   }
-  updateButtonText(isSignedIn);
 }
 
 /**
@@ -102,6 +54,10 @@ function importTasklist(tasklistId) {
  * logged in.
  */
 function drawImportMenu() {
+  const $button = $('#connect-tasks-btn');
+  $button.html('Unlink Tasks');
+  $button.attr('data-is-import-menu-visible', 'true');
+
   // Create a div element to hold the custom select.
   const customSelect = document.getElementById('import-menu-wrapper');
 
@@ -143,17 +99,12 @@ function drawImportMenu() {
 }
 
 function clearImportMenu() {
+  const $button = $('#connect-tasks-btn');
+  $button.html('Link Tasks');
+  $button.attr('data-is-import-menu-visible', 'false');
+
   const menuWrapper = document.getElementById('import-menu-wrapper');
   menuWrapper.innerHTML = '';
-}
-
-function updateButtonText(isSignedIn) {
-  const button = document.getElementById('connect-tasks-btn');
-  if (isSignedIn) {
-    button.innerText = 'Unlink Tasks';
-  } else {
-    button.innerText = 'Link Tasks';
-  }
 }
 
 function handleImportButtonPress() {
@@ -168,24 +119,4 @@ function handleImportButtonPress() {
 function clearTasks() {
   const toClear = document.getElementById('new-task-list');
   toClear.innerHTML = '';
-}
-
-function handleTaskAuthError(e) {
-  var text;
-  if (e.error == 'popup_closed_by_user') {
-    text =
-        'Please complete the entire sign in process if you wish to import Tasks.';
-  } else if (e.error == 'access_denied') {
-    text = 'You have denied this app from accessing your tasks,' +
-        'please allow access if you wish to import tasks.';
-  } else {
-    text =
-        'Unknown error encountered when granting permissions. Please try again.';
-  }
-  $('#task-link-error').text(text);
-  $('#task-link-error').addClass('d-block');
-}
-
-function clearAuthErrorPrompt() {
-  $('#task-link-error').empty().removeClass('d-block');
 }

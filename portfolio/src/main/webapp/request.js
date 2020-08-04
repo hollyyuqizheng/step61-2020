@@ -25,9 +25,12 @@ class ScheduleRequest {
   }
 }
 
-// Once a call is made to the server for scheduling this array will be a local
-// copy of the results.
-var scheduledTasks = [];
+// Constants for DOM information of scheduledTasks
+const SCHEDULED_TIME_INITIAL_TEXT = 'Scheduled for: ';
+const DURATION_INITIAL_TEXT = 'Duration (minutes): ';
+const DESCRIPTION_INITIAL_TEXT = 'Description: ';
+const PRIORITY_INITIAL_TEXT = 'Priority: ';
+const INCOMPLETE_WARNING_TEXT = 'This task cannot be scheduled completely.'; 
 
 /**
  * Gets all of the scheduling information from the UI and returns a
@@ -40,10 +43,7 @@ function createScheduleRequestFromDom() {
   const tasks = collectAllTasks();
   const algorithmType = document.getElementById('algorithm-type').value;
   const scheduleRequest = new ScheduleRequest(
-      events,
-      tasks,
-      getTimeObject(startTime),
-      getTimeObject(endTime),
+      events, tasks, getTimeObject(startTime), getTimeObject(endTime),
       algorithmType);
   return scheduleRequest;
 }
@@ -52,21 +52,72 @@ function createScheduleRequestFromDom() {
  * Gets called when the user hits 'Start Scheduling'.
  */
 function onClickStartScheduling() {
-  const scheduleRequest = createScheduleRequestFromDom();
-  // Create the request to send to the server using the data we collected from
-  // the web form.
-  fetchScheduledTasksFromServlet(scheduleRequest).then((scheduledTaskArray) => {
-    handleScheduledTaskArray(scheduledTaskArray);
-  });
+  const inputTasks = collectAllTasks();
+  const $emptyTaskMessage = $('#empty-scheduled-task-message');
+  const $invalidWorkingHoursMessage = $('#invalid-working-hours-message');
+
+  if (isToday(getUserPickedDateFromDom()) && workingStartHourHasPassed()) {
+    $invalidWorkingHoursMessage.removeClass('d-none');
+  } else if (inputTasks.length == 0) {
+    $emptyTaskMessage.removeClass('d-none');
+  } else {
+    $emptyTaskMessage.addClass('d-none');
+    $invalidWorkingHoursMessage.addClass('d-none');
+    // Create the request to send to the server using the data we collected from
+    // the web form.
+    fetchScheduledTasksFromServlet().then(handleScheduledTaskArray);
+  }
 }
 
 /**
  * Updates the UI to show the results of a query.
  */
 function handleScheduledTaskArray(scheduledTaskArray) {
-  const resultElement = document.getElementById('scheduled-task-list');
+  // Show the 2 export buttons only after scheduling finishes normally.
+  const $exportCalendarButton = $('#export-calendar-button');
+  const $exportSheetsButton = $('#sheets-export-button');
+  $exportCalendarButton.removeClass('d-none');
+  $exportSheetsButton.removeClass('d-none');
+
+  const resultElement = document.getElementById('schedule-result-list');
   resultElement.innerHTML = '';
-  scheduledTaskArray.forEach(addScheduledTaskToDom, resultElement);
+  scheduledTaskArray.forEach(addScheduledTaskToDom);
+}
+
+/**
+ * Returns a JSON of the latest scheduled tasks pulled from the DOM.
+ */
+function collectAllScheduledTasks() {
+  const allScheduledTasks = new Array();
+  // Get scheduled task list element to run through cards collecting data.
+  const scheduledTaskList = document.getElementById('schedule-result-list');
+
+  scheduledTaskList.childNodes.forEach((scheduledTaskCard) => {
+    const cardBody = scheduledTaskCard.childNodes[0];
+
+    const scheduledTaskName =
+        cardBody.childNodes[0].getAttribute('data-task-name');
+    const scheduledTaskScheduledTime =
+        cardBody.childNodes[1].getAttribute('data-task-time');
+    const scheduledTaskDurationMinutes = parseInt(
+        cardBody.childNodes[2].getAttribute('data-task-duration-minutes'));
+    const scheduledTaskDescription =
+        cardBody.childNodes[3].getAttribute('data-task-description');
+    const scheduledTaskPriority =
+        parseInt(cardBody.childNodes[4].getAttribute('data-task-priority'));
+
+    var scheduledTask = {};
+    const task = new Task(
+        scheduledTaskName,
+        scheduledTaskDescription,
+        scheduledTaskDurationMinutes,
+        scheduledTaskPriority);
+
+    scheduledTask.task = task;
+    scheduledTask.date = scheduledTaskScheduledTime;
+    allScheduledTasks.push(scheduledTask);
+  });
+  return allScheduledTasks;
 }
 
 /**
@@ -76,34 +127,29 @@ function handleScheduledTaskArray(scheduledTaskArray) {
 function fetchScheduledTasksFromServlet() {
   const scheduleRequest = createScheduleRequestFromDom();
   const json = JSON.stringify(scheduleRequest);
-  return fetch('/schedule', {method: 'POST', body: json})
-      .then((response) => {
-        var array = response.json();
-        scheduledTasks = array;
-        return scheduledTasks;
-      });
-}
 
-/**
- * Returns the local copy of the latest scheduled tasks.
- */
-function collectAllScheduledTasks() {
-  return scheduledTasks;
+  return fetch('/schedule', {method: 'POST', body: json}).then((response) => {
+    return response.json();
+  });
 }
 
 /**
  * This takes in a single JSON object of a ScheduledTask (Java Class) and
  * displays that information on the result element using a card format.
  */
-function addScheduledTaskToDom(scheduledTaskWrapper, resultElement) {
-  const task = scheduledTaskWrapper.task;
+function addScheduledTaskToDom(scheduledTask) {
+  const task = scheduledTask.task;
   const taskName = task.name;
-  const taskTimeSeconds = scheduledTaskWrapper.startTime.seconds;
-  const taskDate = new Date();
-  // This is x1000 because the functions takes milliseconds
-  taskDate.setTime(taskTimeSeconds * 1000);
+  const isTaskCompletelyScheduled = scheduledTask.isCompletelyScheduled;
+
+  // Changes seconds into minutes.
+  const taskDurationMinutes = task.duration.seconds / 60;
+  const taskDescription = task.description.value;
   const taskPriority = task.priority.priority;
-  resultElement.innerText += taskName;
+  const taskTimeSeconds = scheduledTask.startTime.seconds;
+  const taskDate = new Date();
+  // This is x1000 because the function takes milliseconds
+  taskDate.setTime(taskTimeSeconds * 1000);
 
   const newResultCard = document.createElement('div');
   newResultCard.classList.add('card');
@@ -115,14 +161,53 @@ function addScheduledTaskToDom(scheduledTaskWrapper, resultElement) {
   const cardTitle = document.createElement('h4');
   cardTitle.classList.add('card-title');
   cardTitle.innerText = taskName;
+  cardTitle.setAttribute('data-task-name', taskName);
   cardBody.appendChild(cardTitle);
 
   const timeText = document.createElement('p');
   timeText.classList.add('card-text');
-  timeText.innerText = 'Scheduled for: ' + taskDate;
+  timeText.innerText = SCHEDULED_TIME_INITIAL_TEXT + taskDate;
+  timeText.setAttribute('data-task-time', taskDate);
   cardBody.appendChild(timeText);
 
-  const eventList = document.getElementById('scheduled-task-list');
-  eventList.innterHTML = '';
-  eventList.appendChild(newResultCard);
+  const durationText = document.createElement('p');
+  durationText.classList.add('card-text');
+  durationText.innerText = DURATION_INITIAL_TEXT + taskDurationMinutes;
+  durationText.setAttribute('data-task-duration-minutes', taskDurationMinutes);
+  cardBody.appendChild(durationText);
+
+  const descriptionText = document.createElement('p');
+  descriptionText.classList.add('card-text');
+  descriptionText.innerText = DESCRIPTION_INITIAL_TEXT + taskDescription;
+  descriptionText.setAttribute('data-task-description', taskDescription);
+  cardBody.appendChild(descriptionText);
+
+  const priorityText = document.createElement('p');
+  priorityText.classList.add('card-text');
+  priorityText.innerText = PRIORITY_INITIAL_TEXT + taskPriority;
+  priorityText.setAttribute('data-task-priority', taskPriority);
+  cardBody.appendChild(priorityText);
+
+  if (!isTaskCompletelyScheduled) {
+    const incompleteWarning = document.createElement('div');
+    incompleteWarning.classList.add('alert');
+    incompleteWarning.classList.add('alert-warning');
+    incompleteWarning.innerText = INCOMPLETE_WARNING_TEXT; 
+    cardBody.appendChild(incompleteWarning); 
+  }
+  
+  const scheduledTaskList = document.getElementById('schedule-result-list');
+  scheduledTaskList.appendChild(newResultCard);
+}
+
+function workingStartHourHasPassed() {
+  const workStartParts = $('#working-hour-start').val().split(':');
+  const workStartHour = parseInt(workStartParts[0]);
+  const workStartMinute = parseInt(workStartParts[1]);
+  const now = new Date();
+
+  if (now.getHours() < workStartHour || (now.getHours() == workStartHour && now.getMinutes() < workStartMinute)) {
+    return false;
+  }
+  return true;
 }

@@ -30,74 +30,73 @@
     <script src="task.js"></script>
     <script src="calendar.js"></script>
     <script src="request.js"></script>
+    <script src="apiLibrary.js"></script>
     <script src="calendarApi.js"></script>
     <script src="sheetsApi.js"></script>
     <script src="tasksApi.js"></script>
-    <script
-      async
-      defer
-      src="https://apis.google.com/js/api.js"
-      onload="handleClientLoadTasks()"
-    ></script>
+    <script async defer src="https://apis.google.com/js/api.js" onload="handleClientLoad()"></script>
   </head>
- 
-  <body onload="setDatePickerToToday(); setNewEventStartAndEndTimes()">
+
+  <body onload="setDatePickerToToday(); setNewEventStartAndEndTimes();">
     <div class="container-fluid">
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Task Scheduler</a>
-        <div class="collapse navbar-collapse">
-          <ul class="navbar-nav">
-            <li class="nav-item nav-link">
-              Date to schedule for:
-              <!-- The default date will be set to current date by one of the onload functions -->
-              <input type="date" id="date-picker" value="2020-07-01" onchange="checkDatePicker(); setNewEventStartAndEndTimes()" />
-              <small class="d-none" id="date-picker-warning">
-                The date you have picked is earlier than today. Please choose a different date to schedule tasks for.
-              </small>
-            </li>
-            <li class="nav-item nav-link">
-              Working hours:
-              <input
-                type="time"
-                id="working-hour-start"
-                name="working-hour-start"
-                value="09:00"
-                onchange="checkWorkingHourRange()"
-              />
-              to
-              <input
-                type="time"
-                id="working-hour-end"
-                name="working-hour-end"
-                value="17:00"
-                onchange="checkWorkingHourRange()"
-              />
-              <small class="d-none" id="working-hour-warning"></small>
-            </li>
-            <li class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                role="button"
-                data-toggle="dropdown"
-                aria-haspopup="true"
-                aria-expanded="false"
-              >
-                Scheduling algorithm preferences
-              </a>
-              <div class="dropdown-menu" aria-labelledby="navbar-dropdown"></div>
-            </li>
-          </ul>
-        </div>
+        <a class="navbar-brand">Task Scheduler</a>
+        <ul class="navbar-nav">
+          <li class="nav-item nav-link">
+            Date to schedule for:
+            <!-- The default date will be set to current date by one of the onload functions -->
+            <input
+              type="date"
+              id="date-picker"
+              value="2020-07-01"
+              onchange="checkDatePicker(); setNewEventStartAndEndTimes(); setTaskHeaderDate();"
+            />
+          </li>
+          <li class="nav-item nav-link">
+            Working hours:
+            <input
+              type="time"
+              id="working-hour-start"
+              name="working-hour-start"
+              value="09:00"
+              onchange="checkWorkingHourRange()"
+            />
+            to
+            <input
+              type="time"
+              id="working-hour-end"
+              name="working-hour-end"
+              value="17:00"
+              onchange="checkWorkingHourRange()"
+            />
+            <small class="d-none" id="working-hour-warning"></small>
+          </li>
+        </ul>
       </nav>
 
       <div class="row">
+        <div class="d-none alert alert-secondary" role="alert" id="date-picker-warning">
+          The date you have picked is earlier than today. Please choose a different date to schedule tasks for.
+        </div>
+        <div class="d-none alert alert-secondary" role="alert" id="working-hour-warning"></div>
+      </div>
+
+      <div class="row">
         <div id="new-task-wrapper" class="col-md-12 col-lg-6 col-xl-3">
-          <h2>1. Add the tasks you would like to schedule for today</h2>
-          <h5>Fields with asterisk (*) are required.</h5>
+          <h2 id="task-instruction-title">1. Add any tasks you want to schedule for today</h2>
+          <div><small>Fields with asterisk (*) are required.</small></div>
+          <br />
           <form id="new-task-form">
             <div class="form-group">
               <label for="new-task-name">Task name*:</label>
-              <input type="text" id="new-task-name" class="form-control" name="new-task-name" placeholder="New Task" required="true" />
+              <input
+                type="text"
+                id="new-task-name"
+                class="form-control"
+                name="new-task-name"
+                placeholder="New Task"
+                required="true"
+              />
               <div class="invalid-feedback" id="empty-name-message">Name cannot be empty!</div>
             </div>
             <label for="new-task-description">Task description:</label><br />
@@ -105,9 +104,10 @@
               id="new-task-description"
               class="form-control"
               name="new-task-description"
-              placeholder="Description"></textarea>
+              placeholder="Description"
+            ></textarea>
             <br />
- 
+
             <div class="form-row">
               <div class="col">
                 <label for="new-task-estimated-length">Duration*:</label>
@@ -144,26 +144,39 @@
               </div>
             </div>
             <br />
-            <button type="button" class="btn btn-primary" onclick="createNewTask()">Add this task</button>
-            <button type="button" class="btn btn-primary" id="connect-tasks-btn" onclick="handleAuthClick()"></button>
-            <div class="invalid-feedback" id="task-link-error"></div>
+            <button
+              type="button"
+              class="btn btn-primary btn-with-top-margin"
+              onclick="createNewTask()"
+            >
+              Add this task
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary btn-with-top-margin d-none"
+              id="connect-tasks-btn"
+              onclick="toggleTasks()"
+            >
+              Link Tasks
+            </button>
             <div class="input-group" id="import-menu-wrapper"></div>
           </form>
+
           <br />
-          <h2>Tasks added:</h2>
-          <div class="scrollable" id="new-task-list-wrapper">
-            <div id="new-task-list"></div>
-          </div>
+          <h2 id="task-added-header" class="d-none">Tasks added:</h2>
+          <div id="new-task-list"></div>
           <button type="button" class="btn btn-warning" onclick="clearTasks()">Clear Tasks</button>
         </div>
- 
+
         <div id="new-event-wrapper" class="col-md-12 col-lg-6 col-xl-3">
           <h2>2. Add any pre-scheduled events here</h2>
-          <h5>We will not schedule any tasks during these time slots.</h5>
-          <h5>Fields with asterisk (*) are required.</h5>
+          <div><small>We will not schedule any tasks during these time slots.</small></div>
+          <div><small>Fields with asterisk (*) are required.</small></div>
+          <br />
           <form id="new-event-form">
             <div class="form-group">
               <label for="new-event-name">Event name*:</label>
+              <div class="invalid-feedback" id="empty-event-name-message">Event's name cannot be empty!</div>
               <input
                 type="text"
                 class="form-control"
@@ -174,11 +187,12 @@
                 required="true"
               />
             </div>
- 
+
             <div class="row">
               <div class="col">
                 <div class="form-group">
                   <label for="new-event-start-time">Start time*:</label>
+                  <div class="invalid-feedback" id="empty-event-start-time">Event's start time cannot be empty!</div>
                   <input
                     type="time"
                     class="form-control"
@@ -196,6 +210,7 @@
               <div class="col">
                 <div class="form-group">
                   <label for="new-event-end-time">End time*:</label>
+                  <div class="invalid-feedback" id="empty-event-end-time">Event's end time cannot be empty!</div>
                   <input
                     type="time"
                     class="form-control"
@@ -208,65 +223,96 @@
                 </div>
               </div>
             </div>
- 
+
             <button
               type="button"
-              class="btn btn-primary"
+              class="btn btn-primary btn-with-top-margin"
               onclick="createNewCalendarEventUserInput(); setNewEventStartAndEndTimes()"
             >
               Add this event
             </button>
- 
+            <button
+              type="button"
+              class="btn btn-primary btn-with-top-margin d-none"
+              id="import-calendar-button"
+              onclick="listUpcomingEvents()"
+            >
+              Import from Google Calendar
+            </button>
+
             <div class="alert alert-secondary d-none" role="alert" id="event-warning"></div>
           </form>
- 
+          <br />
           <div id="new-event-list-wrapper">
-            <h2>Events added:</h2>
+            <h2 class="d-none" id="event-added-header">Events added:</h2>
             <div class="alert alert-secondary d-none" role="alert" id="empty-calendar-import-message"></div>
-            <div class="scrollable">
-              <div id="new-event-list"></div>
-            </div>
+            <div id="new-event-list"></div>
           </div>
         </div>
- 
+
         <div id="calendar-wrapper" class="col-md-12 col-lg-6 col-xl-3">
           <div id="calendar-view-wrapper">
             <iframe title="Your Google Calendar" id="calendar-view" class="d-none" scrolling="yes"></iframe>
-            <button type="button" class="btn btn-primary" id="calendar-auth-button" onclick="initiateCalendarAuth()">
-              Log in to Google Calendar
+            <button type="button"
+              class="btn btn-primary btn-with-top-margin"
+              id="google-auth-button"
+              onclick="handleAuthClick()"
+            >
+              Log into your Google account
             </button>
-            <button type="button" class="btn btn-primary" id="calendar-logout-button"> 
-              Log out of Google Calendar
+            <button
+              type="button"
+              class="btn btn-primary btn-with-top-margin d-none"
+              id="google-logout-button"
+              onclick="logOutAllApis()"
+            >
+              Log out of your Google account
             </button>
+          </div>
+
+          <div class="d-none" id="import-auth-message"></div>
+        </div>
+
+        <div id="schedule-result-wrapper" class="col-md-12 col-lg-6 col-xl-3">
+          <div class="input-group input-group-lg" id="algorithm-menu-wrapper">
+            <select class="custom-select" id="algorithm-type">
+              <option value="SHORTEST_TASK_FIRST">Shortest Tasks First</option>
+              <option value="LONGEST_TASK_FIRST">Longest Tasks First</option>
+            </select>
+            <div class="input-group-append">
+              <button class="btn btn-success" type="button" onclick="onClickStartScheduling()">
+                Start Scheduling!
+              </button>
+            </div>
+          </div>
+          <br />
+          <div id="schedule-result-list"></div>
+          <div class="alert alert-secondary d-none" role="alert" id="invalid-working-hours-message">
+            Your working hours cannot be set in the past.
+          </div>
+          <div class="alert alert-secondary d-none" role="alert" id="empty-scheduled-task-message">
+            It seems like you haven't added any tasks to schedule.
           </div>
           <button
             type="button"
-            class="btn btn-primary d-none"
-            id="import-calendar-button"
-            onclick="listUpcomingEvents()"
+            class="btn btn-primary btn-with-top-margin d-none"
+            id="export-calendar-button"
+            onclick="addCalendarWriteScope()"
           >
-            Import from Google Calendar
-          </button>
-          <div class="d-none" id="import-calendar-message"></div>
-        </div>
- 
-        <div id="schedule-result-wrapper" class="col-md-12 col-lg-6 col-xl-3">
-          <button type="button" class="btn btn-primary" onclick="startScheduling()">
-            Start scheduling!
-          </button>
-          <h2>3. Your tasks are scheduled here!</h2>
-          <div id="schedule-result-list"></div>
-          <button type="button" class="btn btn-primary d-none" id="export-calendar-button" onclick="addCalendarWriteScope()">
             Looks good to me! Add them to my Google Calendar
           </button>
           <div class="d-none" id="export-calendar-message"></div>
-
           <div id="sheets-message"></div>
-          <button class="btn btn-primary" onclick="handleClientLoad()">Handle Client Load</button>
-          <button id="sheets-export-button" class="btn btn-primary" class="d-none">Export to Google Sheets</button>
-          <button id="sheets-sign-out-button" class="btn btn-primary" class="d-none">Sign out of Google Sheets</button>
-          <button id="sheets-sign-in-button" class="btn btn-primary">Sign in to Google Sheets</button>
-          <a id="sheets-url-container" href="#" class="d-none">Link to new spreadsheet</a>
+          <button
+            id="sheets-export-button"
+            class="btn btn-primary btn-with-top-margin d-none"
+            onclick="handleExportSchedule()"
+          >
+            Export to Google Sheets
+          </button>
+          <div>
+            <a id="sheets-url-container" href="#" target="_blank" class="d-none">Link to new spreadsheet</a>
+          </div>
         </div>
       </div>
     </div>
