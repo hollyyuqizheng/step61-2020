@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(value = Parameterized.class)
@@ -22,12 +23,8 @@ public class TimeRangeGroupTest {
     return Arrays.asList(ArrayListTimeRangeGroup.class, LinkedListTimeRangeGroup.class);
   }
 
-  private Class timeRangeGroupClass;
+  @Parameter public Class timeRangeGroupClass;
   private AbstractListTimeRangeGroup timeRangeGroup;
-
-  public TimeRangeGroupTest(Class cl) {
-    timeRangeGroupClass = cl;
-  }
 
   @Before
   public void setUp()
@@ -248,20 +245,20 @@ public class TimeRangeGroupTest {
     // To add:       |-----B-----|
     // Result:       |-----------|
     Instant timeRangeOneStart = Instant.now();
-    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(3000);
-    Instant timeRangeTwoStart = timeRangeOneStart.plusSeconds(500);
-    Instant timeRangeTwoEnd = timeRangeTwoStart.plusSeconds(500);
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
+    Instant timeRangeTwoStart = timeRangeOneStart.minusSeconds(500);
+    Instant timeRangeTwoEnd = timeRangeOneEnd.plusSeconds(500);
 
     TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
     TimeRange timeRangeTwo = TimeRange.fromStartEnd(timeRangeTwoStart, timeRangeTwoEnd);
 
-    List<TimeRange> originalTimeRanges = Arrays.asList(timeRangeTwo);
+    List<TimeRange> originalTimeRanges = Arrays.asList(timeRangeOne);
     for (TimeRange timeRange : originalTimeRanges) {
       timeRangeGroup.addTimeRange(timeRange);
     }
-    List<TimeRange> expected = Arrays.asList(timeRangeOne);
+    List<TimeRange> expected = Arrays.asList(timeRangeTwo);
 
-    timeRangeGroup.addTimeRange(timeRangeOne);
+    timeRangeGroup.addTimeRange(timeRangeTwo);
     Iterator<TimeRange> actualIterator = timeRangeGroup.iterator();
 
     List<TimeRange> actual = new LinkedList();
