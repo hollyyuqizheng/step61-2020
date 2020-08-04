@@ -46,7 +46,7 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
         currentScheduleTime = availableTimeRange.start();
       }
 
-      Boolean doesTaskFit =
+      boolean doesTaskFit =
           !currentScheduleTime
               .plusSeconds(task.getDuration().getSeconds())
               .isAfter(availableTimeRange.end());
@@ -104,7 +104,7 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
     return scheduledTasks;
   }
 
-  private Boolean isNextTaskDifferentPriority(TaskQueue taskQueue, Task task) {
+  private boolean isNextTaskDifferentPriority(TaskQueue taskQueue, Task task) {
     return !taskQueue.isEmpty()
         && taskQueue.peek().getPriority().getPriority() != task.getPriority().getPriority();
   }
