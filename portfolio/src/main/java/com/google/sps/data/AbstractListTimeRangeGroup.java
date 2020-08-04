@@ -11,7 +11,7 @@ abstract class AbstractListTimeRangeGroup implements TimeRangeGroup {
    * Helper method for merging two time ranges. This method is package-private so that it can be
    * tested.
    */
-  public static TimeRange mergeTwoTimeRanges(TimeRange a, TimeRange b) {
+  protected static TimeRange mergeTwoTimeRanges(TimeRange a, TimeRange b) {
     if (!a.overlaps(b)) {
       throw new IllegalArgumentException("Merging two time ranges that do not overlap is invalid");
     }
@@ -37,7 +37,16 @@ abstract class AbstractListTimeRangeGroup implements TimeRangeGroup {
   }
 
   /** Returns an iterator for the list of all time ranges. */
+  @Override
   public Iterator<TimeRange> iterator() {
     return allTimeRanges.iterator();
+  }
+
+  /** Adds all the ranges from timeRanges into allTimeRanges. */
+  protected void addAllTimeRanges(Iterable<TimeRange> timeRanges) {
+    timeRanges.forEach(
+        (range) -> {
+          addTimeRange(range);
+        });
   }
 }
