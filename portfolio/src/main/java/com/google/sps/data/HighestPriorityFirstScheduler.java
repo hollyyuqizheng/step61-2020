@@ -29,7 +29,7 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
 
     List<TimeRange> availableTimes = calendarEventsGroup.getFreeTimeRanges();
     TimeRangeGroup availableTimesGroup = new ArrayListTimeRangeGroup(availableTimes);
-    List<TimeRange> currentAvailableTimes = availableTimeRangesList(availableTimesGroup);
+    List<TimeRange> currentAvailableTimes = getAvailableTimeRangesList(availableTimesGroup);
 
     List<ScheduledTask> scheduledTasks = new ArrayList<ScheduledTask>();
 
@@ -61,7 +61,7 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
                     .getStartTime()
                     .plusSeconds(scheduledTask.getTask().getDuration().getSeconds())));
         // After deleting a TimeRange, we must renew the list.
-        currentAvailableTimes = availableTimeRangesList(availableTimesGroup);
+        currentAvailableTimes = getAvailableTimeRangesList(availableTimesGroup);
 
         // Push the currentScheduleTime back by the amount that was scheduled.
         currentScheduleTime = currentScheduleTime.plusSeconds(task.getDuration().getSeconds());
@@ -105,7 +105,7 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
         && taskQueue.peek().getPriority().getPriority() != task.getPriority().getPriority();
   }
 
-  private List<TimeRange> availableTimeRangesList(TimeRangeGroup updatedTimeRangeGroup) {
+  private List<TimeRange> getAvailableTimeRangesList(TimeRangeGroup updatedTimeRangeGroup) {
     List<TimeRange> availableTimes = new ArrayList();
     updatedTimeRangeGroup.iterator().forEachRemaining(availableTimes::add);
     return availableTimes;
