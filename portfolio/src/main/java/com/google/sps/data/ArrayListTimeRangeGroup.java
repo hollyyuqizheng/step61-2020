@@ -2,7 +2,6 @@ package com.google.sps.data;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /** Models an implementation of the TimeRangeGroup model using ArrayList. */
@@ -12,12 +11,9 @@ public class ArrayListTimeRangeGroup extends AbstractListTimeRangeGroup implemen
    * Adds all the input time ranges to the list of all time ranges. Also sorts the list of all
    * ranges in the constructor.
    */
-  public ArrayListTimeRangeGroup(Collection<TimeRange> timeRanges) {
+  public ArrayListTimeRangeGroup(Iterable<TimeRange> timeRanges) {
     allTimeRanges = new ArrayList<TimeRange>();
-    timeRanges.forEach(
-        (range) -> {
-          addTimeRange(range);
-        });
+    addAllTimeRanges(timeRanges);
   }
 
   /**
@@ -48,6 +44,9 @@ public class ArrayListTimeRangeGroup extends AbstractListTimeRangeGroup implemen
       // If the current range is completely contained by the lastExaminedTimeRange,
       // no merging or adding needs to happen.
       if (lastExaminedTimeRange.contains(currentRange)) {
+        if (i == allTimeRanges.size() - 1) {
+          newTimeRanges.add(lastExaminedTimeRange);
+        }
         continue;
       }
 
@@ -89,15 +88,18 @@ public class ArrayListTimeRangeGroup extends AbstractListTimeRangeGroup implemen
    * the target range is contained within this current range.
    */
   public boolean hasTimeRange(TimeRange timeRangeToCheck) {
+    if (allTimeRanges.isEmpty()) {
+      return false;
+    }
+
     int end = allTimeRanges.size() - 1;
     int start = 0;
-    int middle;
 
     while (start < end) {
-      middle = (start + end) / 2;
+      int middle = (start + end) / 2;
       TimeRange middleRange = allTimeRanges.get(middle);
       if (middleRange.start().isAfter(timeRangeToCheck.start())) {
-        end = middle;
+        end = middle - 1;
       } else if (middleRange.end().isBefore(timeRangeToCheck.end())) {
         start = middle + 1;
       } else {
@@ -141,6 +143,7 @@ public class ArrayListTimeRangeGroup extends AbstractListTimeRangeGroup implemen
         newTimeRanges.add(currentRange);
       }
     }
+
     allTimeRanges = newTimeRanges;
   }
 }
