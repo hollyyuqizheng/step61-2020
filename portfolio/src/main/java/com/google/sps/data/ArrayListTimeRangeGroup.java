@@ -20,6 +20,7 @@ public class ArrayListTimeRangeGroup extends AbstractListTimeRangeGroup implemen
    * Adds a new time range to the list. If the time range to add overlaps with any existing time
    * range, the overlapping time ranges will be merged.
    */
+  @Override
   public void addTimeRange(TimeRange timeRange) {
     // If the original allTimeRanges list is empty,
     // this is the first time we add anything to the list,
@@ -87,6 +88,7 @@ public class ArrayListTimeRangeGroup extends AbstractListTimeRangeGroup implemen
    * and whose end time is after the target range's end. Then the method calls contains to see if
    * the target range is contained within this current range.
    */
+  @Override
   public boolean hasTimeRange(TimeRange timeRangeToCheck) {
     if (allTimeRanges.isEmpty()) {
       return false;
@@ -121,6 +123,7 @@ public class ArrayListTimeRangeGroup extends AbstractListTimeRangeGroup implemen
    * <p>Another example for deleting overlapping time ranges: if [3 - 4] and [5 - 6] are in the
    * original list, deleting [3:30 - 5:30] will result in two new ranges: [3 - 3:30] and [5:30 - 6].
    */
+  @Override
   public void deleteTimeRange(TimeRange timeRangeToDelete) {
     List<TimeRange> newTimeRanges = new ArrayList<TimeRange>();
 
