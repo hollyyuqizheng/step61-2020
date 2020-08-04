@@ -71,8 +71,7 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
         // then reset the availableTimesIndex, currentScheduleTime, and make the loop
         // grab a TimeRange. We go back to the first availableTimeRange in order to schedule
         // more tasks towards the beginning of the availableTimes.
-        if (!taskQueue.isEmpty()
-            && taskQueue.peek().getPriority().getPriority() != task.getPriority().getPriority()) {
+        if (isNextTaskDifferentPriority(taskQueue, task)) {
           availableTimesIndex = 0;
           currentScheduleTime = workHoursStartTime;
         }
@@ -99,6 +98,11 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
 
     Collections.sort(scheduledTasks, sortByScheduledStartTimeAscending);
     return scheduledTasks;
+  }
+
+  private Boolean isNextTaskDifferentPriority(TaskQueue taskQueue, Task task) {
+    return !taskQueue.isEmpty()
+        && taskQueue.peek().getPriority().getPriority() != task.getPriority().getPriority();
   }
 
   private List<TimeRange> availableTimeRangesList(TimeRangeGroup updatedTimeRangeGroup) {
