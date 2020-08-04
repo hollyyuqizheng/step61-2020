@@ -47,11 +47,15 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
         currentScheduleTime = availableTimeRange.start();
       }
 
-      if (!currentScheduleTime
-          .plusSeconds(task.getDuration().getSeconds())
-          .isAfter(availableTimeRange.end())) {
+      Boolean doesTaskFit =
+          !currentScheduleTime
+              .plusSeconds(task.getDuration().getSeconds())
+              .isAfter(availableTimeRange.end());
+
+      if (doesTaskFit) {
         ScheduledTask scheduledTask =
-            new ScheduledTask(task, currentScheduleTime, Optional.of(true));
+            new ScheduledTask(
+                task, currentScheduleTime, /* isCompletelyScheduled = */ Optional.of(true));
         scheduledTasks.add(scheduledTask);
 
         // Delete the TimeRange that has been scheduled over so that different priority tasks
