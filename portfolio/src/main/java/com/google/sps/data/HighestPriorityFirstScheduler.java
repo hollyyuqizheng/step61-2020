@@ -39,17 +39,17 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
     Instant currentScheduleTime = workHoursStartTime;
 
     while (currentAvailableTimesIndex < currentAvailableTimes.size() && !taskQueue.isEmpty()) {
-      TimeRange availableTimeRange = currentAvailableTimes.get(currentAvailableTimesIndex);
+      TimeRange currentAvailableTimeRange = currentAvailableTimes.get(currentAvailableTimesIndex);
       Task task = taskQueue.peek();
 
-      if (availableTimeRange.start().isAfter(currentScheduleTime)) {
-        currentScheduleTime = availableTimeRange.start();
+      if (currentAvailableTimeRange.start().isAfter(currentScheduleTime)) {
+        currentScheduleTime = currentAvailableTimeRange.start();
       }
 
       boolean doesTaskFit =
           !currentScheduleTime
               .plusSeconds(task.getDuration().getSeconds())
-              .isAfter(availableTimeRange.end());
+              .isAfter(currentAvailableTimeRange.end());
 
       if (doesTaskFit) {
         ScheduledTask scheduledTask =
