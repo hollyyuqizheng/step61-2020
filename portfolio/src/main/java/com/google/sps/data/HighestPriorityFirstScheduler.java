@@ -20,7 +20,6 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
       Collection<Task> tasks,
       Instant workHoursStartTime,
       Instant workHoursEndTime) {
-
     List<CalendarEvent> eventsList = new ArrayList<CalendarEvent>(events);
     List<Task> tasksList = new ArrayList<Task>(tasks);
 
@@ -66,8 +65,6 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
                 scheduledTask
                     .getStartTime()
                     .plusSeconds(scheduledTask.getTask().getDuration().getSeconds())));
-        // After deleting a TimeRange, we must renew the list.
-        currentAvailableTimes = getAvailableTimeRangesList(availableTimesGroup);
 
         // Push the currentScheduleTime back by the amount that was scheduled.
         currentScheduleTime = currentScheduleTime.plusSeconds(task.getDuration().getSeconds());
@@ -80,6 +77,7 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
         if (isNextTaskDifferentPriority(taskQueue, task)) {
           availableTimesIndex = 0;
           currentScheduleTime = workHoursStartTime;
+          currentAvailableTimes = getAvailableTimeRangesList(availableTimesGroup);
         }
         // If the task's priority is not different, then we can simply continue running the
         // the loop without retrieving the next availableTimeRange since there might be
