@@ -28,22 +28,18 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
     CalendarEventsGroup calendarEventsGroup =
         new CalendarEventsGroup(eventsList, workHoursStartTime, workHoursEndTime);
 
-    // When accessing available TimeRanges, work with currentAvailableTimes
-    // since availableTimes will not be updated after creation while
-    // currentAvailableTimes will be updated everytime the algorithm works
-    // with a new priority value. Updates included modified or deleted TimeRanges.
     List<TimeRange> availableTimes = calendarEventsGroup.getFreeTimeRanges();
     TimeRangeGroup availableTimesGroup = new ArrayListTimeRangeGroup(availableTimes);
-    List<TimeRange> currentAvailableTimes = getAvailableTimeRangesList(availableTimesGroup);
+    availableTimes = getAvailableTimeRangesList(availableTimesGroup);
 
     List<ScheduledTask> scheduledTasks = new ArrayList<ScheduledTask>();
 
-    int currentAvailableTimesIndex = 0;
+    int availableTimesIndex = 0;
 
     Instant currentScheduleTime = workHoursStartTime;
 
     // The algorithm begins with the Task with the highest priority, and lowest duration. It
-    // then iterates through the currentAvailableTimes list trying to find a TimeRange that is
+    // then iterates through the availableTimes list trying to find a TimeRange that is
     // large enough to fit the Task in and schedules it there. Once a Task is scheduled, the
     // next Task from the PriorityQueue is retrieved until the PriorityQueue is empty and each
     // Task that can be scheduled has been scheduled. If a Task has the same priority as the
@@ -51,8 +47,8 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
     // at the TimeRange that the previous Task was scheduled in. If the Task has a different
     // priority
     // then the algorithm starts at the first available TimeRange.
-    while (currentAvailableTimesIndex < currentAvailableTimes.size() && !taskQueue.isEmpty()) {
-      TimeRange currentAvailableTimeRange = currentAvailableTimes.get(currentAvailableTimesIndex);
+    while (availableTimesIndex < availableTimes.size() && !taskQueue.isEmpty()) {
+      TimeRange currentAvailableTimeRange = availableTimes.get(availableTimesIndex);
       Task task = taskQueue.peek();
 
       if (currentAvailableTimeRange.start().isAfter(currentScheduleTime)) {
@@ -84,29 +80,29 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
         taskQueue.remove();
 
         // If the next task's priority is different from the task that was just scheduled,
-        // then reset the currentAvailableTimesIndex, currentScheduleTime, and make the loop
+        // then reset the availableTimesIndex, currentScheduleTime, and make the loop
         // grab a TimeRange. We go back to the first availableTimeRange in order to schedule
         // more tasks towards the beginning of the availableTimes.
         if (isNextTaskDifferentPriority(taskQueue, task)) {
-          currentAvailableTimesIndex = 0;
+          availableTimesIndex = 0;
           currentScheduleTime = workHoursStartTime;
-          currentAvailableTimes = getAvailableTimeRangesList(availableTimesGroup);
+          availableTimes = getAvailableTimeRangesList(availableTimesGroup);
         }
         // If the task's priority is not different, then we can simply continue running the
         // the loop without retrieving the next availableTimeRange since there might be
         // some time left over towards the end of the current one.
-      } else if (currentAvailableTimesIndex == currentAvailableTimes.size() - 1) {
+      } else if (availableTimesIndex == availableTimes.size() - 1) {
         // If we've reached the end of the availableTimeRange group and we can't schedule a task,
         // then we can remove all the remaining tasks of equal priority since they will all be
         // longer in duration therefore, they will not be able to be scheduled either.
         if (!taskQueue.isEmpty()) {
-          currentAvailableTimesIndex = 0;
+          availableTimesIndex = 0;
           removeTasksWithPriority(taskQueue, task.getPriority());
         }
       } else {
         // Get the next TimeRange if the Task cannot be scheduled but we aren't at the final
         // TimeRange.
-        currentAvailableTimesIndex++;
+        availableTimesIndex++;
       }
     }
 
