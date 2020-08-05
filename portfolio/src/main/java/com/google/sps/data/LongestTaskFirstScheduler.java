@@ -137,10 +137,12 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
 
     // If iterating through all current time ranges finishes, and the task still isn't
     // completely scheduled, then this task is only partially scheduled.
-    // Go through all the segments for this task, and set their completeness to false.
-    Optional<Boolean> isCompletelyScheduled = Optional.of(false);
+    // Go through all the segments for this task, and set their completeness to partially scheduled.
+    Optional<SchedulingCompleteness> schedulingCompleteness =
+        Optional.of(SchedulingCompleteness.PARTIALLY_SCHEDULED);
+
     for (ScheduledTask taskSegment : newScheduledTasks) {
-      taskSegment.setCompleteness(isCompletelyScheduled);
+      taskSegment.setCompleteness(schedulingCompleteness);
     }
     return newScheduledTasks;
   }
@@ -156,11 +158,12 @@ public class LongestTaskFirstScheduler implements TaskScheduler {
       TimeRangeGroup availableTimesGroup) {
     Duration taskDuration = task.getDuration();
 
-    Optional<Boolean> isCompletelyScheduled = Optional.of(true);
+    Optional<SchedulingCompleteness> schedulingCompleteness =
+        Optional.of(SchedulingCompleteness.COMPLETELY_SCHEDULED);
 
     // Assumes this task can be scheduled for now.
     // If not, the true tag will be overwritten at the end of the scheduleOneTask method.
-    ScheduledTask scheduledTask = new ScheduledTask(task, scheduledTime, isCompletelyScheduled);
+    ScheduledTask scheduledTask = new ScheduledTask(task, scheduledTime, schedulingCompleteness);
     scheduledTasks.add(scheduledTask);
 
     Instant scheduledTaskEndTime = scheduledTime.plus(taskDuration);
