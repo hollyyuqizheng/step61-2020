@@ -82,7 +82,11 @@ public final class HighestPriorityFirstSchedulerTest {
     HighestPriorityFirstScheduler highestPriorityFirstScheduler =
         new HighestPriorityFirstScheduler();
 
-    Collection<CalendarEvent> events = Arrays.asList();
+    Collection<CalendarEvent> events =
+        Arrays.asList(
+            new CalendarEvent("Event 1", SchedulerTestUtil.TIME_1400, SchedulerTestUtil.TIME_1500),
+            new CalendarEvent("Event 2", SchedulerTestUtil.TIME_1600, SchedulerTestUtil.TIME_1700));
+
     Task task1 =
         new Task(
             "Task 1",
