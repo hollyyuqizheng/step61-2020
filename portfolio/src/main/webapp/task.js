@@ -66,6 +66,9 @@ function createNewTask() {
       name, description, getDurationMinutes(length, lengthUnit), priority);
 
   updateTaskList(newTask, lengthUnit);
+
+  $('#new-task-estimated-length').val(30);
+  $('#new-task-estimated-length-unit').val("minutes");
 }
 
 /** Shows the "Task Added" header. */
