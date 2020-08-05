@@ -53,8 +53,8 @@ public class SchedulerTestUtil {
   public static final TaskPriority PRIORITY_FOUR = new TaskPriority(4);
   public static final TaskPriority PRIORITY_FIVE = new TaskPriority(5);
 
-  public static final Optional<SchedulingCompleteness> completelyScheduled =
-      Optional.of(SchedulingCompleteness.COMPLETELY_SCHEDULED);
-  public static final Optional<SchedulingCompleteness> notCompletelyScheduled =
-      Optional.of(SchedulingCompleteness.PARTIALLY_SCHEDULED);
+  public static final Optional<Integer> completelyScheduled =
+      Optional.of(SchedulingCompleteness.COMPLETELY_SCHEDULED.getValue());
+  public static final Optional<Integer> notCompletelyScheduled =
+      Optional.of(SchedulingCompleteness.PARTIALLY_SCHEDULED.getValue());
 }

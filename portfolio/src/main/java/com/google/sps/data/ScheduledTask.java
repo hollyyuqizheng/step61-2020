@@ -10,10 +10,9 @@ import java.util.Optional;
 public class ScheduledTask {
   private final Task task;
   private final Instant startTime;
-  private Optional<SchedulingCompleteness> schedulingCompleteness;
+  private Optional<Integer> schedulingCompletenessInt;
 
-  public ScheduledTask(
-      Task task, Instant startTime, Optional<SchedulingCompleteness> schedulingCompleteness) {
+  public ScheduledTask(Task task, Instant startTime, Optional<Integer> schedulingCompletenessInt) {
     if (task == null) {
       throw new IllegalArgumentException("Task cannot be null");
     }
@@ -22,7 +21,7 @@ public class ScheduledTask {
     }
     this.task = task;
     this.startTime = startTime;
-    this.schedulingCompleteness = schedulingCompleteness;
+    this.schedulingCompletenessInt = schedulingCompletenessInt;
   }
 
   public Task getTask() {
@@ -42,7 +41,7 @@ public class ScheduledTask {
     return a.task.equals(b.task) && a.startTime.equals(b.startTime);
   }
 
-  public void setCompleteness(Optional<SchedulingCompleteness> schedulingCompleteness) {
-    this.schedulingCompleteness = schedulingCompleteness;
+  public void setCompleteness(Optional<Integer> schedulingCompletenessInt) {
+    this.schedulingCompletenessInt = schedulingCompletenessInt;
   }
 }
