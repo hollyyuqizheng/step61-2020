@@ -28,6 +28,10 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
     CalendarEventsGroup calendarEventsGroup =
         new CalendarEventsGroup(eventsList, workHoursStartTime, workHoursEndTime);
 
+    // When accessing available TimeRanges, work with currentAvailableTimes
+    // since availableTimes will not be updated after creation while
+    // currentAvailableTimes will be updated everytime the algorithm works
+    // with a new priority value. Updates included modified or deleted TimeRanges.
     List<TimeRange> availableTimes = calendarEventsGroup.getFreeTimeRanges();
     TimeRangeGroup availableTimesGroup = new ArrayListTimeRangeGroup(availableTimes);
     List<TimeRange> currentAvailableTimes = getAvailableTimeRangesList(availableTimesGroup);
