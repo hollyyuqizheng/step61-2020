@@ -67,7 +67,10 @@ class ShortestTaskFirstScheduler implements TaskScheduler {
           .plusSeconds(task.getDuration().getSeconds())
           .isAfter(availableTimeRange.end())) {
         ScheduledTask scheduledTask =
-            new ScheduledTask(task, currentScheduleTime, Optional.of(true));
+            new ScheduledTask(
+                task,
+                currentScheduleTime,
+                Optional.of(SchedulingCompleteness.COMPLETELY_SCHEDULED));
         scheduledTasks.add(scheduledTask);
         currentScheduleTime = currentScheduleTime.plusSeconds(task.getDuration().getSeconds());
         taskQueue.remove();

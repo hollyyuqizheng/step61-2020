@@ -2,16 +2,10 @@ package com.google.sps.data;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /** Models an implementation of the TimeRangeGroup model using ArrayList. */
-public class ArrayListTimeRangeGroup implements TimeRangeGroup, Iterable<TimeRange> {
-
-  // This list of all the time ranges will be sorted by start time ascending
-  // in add and delete methods. The time ranges stored in this list are
-  // pair-wise disjoint at any moment.
-  private List<TimeRange> allTimeRanges;
+public class ArrayListTimeRangeGroup extends AbstractListTimeRangeGroup implements TimeRangeGroup {
 
   /**
    * Adds all the input time ranges to the list of all time ranges. Also sorts the list of all
@@ -19,16 +13,14 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup, Iterable<TimeRan
    */
   public ArrayListTimeRangeGroup(Iterable<TimeRange> timeRanges) {
     allTimeRanges = new ArrayList<TimeRange>();
-    timeRanges.forEach(
-        (range) -> {
-          addTimeRange(range);
-        });
+    addAllTimeRanges(timeRanges);
   }
 
   /**
    * Adds a new time range to the list. If the time range to add overlaps with any existing time
    * range, the overlapping time ranges will be merged.
    */
+  @Override
   public void addTimeRange(TimeRange timeRange) {
     // If the original allTimeRanges list is empty,
     // this is the first time we add anything to the list,
@@ -90,46 +82,13 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup, Iterable<TimeRan
   }
 
   /**
-   * Helper method for merging two time ranges. This method is package-private so that it can be
-   * tested.
-   */
-  static TimeRange mergeTwoTimeRanges(TimeRange a, TimeRange b) {
-    if (!a.overlaps(b)) {
-      throw new IllegalArgumentException("Merging two time ranges that do not overlap is invalid");
-    }
-
-    Instant newTimeRangeStart;
-    Instant newTimeRangeEnd;
-
-    // The new time range after merging should have the earlier start time
-    // and the later end time among the two overlapping time ranges.
-    if (a.start().isBefore(b.start())) {
-      newTimeRangeStart = a.start();
-    } else {
-      newTimeRangeStart = b.start();
-    }
-
-    if (a.end().isBefore(b.end())) {
-      newTimeRangeEnd = b.end();
-    } else {
-      newTimeRangeEnd = a.end();
-    }
-
-    return TimeRange.fromStartEnd(newTimeRangeStart, newTimeRangeEnd);
-  }
-
-  /** Returns an iterator for the list of all time ranges. */
-  public Iterator<TimeRange> iterator() {
-    return allTimeRanges.iterator();
-  }
-
-  /**
    * Checks if a time range exists in the collection. For example, if [3:00 - 4:00] is in the
    * collection, [3:00 - 3:30] is considered to exist as a time range in the collection. This method
    * uses binary search to find the time ranges whose start time is before the target range's start
    * and whose end time is after the target range's end. Then the method calls contains to see if
    * the target range is contained within this current range.
    */
+  @Override
   public boolean hasTimeRange(TimeRange timeRangeToCheck) {
     if (allTimeRanges.isEmpty()) {
       return false;
@@ -164,6 +123,7 @@ public class ArrayListTimeRangeGroup implements TimeRangeGroup, Iterable<TimeRan
    * <p>Another example for deleting overlapping time ranges: if [3 - 4] and [5 - 6] are in the
    * original list, deleting [3:30 - 5:30] will result in two new ranges: [3 - 3:30] and [5:30 - 6].
    */
+  @Override
   public void deleteTimeRange(TimeRange timeRangeToDelete) {
     List<TimeRange> newTimeRanges = new ArrayList<TimeRange>();
 
