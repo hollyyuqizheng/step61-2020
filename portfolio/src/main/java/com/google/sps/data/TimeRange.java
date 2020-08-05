@@ -25,10 +25,9 @@ import java.util.Comparator;
 public final class TimeRange {
   private final Instant start;
   private final Duration duration;
-
-  // Comparator for sorting time ranges by start time
-  public static final Comparator<TimeRange> sortByTimeRangeStartTimeAscending =
-      Comparator.comparing(TimeRange::start);
+  // Comparator for sorting time ranges by duration ascending and then by start time ascending
+  public static final Comparator<TimeRange> SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME =
+      Comparator.comparing(TimeRange::duration).thenComparing(TimeRange::start);
 
   private TimeRange(Instant start, Duration duration) {
     this.start = start;
@@ -93,7 +92,7 @@ public final class TimeRange {
 
   /**
    * Checks if a time range contains a time point. Helper method for contains and overlaps. This
-   * method is public so that it can be tested.
+   * method is package-private so that it can be tested.
    */
   static boolean timeRangeContainsPoint(TimeRange range, Instant point) {
     // If a range has no duration, it cannot contain anything.

@@ -6,7 +6,6 @@
 function toggleTasks() {
   const menuIsVisible =
       $('#connect-tasks-btn').attr('data-is-import-menu-visible');
-  console.log(menuIsVisible);
   if (menuIsVisible == 'true') {
     clearImportMenu();
   } else {
@@ -43,7 +42,7 @@ function importTasklist(tasklistId) {
         var tasks = taskResponse.result.items;
         if (tasks) {
           tasks.forEach(task => {
-            const newTask = new Task(task.title, task.notes, 60, 3);
+            const newTask = new Task(task.title, task.notes, 30, 3);
             updateTaskList(newTask, TIME_UNIT.MINUTES);
           });
         }

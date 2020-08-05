@@ -37,7 +37,7 @@
     <script async defer src="https://apis.google.com/js/api.js" onload="handleClientLoad()"></script>
   </head>
 
-  <body onload="setDatePickerToToday(); setNewEventStartAndEndTimes(); setWorkingHour()">
+  <body onload="setDatePickerToToday(); setNewEventStartAndEndTimes();">
     <div class="container-fluid">
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand">Task Scheduler</a>
@@ -49,7 +49,7 @@
               type="date"
               id="date-picker"
               value="2020-07-01"
-              onchange="checkDatePicker(); setNewEventStartAndEndTimes(); setWorkingHour()"
+              onchange="checkDatePicker(); setNewEventStartAndEndTimes(); setTaskHeaderDate();"
             />
           </li>
           <li class="nav-item nav-link">
@@ -117,6 +117,7 @@
                   class="form-control"
                   name="new-task-estimated-length"
                   required="true"
+                  value="30"
                 />
                 <div class="invalid-feedback" id="task-length-message">Duration must be a positive integer!</div>
               </div>
@@ -124,7 +125,7 @@
               <div class="col">
                 <label for="new-task-estimated-length-unit">Unit*:</label>
                 <select id="new-task-estimated-length-unit" class="form-control" name="new-task-estimated-length-unit">
-                  <option value="minutes">minute(s)</option>
+                  <option value="minutes" selected>minute(s)</option>
                   <option value="hours">hour(s)</option>
                 </select>
                 <div class="invalid-feedback" id="task-length-unit-message">
@@ -155,7 +156,6 @@
               type="button"
               class="btn btn-primary btn-with-top-margin d-none"
               id="connect-tasks-btn"
-              onclick="handleAuthClick()"></button>
               onclick="toggleTasks()"
             >
               Link Tasks
@@ -259,7 +259,7 @@
               id="google-auth-button"
               onclick="handleAuthClick()"
             >
-              Log in to see your Google Calendar
+              Log into your Google account
             </button>
             <button
               type="button"
@@ -278,6 +278,7 @@
           <div class="input-group input-group-lg" id="algorithm-menu-wrapper">
             <select class="custom-select" id="algorithm-type">
               <option value="SHORTEST_TASK_FIRST">Shortest Tasks First</option>
+              <option value="LONGEST_TASK_FIRST">Longest Tasks First</option>
             </select>
             <div class="input-group-append">
               <button class="btn btn-success" type="button" onclick="onClickStartScheduling()">
@@ -287,6 +288,9 @@
           </div>
           <br />
           <div id="schedule-result-list"></div>
+          <div class="alert alert-secondary d-none" role="alert" id="invalid-working-hours-message">
+            Your working hours cannot be set in the past.
+          </div>
           <div class="alert alert-secondary d-none" role="alert" id="empty-scheduled-task-message">
             It seems like you haven't added any tasks to schedule.
           </div>
