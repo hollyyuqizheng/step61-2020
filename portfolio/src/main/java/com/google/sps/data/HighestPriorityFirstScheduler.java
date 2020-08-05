@@ -42,6 +42,15 @@ public class HighestPriorityFirstScheduler implements TaskScheduler {
 
     Instant currentScheduleTime = workHoursStartTime;
 
+    // The algorithm begins with the Task with the highest priority, and lowest duration. It
+    // then iterates through the currentAvailableTimes list trying to find a TimeRange that is
+    // large enough to fit the Task in and schedules it there. Once a Task is scheduled, the
+    // next Task from the PriorityQueue is retrieved until the PriorityQueue is empty and each
+    // Task that can be scheduled has been scheduled. If a Task has the same priority as the
+    // previously scheduled task then the scheduling algorithm tries to schedule the task starting
+    // at the TimeRange that the previous Task was scheduled in. If the Task has a different
+    // priority
+    // then the algorithm starts at the first available TimeRange.
     while (currentAvailableTimesIndex < currentAvailableTimes.size() && !taskQueue.isEmpty()) {
       TimeRange currentAvailableTimeRange = currentAvailableTimes.get(currentAvailableTimesIndex);
       Task task = taskQueue.peek();
