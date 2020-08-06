@@ -4,7 +4,7 @@ import java.time.Instant;
 import java.util.Iterator;
 import java.util.List;
 
-abstract class AbstractListTimeRangeGroup implements TimeRangeGroup {
+abstract class AbstractListTimeRangeGroup implements TimeRangeGroup, Iterable<TimeRange> {
   protected List<TimeRange> allTimeRanges;
 
   /**

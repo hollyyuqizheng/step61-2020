@@ -3,6 +3,7 @@ package com.google.sps.data;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -72,6 +73,18 @@ public class TimeRangeGroupTest {
     Assert.assertTrue(timeRangeGroup.hasTimeRange(timeRangeThree));
     Assert.assertFalse(timeRangeGroup.hasTimeRange(timeRangeFour));
     Assert.assertFalse(timeRangeGroup.hasTimeRange(timeRangeFive));
+  }
+
+  /** Tests for the has method in an empty time range group. */
+  @Test
+  public void testHasRangeEmpty() {
+    List<TimeRange> timeRanges = Arrays.asList();
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
+
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+
+    Assert.assertFalse(timeRangeGroup.hasTimeRange(timeRangeOne));
   }
 
   /** Tests for merging two overlapping ranges. */
@@ -293,6 +306,37 @@ public class TimeRangeGroupTest {
     List<TimeRange> actual = new LinkedList();
     while (actualIterator.hasNext()) {
       actual.add(actualIterator.next());
+    }
+
+    Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);
+    Assert.assertEquals(expected, actual);
+  }
+
+  /** Tests for adding one time range that is contained by an existing one. */
+  @Test
+  public void testAddTimeRangeContainedByExisting() {
+    // Time Ranges:  |-------A-------|
+    // To add:          |---B-----|
+    // Result:       |---------------|
+
+    Instant timeRangeOneStart = Instant.now();
+    Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
+    TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
+
+    List<TimeRange> originalTimeRanges = Arrays.asList(timeRangeOne);
+
+    Instant timeRangeToAddStart = timeRangeOneStart.plusSeconds(100);
+    Instant timeRangeToAddEnd = timeRangeOneEnd.minusSeconds(100);
+    TimeRange timeRangeToAdd = TimeRange.fromStartEnd(timeRangeToAddStart, timeRangeToAddEnd);
+    List<TimeRange> expected = Arrays.asList(timeRangeOne);
+
+    timeRangeGroup.addTimeRange(timeRangeToAdd);
+    Iterator<TimeRange> actualIterator = timeRangeGroup.iterator();
+
+    List<TimeRange> actual = new ArrayList();
+    while (actualIterator.hasNext()) {
+      TimeRange newTimeRange = actualIterator.next();
+      actual.add(newTimeRange);
     }
 
     Collections.sort(actual, TimeRange.SORT_BY_TIME_RANGE_DURATION_ASCENDING_THEN_START_TIME);

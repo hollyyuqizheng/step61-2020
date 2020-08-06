@@ -235,7 +235,6 @@ public final class ArrayListTimeRangeGroupTest {
     // Time Ranges:  |-------A-------|
     // To add:          |---B-----|
     // Result:       |---------------|
-
     Instant timeRangeOneStart = Instant.now();
     Instant timeRangeOneEnd = timeRangeOneStart.plusSeconds(1000);
     TimeRange timeRangeOne = TimeRange.fromStartEnd(timeRangeOneStart, timeRangeOneEnd);
@@ -250,6 +249,7 @@ public final class ArrayListTimeRangeGroupTest {
 
     timeRangeGroup.addTimeRange(timeRangeToAdd);
     List<TimeRange> actual = new ArrayList();
+
     for (TimeRange t : timeRangeGroup) {
       actual.add(t);
     }
