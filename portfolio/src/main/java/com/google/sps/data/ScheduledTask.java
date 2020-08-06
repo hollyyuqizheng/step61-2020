@@ -11,6 +11,7 @@ public class ScheduledTask {
   private final Task task;
   private final Instant startTime;
   private Optional<SchedulingCompleteness> schedulingCompleteness;
+  private Optional<Integer> schedulingCompletenessInt;
 
   public ScheduledTask(
       Task task, Instant startTime, Optional<SchedulingCompleteness> schedulingCompleteness) {
@@ -23,6 +24,10 @@ public class ScheduledTask {
     this.task = task;
     this.startTime = startTime;
     this.schedulingCompleteness = schedulingCompleteness;
+    this.schedulingCompletenessInt = Optional.empty();
+    if (schedulingCompleteness.isPresent()) {
+      this.schedulingCompletenessInt = Optional.of(schedulingCompleteness.get().getValue());
+    }
   }
 
   public Task getTask() {
@@ -44,5 +49,8 @@ public class ScheduledTask {
 
   public void setCompleteness(Optional<SchedulingCompleteness> schedulingCompleteness) {
     this.schedulingCompleteness = schedulingCompleteness;
+    if (schedulingCompleteness.isPresent()) {
+      this.schedulingCompletenessInt = Optional.of(schedulingCompleteness.get().getValue());
+    }
   }
 }

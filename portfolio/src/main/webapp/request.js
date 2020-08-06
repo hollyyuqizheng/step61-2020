@@ -34,9 +34,9 @@ const INCOMPLETE_WARNING_TEXT = 'This task cannot be scheduled completely.';
 
 // Enums for scheduling completeness status
 const SCHEDULING_COMPLETENESS = {
-  NOT_SCHEDULED : 'NOT_SCHEDULED', 
-  PARTIALLY_SCHEDULED : 'PARTIALLY_SCHEDULED', 
-  COMPLETELY_SCHEDULED : 'COMPLETELY_SCHEDULED'
+  NOT_SCHEDULED : 0, 
+  PARTIALLY_SCHEDULED : 1, 
+  COMPLETELY_SCHEDULED : 2
 }
 
 /**
@@ -147,7 +147,7 @@ function fetchScheduledTasksFromServlet() {
 function addScheduledTaskToDom(scheduledTask) {
   const task = scheduledTask.task;
   const taskName = task.name;
-  const schedulingCompletenessStatus = scheduledTask.schedulingCompleteness;
+  const schedulingCompletenessStatus = scheduledTask.schedulingCompletenessInt;
 
   // Changes seconds into minutes.
   const taskDurationMinutes = task.duration.seconds / 60;
