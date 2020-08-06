@@ -2,7 +2,7 @@ package com.google.sps.data;
 
 import java.util.Iterator;
 
-public interface TimeRangeGroup {
+public interface TimeRangeGroup extends Iterable<TimeRange> {
 
   /**
    * Adds a new time range into the collection of time ranges. This newly added time range should be
