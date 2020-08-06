@@ -13,6 +13,8 @@ public class SchedulingAlgorithmReference {
         return Optional.of(SchedulingAlgorithmType.SHORTEST_TASK_FIRST);
       case "LONGEST_TASK_FIRST":
         return Optional.of(SchedulingAlgorithmType.LONGEST_TASK_FIRST);
+      case "HIGHEST_PRIORITY_FIRST":
+        return Optional.of(SchedulingAlgorithmType.HIGHEST_PRIORITY_FIRST);
     }
     return Optional.empty();
   }
@@ -29,6 +31,8 @@ public class SchedulingAlgorithmReference {
         return Optional.of(new ShortestTaskFirstScheduler());
       case LONGEST_TASK_FIRST:
         return Optional.of(new LongestTaskFirstScheduler());
+      case HIGHEST_PRIORITY_FIRST:
+        return Optional.of(new HighestPriorityFirstScheduler());
     }
     return Optional.empty();
   }
