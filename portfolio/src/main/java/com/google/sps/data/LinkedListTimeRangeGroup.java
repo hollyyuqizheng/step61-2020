@@ -83,9 +83,8 @@ public class LinkedListTimeRangeGroup extends AbstractListTimeRangeGroup impleme
       // the same element then there is no need to add it. However, if
       // lastExaminedTimeRange does not match, this means lastExaminedTimeRange
       // actually belongs at the end of the new list.
-      //
       // Note: we do not use TimeRange's equals() method here but compare the objects directly.
-      // If currentRange and lastExainedRange both point to the same time range object,
+      // If currentRange and lastExaminedTimeRange both point to the same time range object,
       // then lastExaminedTimeRange should not be added to the new list. However,
       // the result after merging currentRange with lastExaminedTimeRange could
       // potentially lead to a new time range object with the same
