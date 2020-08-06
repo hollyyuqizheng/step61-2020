@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /** Models an implementation of the TimeRangeGroup model using ArrayList. */
-public class ArrayListTimeRangeGroup extends AbstractListTimeRangeGroup implements TimeRangeGroup {
+public class ArrayListTimeRangeGroup extends AbstractListTimeRangeGroup
+    implements TimeRangeGroup, Iterable<TimeRange> {
 
   /**
    * Adds all the input time ranges to the list of all time ranges. Also sorts the list of all
