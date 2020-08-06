@@ -169,6 +169,7 @@ public final class ArrayListTimeRangeGroupTest {
     Assert.assertEquals(expected, actual);
   }
 
+  /** Testing for adding the exact same time range. */
   @Test
   public void testAddExactSameRange() {
     // Time Ranges:       |----------|
