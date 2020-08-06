@@ -24,8 +24,10 @@ public class SchedulerTestUtil {
 
   public static final Instant TIME_0830 = Instant.parse("2020-06-25T08:30:00Z");
   public static final Instant TIME_0900 = TIME_0830.plus(DURATION_30_MINUTES);
+  public static final Instant TIME_0910 = TIME_0900.plus(DURATION_10_MINUTES);
   public static final Instant TIME_0915 = TIME_0900.plus(DURATION_15_MINUTES);
   public static final Instant TIME_0920 = TIME_0900.plus(DURATION_20_MINUTES);
+  public static final Instant TIME_0925 = TIME_0915.plus(DURATION_10_MINUTES);
   public static final Instant TIME_0930 = TIME_0900.plus(DURATION_30_MINUTES);
   public static final Instant TIME_0950 = TIME_0930.plus(DURATION_20_MINUTES);
   public static final Instant TIME_1000 = TIME_0900.plus(DURATION_60_MINUTES);
@@ -33,9 +35,13 @@ public class SchedulerTestUtil {
   public static final Instant TIME_1030 = TIME_1000.plus(DURATION_30_MINUTES);
   public static final Instant TIME_1050 = TIME_1030.plus(DURATION_20_MINUTES);
   public static final Instant TIME_1100 = TIME_1000.plus(DURATION_60_MINUTES);
+  public static final Instant TIME_1115 = TIME_1100.plus(DURATION_15_MINUTES);
   public static final Instant TIME_1120 = TIME_1100.plus(DURATION_20_MINUTES);
   public static final Instant TIME_1130 = TIME_1030.plus(DURATION_60_MINUTES);
+  public static final Instant TIME_1145 = TIME_1100.plus(DURATION_45_MINUTES);
   public static final Instant TIME_1200 = TIME_1100.plus(DURATION_60_MINUTES);
+  public static final Instant TIME_1230 = TIME_1200.plus(DURATION_30_MINUTES);
+  public static final Instant TIME_1240 = TIME_1230.plus(DURATION_10_MINUTES);
   public static final Instant TIME_1300 = TIME_1200.plus(DURATION_60_MINUTES);
   public static final Instant TIME_1400 = TIME_1300.plus(DURATION_60_MINUTES);
   public static final Instant TIME_1500 = TIME_1400.plus(DURATION_60_MINUTES);

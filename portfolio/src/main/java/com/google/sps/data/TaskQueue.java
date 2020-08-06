@@ -14,6 +14,9 @@ public class TaskQueue {
   private static final Comparator<Task> sortByTaskDurationThenName =
       Comparator.comparing(Task::getDuration).thenComparing(Task::getName);
 
+  private static final Comparator<Task> sortByTaskPriorityThenDuration =
+      Comparator.comparing(Task::getPriority).thenComparing(Task::getDuration);
+
   public static final Comparator<Task> sortByTaskDurationDescendingThenPriorityThenName =
       Comparator.comparing(Task::getDuration)
           .reversed()
@@ -51,6 +54,8 @@ public class TaskQueue {
       case LONGEST_TASK_FIRST:
         return new PriorityQueue<Task>(
             DEFAULT_QUEUE_SIZE, sortByTaskDurationDescendingThenPriorityThenName);
+      case HIGHEST_PRIORITY_FIRST:
+        return new PriorityQueue<Task>(DEFAULT_QUEUE_SIZE, sortByTaskPriorityThenDuration);
       default:
         throw new IllegalArgumentException("SchedulingAlgorithmType not recognized");
     }
