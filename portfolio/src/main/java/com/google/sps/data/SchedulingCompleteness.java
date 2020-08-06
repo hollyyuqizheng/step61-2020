@@ -1,5 +1,9 @@
 package com.google.sps.data;
 
+/**
+ * This Enum includes the scenarios for a scheduled task's completeness. A scheduled task can either
+ * be completely scheduled, partially scheduled, or not be able to be scheduled at all.
+ */
 public enum SchedulingCompleteness {
   NOT_SCHEDULED(0),
   PARTIALLY_SCHEDULED(1),
